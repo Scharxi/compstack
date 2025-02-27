@@ -7,6 +7,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
 import {
   Select,
   SelectContent,
@@ -20,12 +24,14 @@ import {
   OWNERSHIPS, 
   STATUS, 
   INDICATORS,
+  MAINTENANCE_TASKS,
   type HardwareComponent,
   type Category,
   type Location,
   type Ownership,
   type Status,
-  type Indicator
+  type Indicator,
+  type MaintenanceProtocol
 } from "@/app/types/hardware";
 
 interface ComponentDetailsProps {
@@ -69,6 +75,8 @@ export default function ComponentDetailsPage({ params }: ComponentDetailsProps) 
   const [isEditing, setIsEditing] = useState(false);
   const [component, setComponent] = useState<HardwareComponent | null>(null);
   const [editedComponent, setEditedComponent] = useState<HardwareComponent | null>(null);
+  const [completedTasks, setCompletedTasks] = useState<string[]>([]);
+  const [maintenanceNotes, setMaintenanceNotes] = useState("");
   const { id } = use(params);
 
   useEffect(() => {
@@ -113,6 +121,43 @@ export default function ComponentDetailsPage({ params }: ComponentDetailsProps) 
           [key]: value
         }
       });
+    }
+  };
+
+  const handleMaintenanceTaskToggle = (taskId: string) => {
+    setCompletedTasks(prev => 
+      prev.includes(taskId) 
+        ? prev.filter(id => id !== taskId)
+        : [...prev, taskId]
+    );
+  };
+
+  const handleMaintenanceNotesChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setMaintenanceNotes(e.target.value);
+  };
+
+  const handleSaveMaintenance = () => {
+    if (component && completedTasks.length > 0) {
+      const newProtocol: MaintenanceProtocol = {
+        date: new Date(),
+        completedTasks,
+        notes: maintenanceNotes || undefined
+      };
+
+      const updatedComponent = {
+        ...component,
+        lastMaintenanceDate: new Date(),
+        maintenanceHistory: [
+          ...(component.maintenanceHistory || []),
+          newProtocol
+        ]
+      };
+
+      // TODO: Hier werden wir später die Änderungen im globalen State oder einer API speichern
+      setComponent(updatedComponent);
+      setEditedComponent(updatedComponent);
+      setCompletedTasks([]);
+      setMaintenanceNotes("");
     }
   };
   
@@ -394,6 +439,95 @@ export default function ComponentDetailsPage({ params }: ComponentDetailsProps) 
               ) : (
                 <p className="font-medium">{component.assignedTo}</p>
               )}
+            </CardContent>
+          </Card>
+        )}
+
+        <Card className="md:col-span-2">
+          <CardHeader>
+            <CardTitle>Wartung durchführen</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold">Wartungsaufgaben</h3>
+                  {MAINTENANCE_TASKS.map(task => (
+                    <div key={task.id} className="flex items-center space-x-4">
+                      <Switch
+                        id={task.id}
+                        checked={completedTasks.includes(task.id)}
+                        onCheckedChange={() => handleMaintenanceTaskToggle(task.id)}
+                      />
+                      <div className="grid gap-1.5">
+                        <Label htmlFor={task.id}>{task.label}</Label>
+                        <p className="text-sm text-muted-foreground">{task.description}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold">Anmerkungen</h3>
+                  <Textarea
+                    value={maintenanceNotes}
+                    onChange={handleMaintenanceNotesChange}
+                    placeholder="Zusätzliche Anmerkungen zur Wartung..."
+                    className="min-h-[200px]"
+                  />
+                </div>
+              </div>
+
+              <Separator />
+
+              <div className="flex justify-end">
+                <Button
+                  onClick={handleSaveMaintenance}
+                  disabled={completedTasks.length === 0}
+                >
+                  Wartung protokollieren
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {component.maintenanceHistory && component.maintenanceHistory.length > 0 && (
+          <Card className="md:col-span-2">
+            <CardHeader>
+              <CardTitle>Wartungshistorie</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-6">
+                {component.maintenanceHistory.map((protocol, index) => (
+                  <div key={index} className="border rounded-lg p-4">
+                    <div className="flex justify-between items-start mb-4">
+                      <h4 className="text-lg font-semibold">
+                        Wartung vom {protocol.date.toLocaleDateString('de-DE')}
+                      </h4>
+                    </div>
+                    <div className="space-y-4">
+                      <div>
+                        <h5 className="font-medium mb-2">Durchgeführte Aufgaben:</h5>
+                        <ul className="list-disc list-inside space-y-1">
+                          {protocol.completedTasks.map(taskId => {
+                            const task = MAINTENANCE_TASKS.find(t => t.id === taskId);
+                            return task ? (
+                              <li key={taskId}>{task.label}</li>
+                            ) : null;
+                          })}
+                        </ul>
+                      </div>
+                      {protocol.notes && (
+                        <div>
+                          <h5 className="font-medium mb-2">Anmerkungen:</h5>
+                          <p className="text-muted-foreground">{protocol.notes}</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
             </CardContent>
           </Card>
         )}

@@ -57,6 +57,7 @@ export interface HardwareComponent {
   lastMaintenanceDate?: Date;
   assignedTo?: string;
   specifications: Record<string, string>;
+  maintenanceHistory?: MaintenanceProtocol[];
 }
 
 export function generateComponentId(
@@ -91,4 +92,44 @@ export interface Activity {
   date: Date;
   user: string;
   details: string;
-} 
+}
+
+export interface MaintenanceTask {
+  id: string;
+  label: string;
+  description: string;
+}
+
+export interface MaintenanceProtocol {
+  date: Date;
+  completedTasks: string[];
+  notes?: string;
+}
+
+export const MAINTENANCE_TASKS: MaintenanceTask[] = [
+  {
+    id: "visual",
+    label: "Sichtprüfung",
+    description: "Überprüfung auf äußere Schäden und Verschmutzungen"
+  },
+  {
+    id: "cleaning",
+    label: "Reinigung",
+    description: "Gründliche Reinigung aller zugänglichen Komponenten"
+  },
+  {
+    id: "updates",
+    label: "Software Updates",
+    description: "Installation verfügbarer System- und Treiber-Updates"
+  },
+  {
+    id: "performance",
+    label: "Leistungstest",
+    description: "Überprüfung der System- und Komponentenleistung"
+  },
+  {
+    id: "security",
+    label: "Sicherheitsprüfung",
+    description: "Überprüfung der Sicherheitseinstellungen und Antivirensoftware"
+  }
+]; 
