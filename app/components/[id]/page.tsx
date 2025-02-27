@@ -65,11 +65,11 @@ const SPEC_LABELS: Record<string, string> = {
 
 // Temporäre Mock-Daten
 const mockComponent: HardwareComponent = {
-  id: "IT-HH-FI/AKLT/001",
+  id: "IT-ZIT-ZIT/AKLT/001",
   name: "ThinkPad X1 Carbon",
   category: "IT",
-  location: "HH",
-  ownership: "FI",
+  location: "ZIT",
+  ownership: "ZIT",
   status: "AK",
   indicator: "LT",
   runningNumber: "001",

@@ -6,17 +6,15 @@ export const CATEGORIES = {
 } as const;
 
 export const LOCATIONS = {
-  HH: "Hamburg",
-  BE: "Berlin",
-  MUC: "München",
-  FFM: "Frankfurt"
+  ZIT: "ZIT",
+  LSK: "Lieske",
+  SZ: "Schulungszentrum"
 } as const;
 
 export const OWNERSHIPS = {
-  FI: "Firma",
-  MA: "Mitarbeiter",
-  LE: "Leasing",
-  KU: "Kunde"
+  ZIT: "ZIT",
+  LSK: "Lieske",
+  SZ: "Schulungszentrum"
 } as const;
 
 export const STATUS = {

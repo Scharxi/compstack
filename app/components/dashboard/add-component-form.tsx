@@ -504,8 +504,8 @@ export function AddComponentForm({ lastRunningNumber, initialData, mode = 'creat
   const [open, setOpen] = useState(false);
   const [name, setName] = useState(initialData?.name || "");
   const [category, setCategory] = useState<Category>(initialData?.category || "IT");
-  const [location, setLocation] = useState<Location>(initialData?.location || "HH");
-  const [ownership, setOwnership] = useState<Ownership>(initialData?.ownership || "FI");
+  const [location, setLocation] = useState<Location>(initialData?.location || "ZIT");
+  const [ownership, setOwnership] = useState<Ownership>(initialData?.ownership || "ZIT");
   const [status, setStatus] = useState<Status>(initialData?.status || "AK");
   const [indicator, setIndicator] = useState<Indicator>(initialData?.indicator || "PC");
   const [serialNumber, setSerialNumber] = useState(initialData?.serialNumber || "");
@@ -571,8 +571,8 @@ export function AddComponentForm({ lastRunningNumber, initialData, mode = 'creat
   const resetForm = () => {
     setName("");
     setCategory("IT");
-    setLocation("HH");
-    setOwnership("FI");
+    setLocation("ZIT");
+    setOwnership("ZIT");
     setStatus("AK");
     setIndicator("PC");
     setSerialNumber("");
