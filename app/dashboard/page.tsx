@@ -8,20 +8,22 @@ import { type HardwareComponent } from "@/app/types/hardware";
 // Mock-Daten für initiale Komponenten
 const initialComponents: HardwareComponent[] = [
   {
-    id: "IT-HH-FI-AK-GR-001",
+    id: "IT-HH-FI/AKLT/001",
     name: "ThinkPad X1 Carbon",
     category: "IT",
     location: "HH",
     ownership: "FI",
     status: "AK",
-    indicator: "GR",
+    indicator: "LT",
     runningNumber: "001",
     serialNumber: "PF2MXCZ",
     purchaseDate: new Date("2024-01-15"),
     specifications: {
       cpu: "Intel i7-1165G7",
       ram: "16GB",
-      storage: "512GB SSD"
+      storage: "512GB SSD",
+      display: "14 Zoll, 1920x1080",
+      os: "Windows 11 Pro"
     }
   }
 ];

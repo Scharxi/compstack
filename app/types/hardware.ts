@@ -67,7 +67,7 @@ export function generateComponentId(
   indicator: Indicator,
   runningNumber: string
 ): string {
-  return `${category}-${location}-${ownership}-${status}-${indicator}-${runningNumber}`;
+  return `${category}-${location}-${ownership}/${status}${indicator}/${runningNumber}`;
 }
 
 export interface DashboardStats {
