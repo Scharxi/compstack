@@ -36,6 +36,9 @@ import { useComponentsStore } from "@/app/store/components";
 
 interface AddComponentFormProps {
   lastRunningNumber: number;
+  initialData?: HardwareComponent;
+  mode?: 'create' | 'edit';
+  onClose?: () => void;
 }
 
 interface Specifications {
@@ -224,19 +227,25 @@ const MultiSelectCheckboxes = ({
   );
 };
 
-export function AddComponentForm({ lastRunningNumber }: AddComponentFormProps) {
+export function AddComponentForm({ lastRunningNumber, initialData, mode = 'create', onClose }: AddComponentFormProps) {
   const [open, setOpen] = useState(false);
-  const [name, setName] = useState("");
-  const [category, setCategory] = useState<Category>("IT");
-  const [location, setLocation] = useState<Location>("HH");
-  const [ownership, setOwnership] = useState<Ownership>("FI");
-  const [status, setStatus] = useState<Status>("AK");
-  const [indicator, setIndicator] = useState<Indicator>("PC");
-  const [serialNumber, setSerialNumber] = useState("");
-  const [specifications, setSpecifications] = useState<Specifications>({});
-  const [selectedInterfaces, setSelectedInterfaces] = useState<Record<string, string[]>>({});
+  const [name, setName] = useState(initialData?.name || "");
+  const [category, setCategory] = useState<Category>(initialData?.category || "IT");
+  const [location, setLocation] = useState<Location>(initialData?.location || "HH");
+  const [ownership, setOwnership] = useState<Ownership>(initialData?.ownership || "FI");
+  const [status, setStatus] = useState<Status>(initialData?.status || "AK");
+  const [indicator, setIndicator] = useState<Indicator>(initialData?.indicator || "PC");
+  const [serialNumber, setSerialNumber] = useState(initialData?.serialNumber || "");
+  const [specifications, setSpecifications] = useState<Specifications>(initialData?.specifications || {});
+  const [selectedInterfaces, setSelectedInterfaces] = useState<Record<string, string[]>>(() => {
+    if (initialData?.specifications?.interfaces) {
+      return { interfaces: initialData.specifications.interfaces.split(", ") };
+    }
+    return { interfaces: [] };
+  });
 
   const addComponent = useComponentsStore((state) => state.addComponent);
+  const updateComponent = useComponentsStore((state) => state.updateComponent);
 
   const handleSpecificationChange = (key: string, value: string) => {
     setSpecifications(prev => ({
@@ -257,10 +266,10 @@ export function AddComponentForm({ lastRunningNumber }: AddComponentFormProps) {
   };
 
   const handleSubmit = () => {
-    const runningNumber = String(lastRunningNumber + 1).padStart(3, '0');
+    const runningNumber = initialData?.runningNumber || String(lastRunningNumber + 1).padStart(3, '0');
     
-    const newComponent: HardwareComponent = {
-      id: generateComponentId(category, location, ownership, status, indicator, runningNumber),
+    const componentData: HardwareComponent = {
+      id: initialData?.id || generateComponentId(category, location, ownership, status, indicator, runningNumber),
       name,
       category,
       location,
@@ -269,15 +278,21 @@ export function AddComponentForm({ lastRunningNumber }: AddComponentFormProps) {
       indicator,
       runningNumber,
       serialNumber,
-      purchaseDate: new Date(),
+      purchaseDate: initialData?.purchaseDate || new Date(),
       specifications: Object.fromEntries(
         Object.entries(specifications).filter(([, value]) => value !== "" && value !== "none")
       )
     };
 
-    addComponent(newComponent);
+    if (mode === 'edit' && initialData) {
+      updateComponent(componentData);
+    } else {
+      addComponent(componentData);
+    }
+
     setOpen(false);
     resetForm();
+    onClose?.();
   };
 
   const resetForm = () => {
@@ -366,13 +381,18 @@ export function AddComponentForm({ lastRunningNumber }: AddComponentFormProps) {
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={mode === 'edit' ? true : open} onOpenChange={(value) => {
+      setOpen(value);
+      if (!value) onClose?.();
+    }}>
       <DialogTrigger asChild>
-        <Button>Komponente hinzufügen</Button>
+        {mode === 'create' ? (
+          <Button>Komponente hinzufügen</Button>
+        ) : null}
       </DialogTrigger>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Neue Komponente hinzufügen</DialogTitle>
+          <DialogTitle>{mode === 'create' ? 'Neue Komponente hinzufügen' : 'Komponente bearbeiten'}</DialogTitle>
         </DialogHeader>
         <div className="grid gap-6 py-4">
           <div className="grid gap-2">

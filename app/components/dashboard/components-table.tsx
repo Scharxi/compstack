@@ -11,6 +11,9 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Pencil } from "lucide-react";
+import { AddComponentForm } from "./add-component-form";
 import { 
   CATEGORIES, 
   LOCATIONS, 
@@ -123,45 +126,72 @@ const columns: Column[] = [
 
 export function ComponentsTable({ components }: ComponentsTableProps) {
   const router = useRouter();
+  const [editingComponent, setEditingComponent] = React.useState<HardwareComponent | null>(null);
 
   const handleRowClick = (id: string) => {
-    // Encode the ID to handle slashes and special characters
     const encodedId = encodeURIComponent(id);
     router.push(`/components/${encodedId}`);
   };
 
+  const handleEditClick = (e: React.MouseEvent<HTMLButtonElement>, component: HardwareComponent) => {
+    e.stopPropagation();
+    setEditingComponent(component);
+  };
+
   return (
-    <div className="rounded-md border">
-      <Table>
-        <TableHeader>
-          <TableRow>
-            {columns.map((column) => (
-              <TableHead key={column.accessorKey}>
-                {column.header}
-              </TableHead>
-            ))}
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {components.map((component) => (
-            <TableRow 
-              key={component.id}
-              onClick={() => handleRowClick(component.id)}
-              className="cursor-pointer hover:bg-muted/50"
-            >
+    <>
+      <div className="rounded-md border">
+        <Table>
+          <TableHeader>
+            <TableRow>
               {columns.map((column) => (
-                <TableCell key={column.accessorKey}>
-                  {column.cell({ 
-                    row: { 
-                      getValue: (key) => component[key as keyof HardwareComponent] 
-                    } 
-                  })}
-                </TableCell>
+                <TableHead key={column.accessorKey}>
+                  {column.header}
+                </TableHead>
               ))}
+              <TableHead>Aktionen</TableHead>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </div>
+          </TableHeader>
+          <TableBody>
+            {components.map((component) => (
+              <TableRow 
+                key={component.id}
+                onClick={() => handleRowClick(component.id)}
+                className="cursor-pointer hover:bg-muted/50"
+              >
+                {columns.map((column) => (
+                  <TableCell key={column.accessorKey}>
+                    {column.cell({ 
+                      row: { 
+                        getValue: (key) => component[key as keyof HardwareComponent] 
+                      } 
+                    })}
+                  </TableCell>
+                ))}
+                <TableCell>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={(e) => handleEditClick(e, component)}
+                    className="h-8 w-8"
+                  >
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+
+      {editingComponent && (
+        <AddComponentForm
+          lastRunningNumber={0}
+          mode="edit"
+          initialData={editingComponent}
+          onClose={() => setEditingComponent(null)}
+        />
+      )}
+    </>
   );
 } 
