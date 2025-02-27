@@ -2,7 +2,7 @@
 
 import { ReactNode } from 'react';
 import Link from 'next/link';
-import { Package, List, Settings, Activity } from 'lucide-react';
+import { List } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 
 interface DashboardLayoutProps {
@@ -13,11 +13,8 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const pathname = usePathname();
 
   const navigation = [
-    { name: 'Overview', href: '/dashboard', icon: Package },
     { name: 'Components', href: '/dashboard/components', icon: List },
     { name: 'Listen', href: '/dashboard/lists', icon: List },
-    { name: 'Activities', href: '/dashboard/activities', icon: Activity },
-    { name: 'Settings', href: '/dashboard/settings', icon: Settings },
   ];
 
   return (

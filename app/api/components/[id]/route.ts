@@ -96,4 +96,36 @@ export async function PUT(
       { status: 500 }
     );
   }
+}
+
+export async function DELETE(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const resolvedParams = await params;
+    const decodedId = decodeURIComponent(resolvedParams.id);
+
+    // First delete all maintenance protocols for this component
+    await prisma.maintenanceProtocol.deleteMany({
+      where: {
+        componentId: decodedId
+      }
+    });
+
+    // Then delete the component
+    const component = await prisma.component.delete({
+      where: {
+        id: decodedId
+      }
+    });
+
+    return NextResponse.json(component);
+  } catch (error) {
+    console.error('Failed to delete component:', error);
+    return NextResponse.json(
+      { error: 'Failed to delete component' },
+      { status: 500 }
+    );
+  }
 } 

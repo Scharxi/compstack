@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { HardwareComponent } from '@/app/types/hardware';
-import { fetchComponents, createComponent, updateComponent as updateComponentApi } from '@/app/services/api';
+import { fetchComponents, createComponent, updateComponent as updateComponentApi, deleteComponent as deleteComponentApi } from '@/app/services/api';
 
 interface ComponentsState {
   components: HardwareComponent[];
@@ -10,6 +10,7 @@ interface ComponentsState {
   setComponents: (components: HardwareComponent[]) => void;
   addComponent: (component: Omit<HardwareComponent, 'id'>) => Promise<void>;
   updateComponent: (component: HardwareComponent) => Promise<void>;
+  deleteComponent: (id: string) => Promise<void>;
 }
 
 export const useComponentsStore = create<ComponentsState>((set) => ({
@@ -50,6 +51,18 @@ export const useComponentsStore = create<ComponentsState>((set) => ({
       }));
     } catch (error) {
       set({ error: 'Failed to update component', isLoading: false });
+    }
+  },
+  deleteComponent: async (id) => {
+    set({ isLoading: true, error: null });
+    try {
+      await deleteComponentApi(id);
+      set((state) => ({
+        components: state.components.filter((c) => c.id !== id),
+        isLoading: false
+      }));
+    } catch (error) {
+      set({ error: 'Failed to delete component', isLoading: false });
     }
   },
 })); 

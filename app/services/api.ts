@@ -44,4 +44,13 @@ export async function updateComponent(component: HardwareComponent & { newMainte
     throw new Error('Failed to update component');
   }
   return response.json();
+}
+
+export async function deleteComponent(id: string): Promise<void> {
+  const response = await fetch(`/api/components/${encodeURIComponent(id)}`, {
+    method: 'DELETE',
+  });
+  if (!response.ok) {
+    throw new Error('Failed to delete component');
+  }
 } 

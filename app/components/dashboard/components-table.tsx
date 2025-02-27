@@ -12,8 +12,9 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Pencil } from "lucide-react";
+import { Pencil, Trash2 } from "lucide-react";
 import { AddComponentForm } from "./add-component-form";
+import { DeleteComponentDialog } from "./delete-component-dialog";
 import { 
   CATEGORIES, 
   LOCATIONS, 
@@ -21,6 +22,7 @@ import {
   INDICATORS,
   type HardwareComponent,
 } from "@/app/types/hardware";
+import { useComponentsStore } from "@/app/store/components";
 
 // Hilfsfunktion für einheitliche Datumsformatierung
 function formatDate(date: Date | string | undefined): string {
@@ -126,6 +128,8 @@ const columns: Column[] = [
 export function ComponentsTable({ components }: ComponentsTableProps) {
   const router = useRouter();
   const [editingComponent, setEditingComponent] = React.useState<HardwareComponent | null>(null);
+  const [deletingComponent, setDeletingComponent] = React.useState<HardwareComponent | null>(null);
+  const deleteComponent = useComponentsStore((state) => state.deleteComponent);
 
   const handleRowClick = (id: string) => {
     const encodedId = encodeURIComponent(id);
@@ -135,6 +139,18 @@ export function ComponentsTable({ components }: ComponentsTableProps) {
   const handleEditClick = (e: React.MouseEvent<HTMLButtonElement>, component: HardwareComponent) => {
     e.stopPropagation();
     setEditingComponent(component);
+  };
+
+  const handleDeleteClick = (e: React.MouseEvent<HTMLButtonElement>, component: HardwareComponent) => {
+    e.stopPropagation();
+    setDeletingComponent(component);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (deletingComponent) {
+      await deleteComponent(deletingComponent.id);
+      setDeletingComponent(null);
+    }
   };
 
   return (
@@ -168,14 +184,24 @@ export function ComponentsTable({ components }: ComponentsTableProps) {
                   </TableCell>
                 ))}
                 <TableCell>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={(e) => handleEditClick(e, component)}
-                    className="h-8 w-8"
-                  >
-                    <Pencil className="h-4 w-4" />
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={(e) => handleEditClick(e, component)}
+                      className="h-8 w-8"
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={(e) => handleDeleteClick(e, component)}
+                      className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </TableCell>
               </TableRow>
             ))}
@@ -189,6 +215,15 @@ export function ComponentsTable({ components }: ComponentsTableProps) {
           mode="edit"
           initialData={editingComponent}
           onClose={() => setEditingComponent(null)}
+        />
+      )}
+
+      {deletingComponent && (
+        <DeleteComponentDialog
+          isOpen={true}
+          onClose={() => setDeletingComponent(null)}
+          onConfirm={handleConfirmDelete}
+          componentName={deletingComponent.name}
         />
       )}
     </>
