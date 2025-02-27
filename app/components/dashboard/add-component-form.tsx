@@ -764,11 +764,18 @@ export function AddComponentForm({ lastRunningNumber, initialData, mode = 'creat
           {renderSpecificationFields()}
 
           <div className="flex justify-end space-x-4">
-            <Button variant="outline" onClick={() => setOpen(false)}>
+            <Button 
+              variant="outline" 
+              onClick={() => {
+                setOpen(false);
+                resetForm();
+                onClose?.();
+              }}
+            >
               Abbrechen
             </Button>
             <Button onClick={handleSubmit} disabled={!name || !serialNumber}>
-              Hinzufügen
+              {mode === 'create' ? 'Hinzufügen' : 'Speichern'}
             </Button>
           </div>
         </div>
