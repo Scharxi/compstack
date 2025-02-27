@@ -64,15 +64,15 @@ const SPEC_FIELDS: Record<Indicator, SpecField[]> = {
   PC: [
     { 
       label: "CPU", 
-      key: "cpu",
-      hint: "Prozessor-Modell und Generation",
+      key: "CPU",
+      hint: "Processor model and generation",
       example: "Intel Core i7-12700K",
       type: "text"
     },
     { 
       label: "RAM", 
-      key: "ram",
-      hint: "Arbeitsspeicher-Größe",
+      key: "RAM",
+      hint: "RAM size",
       type: "select",
       options: [
         { label: "8 GB", value: "8 GB" },
@@ -82,9 +82,9 @@ const SPEC_FIELDS: Record<Indicator, SpecField[]> = {
       ]
     },
     { 
-      label: "Primärspeicher", 
+      label: "Primary Storage", 
       key: "primaryStorage",
-      hint: "Hauptspeicher des Systems",
+      hint: "Main system storage",
       type: "select",
       options: [
         { label: "256 GB NVMe SSD", value: "256 GB NVMe" },
@@ -100,12 +100,12 @@ const SPEC_FIELDS: Record<Indicator, SpecField[]> = {
       ]
     },
     { 
-      label: "Sekundärspeicher", 
+      label: "Secondary Storage", 
       key: "secondaryStorage",
-      hint: "Zusätzlicher Speicher (optional)",
+      hint: "Additional storage (optional)",
       type: "select",
       options: [
-        { label: "Keiner", value: "none" },
+        { label: "None", value: "none" },
         { label: "256 GB NVMe SSD", value: "256 GB NVMe" },
         { label: "512 GB NVMe SSD", value: "512 GB NVMe" },
         { label: "1 TB NVMe SSD", value: "1 TB NVMe" },
@@ -119,9 +119,9 @@ const SPEC_FIELDS: Record<Indicator, SpecField[]> = {
       ]
     },
     { 
-      label: "Betriebssystem", 
-      key: "os",
-      hint: "Name und Version des Betriebssystems",
+      label: "Operating System", 
+      key: "OS",
+      hint: "Operating system name and version",
       type: "select",
       options: [
         { label: "Windows 11 Pro", value: "Windows 11 Pro" },
@@ -135,9 +135,9 @@ const SPEC_FIELDS: Record<Indicator, SpecField[]> = {
       ]
     },
     { 
-      label: "Anschlüsse", 
+      label: "Interfaces", 
       key: "interfaces",
-      hint: "Verfügbare Anschlüsse (mehrere auswählbar)",
+      hint: "Available ports (multiple selection)",
       type: "multiselect",
       options: [
         { label: "USB 3.0", value: "USB 3.0" },
@@ -156,15 +156,15 @@ const SPEC_FIELDS: Record<Indicator, SpecField[]> = {
   LT: [
     { 
       label: "CPU", 
-      key: "cpu",
-      hint: "Prozessor-Modell und Generation",
+      key: "CPU",
+      hint: "Processor model and generation",
       example: "Intel Core i5-1240P",
       type: "text"
     },
     { 
       label: "RAM", 
-      key: "ram",
-      hint: "Arbeitsspeicher-Größe",
+      key: "RAM",
+      hint: "RAM size",
       type: "select",
       options: [
         { label: "8 GB", value: "8 GB" },
@@ -174,9 +174,9 @@ const SPEC_FIELDS: Record<Indicator, SpecField[]> = {
       ]
     },
     { 
-      label: "Speicher", 
+      label: "Storage", 
       key: "storage",
-      hint: "Hauptspeicher des Systems",
+      hint: "Main system storage",
       type: "select",
       options: [
         { label: "256 GB NVMe SSD", value: "256 GB NVMe" },
@@ -188,23 +188,23 @@ const SPEC_FIELDS: Record<Indicator, SpecField[]> = {
     { 
       label: "Display", 
       key: "display",
-      hint: "Bildschirmgröße und Auflösung",
+      hint: "Screen size and resolution",
       type: "select",
       options: [
-        { label: "13,3 Zoll (1920x1080)", value: "13,3 Zoll FHD" },
-        { label: "13,3 Zoll (2560x1600)", value: "13,3 Zoll 2.5K" },
-        { label: "14 Zoll (1920x1080)", value: "14 Zoll FHD" },
-        { label: "14 Zoll (2560x1600)", value: "14 Zoll 2.5K" },
-        { label: "15,6 Zoll (1920x1080)", value: "15,6 Zoll FHD" },
-        { label: "15,6 Zoll (2560x1600)", value: "15,6 Zoll 2.5K" },
-        { label: "16 Zoll (1920x1200)", value: "16 Zoll FHD+" },
-        { label: "16 Zoll (2560x1600)", value: "16 Zoll 2.5K" },
+        { label: "13.3 inch (1920x1080)", value: "13.3 inch FHD" },
+        { label: "13.3 inch (2560x1600)", value: "13.3 inch 2.5K" },
+        { label: "14 inch (1920x1080)", value: "14 inch FHD" },
+        { label: "14 inch (2560x1600)", value: "14 inch 2.5K" },
+        { label: "15.6 inch (1920x1080)", value: "15.6 inch FHD" },
+        { label: "15.6 inch (2560x1600)", value: "15.6 inch 2.5K" },
+        { label: "16 inch (1920x1200)", value: "16 inch FHD+" },
+        { label: "16 inch (2560x1600)", value: "16 inch 2.5K" },
       ]
     },
     { 
-      label: "Betriebssystem", 
-      key: "os",
-      hint: "Name und Version des Betriebssystems",
+      label: "Operating System", 
+      key: "OS",
+      hint: "Operating system name and version",
       type: "select",
       options: [
         { label: "Windows 11 Pro", value: "Windows 11 Pro" },
@@ -218,9 +218,9 @@ const SPEC_FIELDS: Record<Indicator, SpecField[]> = {
       ]
     },
     { 
-      label: "Anschlüsse", 
+      label: "Interfaces", 
       key: "interfaces",
-      hint: "Verfügbare Anschlüsse (mehrere auswählbar)",
+      hint: "Available ports (multiple selection)",
       type: "multiselect",
       options: [
         { label: "USB 3.0", value: "USB 3.0" },
@@ -237,21 +237,21 @@ const SPEC_FIELDS: Record<Indicator, SpecField[]> = {
   ],
   MON: [
     { 
-      label: "Bildschirmgröße", 
+      label: "Screen Size", 
       key: "size",
-      hint: "Diagonale des Bildschirms",
+      hint: "Screen diagonal",
       type: "select",
       options: [
-        { label: "24 Zoll", value: "24 Zoll" },
-        { label: "27 Zoll", value: "27 Zoll" },
-        { label: "32 Zoll", value: "32 Zoll" },
-        { label: "34 Zoll", value: "34 Zoll" },
+        { label: "24 inch", value: "24 inch" },
+        { label: "27 inch", value: "27 inch" },
+        { label: "32 inch", value: "32 inch" },
+        { label: "34 inch", value: "34 inch" },
       ]
     },
     {
-      label: "Auflösung",
+      label: "Resolution",
       key: "resolution",
-      hint: "Bildschirmauflösung",
+      hint: "Screen resolution",
       type: "select",
       options: [
         { label: "1920x1080 (FHD)", value: "1920x1080" },
@@ -261,9 +261,9 @@ const SPEC_FIELDS: Record<Indicator, SpecField[]> = {
       ]
     },
     {
-      label: "Panel-Typ",
+      label: "Panel Type",
       key: "panel",
-      hint: "Display-Technologie",
+      hint: "Display technology",
       type: "select",
       options: [
         { label: "IPS", value: "IPS" },
@@ -273,9 +273,9 @@ const SPEC_FIELDS: Record<Indicator, SpecField[]> = {
       ]
     },
     { 
-      label: "Anschlüsse", 
+      label: "Interfaces", 
       key: "interfaces",
-      hint: "Verfügbare Anschlüsse (mehrere auswählbar)",
+      hint: "Available ports (multiple selection)",
       type: "multiselect",
       options: [
         { label: "HDMI", value: "HDMI" },
@@ -291,7 +291,7 @@ const SPEC_FIELDS: Record<Indicator, SpecField[]> = {
     { 
       label: "Chip", 
       key: "chip",
-      hint: "Modell des Grafikchips",
+      hint: "Graphics chip model",
       type: "select",
       options: [
         { label: "NVIDIA RTX 4090", value: "RTX 4090" },
@@ -307,9 +307,9 @@ const SPEC_FIELDS: Record<Indicator, SpecField[]> = {
       ]
     },
     {
-      label: "Speicher",
+      label: "Memory",
       key: "memory",
-      hint: "Grafikspeicher",
+      hint: "Graphics memory",
       type: "select",
       options: [
         { label: "8 GB GDDR6", value: "8 GB GDDR6" },
@@ -319,9 +319,9 @@ const SPEC_FIELDS: Record<Indicator, SpecField[]> = {
       ]
     },
     { 
-      label: "Anschlüsse", 
+      label: "Interfaces", 
       key: "interfaces",
-      hint: "Verfügbare Anschlüsse (mehrere auswählbar)",
+      hint: "Available ports (multiple selection)",
       type: "multiselect",
       options: [
         { label: "HDMI 2.1", value: "HDMI 2.1" },
@@ -332,9 +332,9 @@ const SPEC_FIELDS: Record<Indicator, SpecField[]> = {
   ],
   CPU: [
     { 
-      label: "Modell", 
+      label: "Model", 
       key: "model",
-      hint: "Vollständige Modellbezeichnung",
+      hint: "Complete model name",
       type: "select",
       options: [
         { label: "Intel Core i9-13900K", value: "i9-13900K" },
@@ -346,9 +346,9 @@ const SPEC_FIELDS: Record<Indicator, SpecField[]> = {
       ]
     },
     {
-      label: "Sockel",
+      label: "Socket",
       key: "socket",
-      hint: "CPU-Sockel",
+      hint: "CPU socket",
       type: "select",
       options: [
         { label: "Intel LGA 1700", value: "LGA 1700" },
@@ -359,9 +359,9 @@ const SPEC_FIELDS: Record<Indicator, SpecField[]> = {
   ],
   RAM: [
     { 
-      label: "Typ", 
+      label: "Type", 
       key: "type",
-      hint: "RAM-Technologie und Generation",
+      hint: "RAM technology and generation",
       type: "select",
       options: [
         { label: "DDR5-6000", value: "DDR5-6000" },
@@ -371,9 +371,9 @@ const SPEC_FIELDS: Record<Indicator, SpecField[]> = {
       ]
     },
     {
-      label: "Kapazität",
+      label: "Capacity",
       key: "capacity",
-      hint: "Speicherkapazität pro Modul",
+      hint: "Memory capacity per module",
       type: "select",
       options: [
         { label: "8 GB", value: "8 GB" },
@@ -384,9 +384,9 @@ const SPEC_FIELDS: Record<Indicator, SpecField[]> = {
   ],
   SSD: [
     { 
-      label: "Typ", 
+      label: "Type", 
       key: "type",
-      hint: "SSD-Technologie",
+      hint: "SSD technology",
       type: "select",
       options: [
         { label: "NVMe PCIe 4.0", value: "NVMe PCIe 4.0" },
@@ -395,9 +395,9 @@ const SPEC_FIELDS: Record<Indicator, SpecField[]> = {
       ]
     },
     { 
-      label: "Kapazität", 
+      label: "Capacity", 
       key: "capacity",
-      hint: "Speicherkapazität",
+      hint: "Storage capacity",
       type: "select",
       options: [
         { label: "256 GB", value: "256 GB" },
@@ -408,9 +408,9 @@ const SPEC_FIELDS: Record<Indicator, SpecField[]> = {
       ]
     },
     { 
-      label: "Anschluss", 
+      label: "Interface", 
       key: "interface",
-      hint: "Physischer Anschluss",
+      hint: "Physical connection",
       type: "select",
       options: [
         { label: "M.2", value: "M.2" },
@@ -420,9 +420,9 @@ const SPEC_FIELDS: Record<Indicator, SpecField[]> = {
   ],
   HDD: [
     { 
-      label: "Kapazität", 
+      label: "Capacity", 
       key: "capacity",
-      hint: "Speicherkapazität",
+      hint: "Storage capacity",
       type: "select",
       options: [
         { label: "1 TB", value: "1 TB" },
@@ -433,9 +433,9 @@ const SPEC_FIELDS: Record<Indicator, SpecField[]> = {
       ]
     },
     {
-      label: "Drehzahl",
+      label: "RPM",
       key: "rpm",
-      hint: "Umdrehungen pro Minute",
+      hint: "Revolutions per minute",
       type: "select",
       options: [
         { label: "5400 RPM", value: "5400 RPM" },
@@ -443,9 +443,9 @@ const SPEC_FIELDS: Record<Indicator, SpecField[]> = {
       ]
     },
     { 
-      label: "Anschluss", 
+      label: "Interface", 
       key: "interface",
-      hint: "Physischer Anschluss",
+      hint: "Physical connection",
       type: "select",
       options: [
         { label: "SATA III", value: "SATA III" },
@@ -589,11 +589,11 @@ export function AddComponentForm({ lastRunningNumber, initialData, mode = 'creat
         <div className="space-y-6">
           <div className="space-y-2">
             <div className="flex items-center gap-2">
-              <h3 className="text-lg font-semibold">Spezifikationen für {INDICATORS[indicator]}</h3>
+              <h3 className="text-lg font-semibold">Specifications for {INDICATORS[indicator]}</h3>
               <span className="text-sm text-muted-foreground">(Optional)</span>
             </div>
             <p className="text-sm text-muted-foreground">
-              Geben Sie die technischen Details für {INDICATORS[indicator]} ein. Alle Felder sind optional.
+              Enter the technical details for {INDICATORS[indicator]}. All fields are optional.
             </p>
           </div>
 
@@ -626,7 +626,7 @@ export function AddComponentForm({ lastRunningNumber, initialData, mode = 'creat
                     onValueChange={(value) => handleSpecificationChange(key, value)}
                   >
                     <SelectTrigger className="bg-white/50">
-                      <SelectValue placeholder={`${label} auswählen...`} />
+                      <SelectValue placeholder={`${label} select...`} />
                     </SelectTrigger>
                     <SelectContent>
                       {options.map((option) => (
@@ -641,7 +641,7 @@ export function AddComponentForm({ lastRunningNumber, initialData, mode = 'creat
                     id={key}
                     value={specifications[key] || ""}
                     onChange={(e) => handleSpecificationChange(key, e.target.value)}
-                    placeholder={example || `${label} eingeben...`}
+                    placeholder={example || `${label} enter...`}
                     className="bg-white/50"
                   />
                 )}
@@ -660,12 +660,12 @@ export function AddComponentForm({ lastRunningNumber, initialData, mode = 'creat
     }}>
       <DialogTrigger asChild>
         {mode === 'create' ? (
-          <Button>Komponente hinzufügen</Button>
+          <Button>Add Component</Button>
         ) : null}
       </DialogTrigger>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>{mode === 'create' ? 'Neue Komponente hinzufügen' : 'Komponente bearbeiten'}</DialogTitle>
+          <DialogTitle>{mode === 'create' ? 'Add New Component' : 'Edit Component'}</DialogTitle>
         </DialogHeader>
         <div className="grid gap-6 py-4">
           <div className="grid gap-2">
@@ -674,12 +674,12 @@ export function AddComponentForm({ lastRunningNumber, initialData, mode = 'creat
               id="name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="z.B. ThinkPad X1 Carbon"
+              placeholder="e.g. ThinkPad X1 Carbon"
             />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="grid gap-2">
-              <label htmlFor="category">Kategorie</label>
+              <label htmlFor="category">Category</label>
               <Select value={category} onValueChange={(value: Category) => setCategory(value)}>
                 <SelectTrigger>
                   <SelectValue />
@@ -692,7 +692,7 @@ export function AddComponentForm({ lastRunningNumber, initialData, mode = 'creat
               </Select>
             </div>
             <div className="grid gap-2">
-              <label htmlFor="indicator">Typ</label>
+              <label htmlFor="indicator">Type</label>
               <Select value={indicator} onValueChange={(value: Indicator) => {
                 setIndicator(value);
                 setSpecifications({});
@@ -710,7 +710,7 @@ export function AddComponentForm({ lastRunningNumber, initialData, mode = 'creat
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="grid gap-2">
-              <label htmlFor="location">Standort</label>
+              <label htmlFor="location">Location</label>
               <Select value={location} onValueChange={(value: Location) => setLocation(value)}>
                 <SelectTrigger>
                   <SelectValue />
@@ -723,7 +723,7 @@ export function AddComponentForm({ lastRunningNumber, initialData, mode = 'creat
               </Select>
             </div>
             <div className="grid gap-2">
-              <label htmlFor="ownership">Besitzverhältnis</label>
+              <label htmlFor="ownership">Ownership</label>
               <Select value={ownership} onValueChange={(value: Ownership) => setOwnership(value)}>
                 <SelectTrigger>
                   <SelectValue />
@@ -751,12 +751,12 @@ export function AddComponentForm({ lastRunningNumber, initialData, mode = 'creat
               </Select>
             </div>
             <div className="grid gap-2">
-              <label htmlFor="serialNumber">Seriennummer</label>
+              <label htmlFor="serialNumber">Serial Number</label>
               <Input
                 id="serialNumber"
                 value={serialNumber}
                 onChange={(e) => setSerialNumber(e.target.value)}
-                placeholder="z.B. XYZ123"
+                placeholder="e.g. XYZ123"
               />
             </div>
           </div>
@@ -772,10 +772,10 @@ export function AddComponentForm({ lastRunningNumber, initialData, mode = 'creat
                 onClose?.();
               }}
             >
-              Abbrechen
+              Cancel
             </Button>
             <Button onClick={handleSubmit} disabled={!name || !serialNumber}>
-              {mode === 'create' ? 'Hinzufügen' : 'Speichern'}
+              {mode === 'create' ? 'Add' : 'Save'}
             </Button>
           </div>
         </div>

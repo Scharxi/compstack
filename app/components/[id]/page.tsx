@@ -44,10 +44,23 @@ interface ComponentDetailsProps {
 const SPEC_LABELS: Record<string, string> = {
   CPU: "CPU",
   RAM: "RAM",
-  Storage: "Speicher",
+  Storage: "Storage",
   Display: "Display",
-  OS: "Betriebssystem",
-  interfaces: "Anschlüsse"
+  OS: "Operating System",
+  interfaces: "Interfaces",
+  primaryStorage: "Primary Storage",
+  secondaryStorage: "Secondary Storage",
+  size: "Screen Size",
+  resolution: "Resolution",
+  panel: "Panel Type",
+  chip: "Chip",
+  memory: "Memory",
+  model: "Model",
+  socket: "Socket",
+  type: "Type",
+  capacity: "Capacity",
+  interface: "Interface",
+  rpm: "RPM"
 };
 
 // Temporäre Mock-Daten
@@ -66,7 +79,7 @@ const mockComponent: HardwareComponent = {
     CPU: "Intel i7-1165G7",
     RAM: "16GB",
     Storage: "512GB SSD",
-    Display: "14 Zoll, 1920x1080",
+    Display: "14 inch, 1920x1080",
     OS: "Windows 11 Pro"
   }
 };
