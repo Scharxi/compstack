@@ -15,6 +15,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const navigation = [
     { name: 'Overview', href: '/dashboard', icon: Package },
     { name: 'Components', href: '/dashboard/components', icon: List },
+    { name: 'Listen', href: '/dashboard/lists', icon: List },
     { name: 'Activities', href: '/dashboard/activities', icon: Activity },
     { name: 'Settings', href: '/dashboard/settings', icon: Settings },
   ];
