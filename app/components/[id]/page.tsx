@@ -403,20 +403,6 @@ export default function ComponentDetailsPage({ params }: ComponentDetailsProps) 
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Zeitliche Informationen</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {component.lastMaintenanceDate && (
-              <div>
-                <p className="text-sm text-muted-foreground">Letzte Wartung</p>
-                {renderValue('lastMaintenanceDate', isEditing)}
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
         {component.assignedTo && (
           <Card>
             <CardHeader>
