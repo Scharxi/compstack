@@ -5,7 +5,7 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Hardware Inventory System",
+  title: "CompStack",
   description: "Manage and track your hardware components efficiently",
 };
 

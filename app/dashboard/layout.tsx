@@ -28,7 +28,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           <div className="flex flex-col flex-grow border-r border-[hsl(var(--border))] bg-[hsl(var(--background))] px-4 py-6">
             <div className="flex items-center h-16 flex-shrink-0 px-4">
               <h1 className="text-xl font-semibold text-[hsl(var(--foreground))]">
-                Inventory System
+                CompStack
               </h1>
             </div>
             <div className="mt-8 flex-1 flex flex-col">
