@@ -24,15 +24,10 @@ import {
   STATUS, 
   INDICATORS,
   MAINTENANCE_TASKS,
-  type HardwareComponent,
-  type Category,
-  type Location,
-  type Ownership,
-  type Status,
-  type Indicator,
-  type MaintenanceProtocol
+  type HardwareComponent
 } from "@/app/types/hardware";
 import { useComponentsStore } from "@/app/store/components";
+import { fetchComponent } from '@/app/services/api';
 
 interface ComponentDetailsProps {
   params: Promise<{
@@ -63,50 +58,38 @@ const SPEC_LABELS: Record<string, string> = {
   rpm: "RPM"
 };
 
-// Temporäre Mock-Daten
-const mockComponent: HardwareComponent = {
-  id: "IT-ZIT-ZIT/AKLT/001",
-  name: "ThinkPad X1 Carbon",
-  category: "IT",
-  location: "ZIT",
-  ownership: "ZIT",
-  status: "AK",
-  indicator: "LT",
-  runningNumber: "001",
-  serialNumber: "PF2MXCZ",
-  purchaseDate: new Date("2024-01-15"),
-  specifications: {
-    CPU: "Intel i7-1165G7",
-    RAM: "16GB",
-    Storage: "512GB SSD",
-    Display: "14 inch, 1920x1080",
-    OS: "Windows 11 Pro"
-  }
-};
-
 export default function ComponentDetailsPage({ params }: ComponentDetailsProps) {
   const router = useRouter();
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [completedTasks, setCompletedTasks] = useState<string[]>([]);
   const [maintenanceNotes, setMaintenanceNotes] = useState("");
-  const { id } = use(params);
+  const resolvedParams = use(params);
+  const { id } = resolvedParams;
 
-  const components = useComponentsStore((state) => state.components);
   const updateComponent = useComponentsStore((state) => state.updateComponent);
   const [component, setComponent] = useState<HardwareComponent | null>(null);
   const [editedComponent, setEditedComponent] = useState<HardwareComponent | null>(null);
 
   useEffect(() => {
-    // Decode the ID from the URL
-    const decodedId = decodeURIComponent(id);
-    
-    // Find the component in the store
-    const foundComponent = components.find(c => c.id === decodedId);
-    if (foundComponent) {
-      setComponent(foundComponent);
-      setEditedComponent(foundComponent);
+    async function loadComponent() {
+      try {
+        setIsLoading(true);
+        setError(null);
+        const data = await fetchComponent(id);
+        setComponent(data);
+        setEditedComponent(data);
+      } catch (err) {
+        setError('Failed to load component');
+        console.error('Error loading component:', err);
+      } finally {
+        setIsLoading(false);
+      }
     }
-  }, [id, components]);
+
+    loadComponent();
+  }, [id]);
 
   const handleSave = () => {
     if (editedComponent) {
@@ -129,18 +112,6 @@ export default function ComponentDetailsPage({ params }: ComponentDetailsProps) 
     }
   };
 
-  const handleSpecificationChange = (key: string, value: string) => {
-    if (editedComponent) {
-      setEditedComponent({
-        ...editedComponent,
-        specifications: {
-          ...editedComponent.specifications,
-          [key]: value
-        }
-      });
-    }
-  };
-
   const handleMaintenanceTaskToggle = (taskId: string) => {
     setCompletedTasks(prev => 
       prev.includes(taskId) 
@@ -155,7 +126,7 @@ export default function ComponentDetailsPage({ params }: ComponentDetailsProps) 
 
   const handleSaveMaintenance = () => {
     if (component && completedTasks.length > 0) {
-      const newProtocol: MaintenanceProtocol = {
+      const newProtocol = {
         date: new Date(),
         completedTasks,
         notes: maintenanceNotes || undefined
@@ -178,19 +149,24 @@ export default function ComponentDetailsPage({ params }: ComponentDetailsProps) 
     }
   };
   
-  if (!component || !editedComponent) {
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <p>Komponente nicht gefunden</p>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  if (error || !component || !editedComponent) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <p className="text-destructive">Component not found</p>
       </div>
     );
   }
 
   const renderValue = (field: keyof typeof component, isEditing: boolean) => {
     if (!isEditing) {
-      if (field === 'purchaseDate' || field === 'lastMaintenanceDate') {
-        return <p className="font-medium">{(component[field] as Date)?.toLocaleDateString('de-DE')}</p>;
-      }
       return <p className="font-medium">{String(component[field])}</p>;
     }
 
@@ -436,10 +412,6 @@ export default function ComponentDetailsPage({ params }: ComponentDetailsProps) 
             <CardTitle>Zeitliche Informationen</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div>
-              <p className="text-sm text-muted-foreground">Kaufdatum</p>
-              {renderValue('purchaseDate', isEditing)}
-            </div>
             {component.lastMaintenanceDate && (
               <div>
                 <p className="text-sm text-muted-foreground">Letzte Wartung</p>

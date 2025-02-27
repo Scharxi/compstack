@@ -551,7 +551,6 @@ export function AddComponentForm({ lastRunningNumber, initialData, mode = 'creat
       indicator,
       runningNumber,
       serialNumber,
-      purchaseDate: initialData?.purchaseDate || new Date(),
       specifications: Object.fromEntries(
         Object.entries(specifications).filter(([, value]) => value !== "" && value !== "none")
       )

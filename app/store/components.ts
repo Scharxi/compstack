@@ -1,47 +1,55 @@
 import { create } from 'zustand';
-import { type HardwareComponent } from '@/app/types/hardware';
+import { HardwareComponent } from '@/app/types/hardware';
+import { fetchComponents, createComponent, updateComponent as updateComponentApi } from '@/app/services/api';
 
 interface ComponentsState {
   components: HardwareComponent[];
+  isLoading: boolean;
+  error: string | null;
+  fetchComponents: () => Promise<void>;
   setComponents: (components: HardwareComponent[]) => void;
-  updateComponent: (updatedComponent: HardwareComponent) => void;
-  addComponent: (newComponent: HardwareComponent) => void;
+  addComponent: (component: Omit<HardwareComponent, 'id'>) => Promise<void>;
+  updateComponent: (component: HardwareComponent) => Promise<void>;
 }
 
-// Initial mock data
-const initialComponents: HardwareComponent[] = [
-  {
-    id: "IT-HH-FI/AKLT/001",
-    name: "ThinkPad X1 Carbon",
-    category: "IT",
-    location: "HH",
-    ownership: "FI",
-    status: "AK",
-    indicator: "LT",
-    runningNumber: "001",
-    serialNumber: "PF2MXCZ",
-    purchaseDate: new Date("2024-01-15"),
-    specifications: {
-      CPU: "Intel i7-1165G7",
-      RAM: "16GB",
-      Storage: "512GB SSD",
-      Display: "14 Zoll, 1920x1080",
-      OS: "Windows 11 Pro"
-    }
-  }
-];
-
 export const useComponentsStore = create<ComponentsState>((set) => ({
-  components: initialComponents,
+  components: [],
+  isLoading: false,
+  error: null,
+  fetchComponents: async () => {
+    set({ isLoading: true, error: null });
+    try {
+      const components = await fetchComponents();
+      set({ components, isLoading: false });
+    } catch (error) {
+      set({ error: 'Failed to fetch components', isLoading: false });
+    }
+  },
   setComponents: (components) => set({ components }),
-  updateComponent: (updatedComponent) => 
-    set((state) => ({
-      components: state.components.map((component) =>
-        component.id === updatedComponent.id ? updatedComponent : component
-      ),
-    })),
-  addComponent: (newComponent) =>
-    set((state) => ({
-      components: [...state.components, newComponent],
-    })),
+  addComponent: async (newComponent) => {
+    set({ isLoading: true, error: null });
+    try {
+      const component = await createComponent(newComponent);
+      set((state) => ({
+        components: [...state.components, component],
+        isLoading: false
+      }));
+    } catch (error) {
+      set({ error: 'Failed to add component', isLoading: false });
+    }
+  },
+  updateComponent: async (updatedComponent) => {
+    set({ isLoading: true, error: null });
+    try {
+      const component = await updateComponentApi(updatedComponent);
+      set((state) => ({
+        components: state.components.map((c) =>
+          c.id === component.id ? component : c
+        ),
+        isLoading: false
+      }));
+    } catch (error) {
+      set({ error: 'Failed to update component', isLoading: false });
+    }
+  },
 })); 

@@ -51,7 +51,6 @@ export interface HardwareComponent {
   indicator: Indicator;
   runningNumber: string;
   serialNumber: string;
-  purchaseDate: Date;
   lastMaintenanceDate?: Date;
   assignedTo?: string;
   specifications: Record<string, string>;
