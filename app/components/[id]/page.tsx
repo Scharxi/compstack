@@ -34,6 +34,15 @@ interface ComponentDetailsProps {
   }>;
 }
 
+// Spezifikations-Labels
+const SPEC_LABELS: Record<string, string> = {
+  CPU: "CPU",
+  RAM: "RAM",
+  Storage: "Speicher",
+  Display: "Display",
+  OS: "Betriebssystem"
+};
+
 // Temporäre Mock-Daten
 const mockComponent: HardwareComponent = {
   id: "IT-HH-FI/AKLT/001",
@@ -47,11 +56,11 @@ const mockComponent: HardwareComponent = {
   serialNumber: "PF2MXCZ",
   purchaseDate: new Date("2024-01-15"),
   specifications: {
-    cpu: "Intel i7-1165G7",
-    ram: "16GB",
-    storage: "512GB SSD",
-    display: "14 Zoll, 1920x1080",
-    os: "Windows 11 Pro"
+    CPU: "Intel i7-1165G7",
+    RAM: "16GB",
+    Storage: "512GB SSD",
+    Display: "14 Zoll, 1920x1080",
+    OS: "Windows 11 Pro"
   }
 };
 
@@ -335,7 +344,9 @@ export default function ComponentDetailsPage({ params }: ComponentDetailsProps) 
             <div className="grid grid-cols-2 gap-4">
               {Object.entries(component.specifications).map(([key, value]) => (
                 <div key={key}>
-                  <p className="text-sm text-muted-foreground">{key}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {SPEC_LABELS[key] || key}
+                  </p>
                   {isEditing ? (
                     <Input
                       value={editedComponent.specifications[key] || ''}
