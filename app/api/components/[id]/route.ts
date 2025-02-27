@@ -9,7 +9,7 @@ export async function GET(
     const resolvedParams = await params;
     const component = await prisma.component.findUnique({
       where: {
-        id: resolvedParams.id,
+        id: decodeURIComponent(resolvedParams.id),
       },
       include: {
         maintenanceHistory: true,
@@ -43,7 +43,7 @@ export async function PUT(
     
     // Handle maintenance protocol if present
     if (data.newMaintenanceProtocol) {
-      const { newMaintenanceProtocol, ...componentData } = data;
+      const { newMaintenanceProtocol, maintenanceHistory, ...componentData } = data;
       
       // Create the maintenance protocol
       await prisma.maintenanceProtocol.create({
@@ -74,13 +74,14 @@ export async function PUT(
     }
 
     // Regular component update without maintenance
+    const { maintenanceHistory, ...updateData } = data;
     const component = await prisma.component.update({
       where: {
         id: resolvedParams.id,
       },
       data: {
-        ...data,
-        specifications: data.specifications || {},
+        ...updateData,
+        specifications: updateData.specifications || {},
       },
       include: {
         maintenanceHistory: true,

@@ -9,7 +9,8 @@ export async function fetchComponents(): Promise<HardwareComponent[]> {
 }
 
 export async function fetchComponent(id: string): Promise<HardwareComponent> {
-  const response = await fetch(`/api/components/${id}`);
+  const encodedId = encodeURIComponent(id);
+  const response = await fetch(`/api/components/${encodedId}`);
   if (!response.ok) {
     throw new Error('Failed to fetch component');
   }

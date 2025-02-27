@@ -20,11 +20,14 @@ import {
   STATUS, 
   INDICATORS,
   type HardwareComponent,
-  type Category,
-  type Location,
-  type Status,
-  type Indicator
 } from "@/app/types/hardware";
+
+// Hilfsfunktion für einheitliche Datumsformatierung
+function formatDate(date: Date | string | undefined): string {
+  if (!date) return 'Keine Wartung';
+  const d = new Date(date);
+  return `${d.getDate().toString().padStart(2, '0')}.${(d.getMonth() + 1).toString().padStart(2, '0')}.${d.getFullYear()}`;
+}
 
 interface ComponentsTableProps {
   components: HardwareComponent[];
@@ -35,12 +38,12 @@ interface RowData {
 }
 
 interface Column {
-  accessorKey: keyof HardwareComponent;
+  accessorKey: string;
   header: string;
-  cell: (props: { row: RowData }) => JSX.Element;
+  cell: ({ row }: { row: RowData }) => React.ReactNode;
 }
 
-const getStatusVariant = (status: Status) => {
+const getStatusVariant = (status: string) => {
   switch (status) {
     case 'AK':
       return 'success';
@@ -74,8 +77,8 @@ const columns: Column[] = [
     accessorKey: "category",
     header: "Kategorie",
     cell: ({ row }) => {
-      const category = row.getValue("category") as Category;
-      const indicator = row.getValue("indicator") as Indicator;
+      const category = row.getValue("category") as keyof typeof CATEGORIES;
+      const indicator = row.getValue("indicator") as keyof typeof INDICATORS;
       return (
         <div>
           <div>{CATEGORIES[category]}</div>
@@ -90,7 +93,7 @@ const columns: Column[] = [
     accessorKey: "location",
     header: "Standort",
     cell: ({ row }) => {
-      const location = row.getValue("location") as Location;
+      const location = row.getValue("location") as keyof typeof LOCATIONS;
       return LOCATIONS[location];
     },
   },
@@ -98,7 +101,7 @@ const columns: Column[] = [
     accessorKey: "status",
     header: "Status",
     cell: ({ row }) => {
-      const status = row.getValue("status") as Status;
+      const status = row.getValue("status") as keyof typeof STATUS;
       return (
         <Badge variant={getStatusVariant(status)}>
           {STATUS[status]}
@@ -110,14 +113,10 @@ const columns: Column[] = [
     accessorKey: "lastMaintenanceDate",
     header: "Letzte Wartung",
     cell: ({ row }) => {
-      const date = row.getValue("lastMaintenanceDate") as Date | undefined;
-      return date ? (
-        <div className="font-medium">
-          {date.toLocaleDateString('de-DE')}
-        </div>
-      ) : (
-        <div className="text-muted-foreground">
-          Keine Wartung
+      const date = row.getValue("lastMaintenanceDate");
+      return (
+        <div className={date ? "font-medium" : "text-muted-foreground"}>
+          {formatDate(date as Date | undefined)}
         </div>
       );
     },
