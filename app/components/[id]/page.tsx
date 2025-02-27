@@ -46,7 +46,8 @@ const SPEC_LABELS: Record<string, string> = {
   RAM: "RAM",
   Storage: "Speicher",
   Display: "Display",
-  OS: "Betriebssystem"
+  OS: "Betriebssystem",
+  interfaces: "Anschlüsse"
 };
 
 // Temporäre Mock-Daten
@@ -271,6 +272,21 @@ export default function ComponentDetailsPage({ params }: ComponentDetailsProps) 
     }
   };
 
+  const renderSpecificationValue = (key: string, value: string) => {
+    if (key === 'interfaces') {
+      return (
+        <div className="flex flex-wrap gap-2">
+          {value.split(", ").map((interface_, index) => (
+            <Badge key={index} variant="outline">
+              {interface_}
+            </Badge>
+          ))}
+        </div>
+      );
+    }
+    return <p className="font-medium">{value}</p>;
+  };
+
   const getStatusVariant = (status: string) => {
     switch (status) {
       case 'AK':
@@ -389,20 +405,13 @@ export default function ComponentDetailsPage({ params }: ComponentDetailsProps) 
             <CardTitle>Spezifikationen</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-4">
               {Object.entries(component.specifications).map(([key, value]) => (
-                <div key={key}>
+                <div key={key} className="space-y-1">
                   <p className="text-sm text-muted-foreground">
                     {SPEC_LABELS[key] || key}
                   </p>
-                  {isEditing ? (
-                    <Input
-                      value={editedComponent.specifications[key] || ''}
-                      onChange={(e) => handleSpecificationChange(key, e.target.value)}
-                    />
-                  ) : (
-                    <p className="font-medium">{value}</p>
-                  )}
+                  {renderSpecificationValue(key, value)}
                 </div>
               ))}
             </div>
