@@ -1,5 +1,6 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import {
   Table,
   TableBody,
@@ -8,60 +9,62 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { 
-  HardwareComponent, 
-  CATEGORIES,
-  LOCATIONS,
-  OWNERSHIPS,
-  STATUS,
-  INDICATORS
-} from "@/app/types/hardware";
 import { Badge } from "@/components/ui/badge";
+import { 
+  CATEGORIES, 
+  LOCATIONS, 
+  STATUS, 
+  INDICATORS,
+  type HardwareComponent 
+} from "@/app/types/hardware";
 
 interface ComponentsTableProps {
   components: HardwareComponent[];
 }
 
 export function ComponentsTable({ components }: ComponentsTableProps) {
+  const router = useRouter();
+
+  const handleRowClick = (id: string) => {
+    // Encode the ID to handle slashes and special characters
+    const encodedId = encodeURIComponent(id);
+    router.push(`/components/${encodedId}`);
+  };
+
   return (
-    <div className="rounded-md border">
+    <div className="border rounded-md">
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead className="w-[200px]">ID/Name</TableHead>
+            <TableHead>ID/Name</TableHead>
             <TableHead>Kategorie</TableHead>
             <TableHead>Standort</TableHead>
-            <TableHead>Besitz</TableHead>
             <TableHead>Status</TableHead>
-            <TableHead>Typ</TableHead>
-            <TableHead>Seriennummer</TableHead>
-            <TableHead className="text-right">Kaufdatum</TableHead>
+            <TableHead>Letzte Wartung</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {components.map((component) => (
-            <TableRow key={component.id}>
-              <TableCell className="font-medium">
+            <TableRow 
+              key={component.id}
+              onClick={() => handleRowClick(component.id)}
+              className="cursor-pointer hover:bg-muted/50"
+            >
+              <TableCell>
                 <div>
-                  <div className="font-bold">{component.name}</div>
+                  <div className="font-medium">{component.name}</div>
                   <div className="text-sm text-muted-foreground">{component.id}</div>
                 </div>
               </TableCell>
               <TableCell>
-                <Badge variant="outline">
-                  {CATEGORIES[component.category]}
-                </Badge>
+                <div>
+                  <div>{CATEGORIES[component.category]}</div>
+                  <div className="text-sm text-muted-foreground">
+                    {INDICATORS[component.indicator]}
+                  </div>
+                </div>
               </TableCell>
-              <TableCell>
-                <Badge variant="outline">
-                  {LOCATIONS[component.location]}
-                </Badge>
-              </TableCell>
-              <TableCell>
-                <Badge variant="outline">
-                  {OWNERSHIPS[component.ownership]}
-                </Badge>
-              </TableCell>
+              <TableCell>{LOCATIONS[component.location]}</TableCell>
               <TableCell>
                 <Badge 
                   variant={
@@ -75,13 +78,11 @@ export function ComponentsTable({ components }: ComponentsTableProps) {
                 </Badge>
               </TableCell>
               <TableCell>
-                <Badge variant="outline">
-                  {INDICATORS[component.indicator]}
-                </Badge>
-              </TableCell>
-              <TableCell>{component.serialNumber}</TableCell>
-              <TableCell className="text-right">
-                {component.purchaseDate.toLocaleDateString('de-DE')}
+                {component.lastMaintenanceDate ? (
+                  component.lastMaintenanceDate.toLocaleDateString('de-DE')
+                ) : (
+                  <span className="text-muted-foreground">-</span>
+                )}
               </TableCell>
             </TableRow>
           ))}
