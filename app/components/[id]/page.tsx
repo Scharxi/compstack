@@ -214,6 +214,21 @@ export default function ComponentDetailsPage({ params }: ComponentDetailsProps) 
     }
   };
 
+  const getStatusVariant = (status: string) => {
+    switch (status) {
+      case 'AK':
+        return 'success';
+      case 'DE':
+        return 'destructive';
+      case 'IN':
+        return 'warning';
+      case 'WA':
+        return 'secondary';
+      default:
+        return 'default';
+    }
+  };
+
   return (
     <div className="container mx-auto p-8">
       <div className="flex justify-between items-center mb-8">
@@ -292,7 +307,9 @@ export default function ComponentDetailsPage({ params }: ComponentDetailsProps) 
                 {isEditing ? (
                   renderValue('status', isEditing)
                 ) : (
-                  <Badge>{STATUS[component.status]}</Badge>
+                  <Badge variant={getStatusVariant(component.status)}>
+                    {STATUS[component.status]}
+                  </Badge>
                 )}
               </div>
               <div>

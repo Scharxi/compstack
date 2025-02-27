@@ -31,6 +31,21 @@ export function ComponentsTable({ components }: ComponentsTableProps) {
     router.push(`/components/${encodedId}`);
   };
 
+  const getStatusVariant = (status: string) => {
+    switch (status) {
+      case 'AK':
+        return 'success';
+      case 'DE':
+        return 'destructive';
+      case 'IN':
+        return 'warning';
+      case 'WA':
+        return 'secondary';
+      default:
+        return 'default';
+    }
+  };
+
   return (
     <div className="border rounded-md">
       <Table>
@@ -66,14 +81,7 @@ export function ComponentsTable({ components }: ComponentsTableProps) {
               </TableCell>
               <TableCell>{LOCATIONS[component.location]}</TableCell>
               <TableCell>
-                <Badge 
-                  variant={
-                    component.status === 'AK' ? 'default' :
-                    component.status === 'IN' ? 'secondary' :
-                    component.status === 'WA' ? 'warning' :
-                    'destructive'
-                  }
-                >
+                <Badge variant={getStatusVariant(component.status)}>
                   {STATUS[component.status]}
                 </Badge>
               </TableCell>
