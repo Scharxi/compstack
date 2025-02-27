@@ -30,8 +30,9 @@ export async function createComponent(component: Omit<HardwareComponent, 'id'>):
   return response.json();
 }
 
-export async function updateComponent(component: HardwareComponent): Promise<HardwareComponent> {
-  const response = await fetch(`/api/components/${component.id}`, {
+export async function updateComponent(component: HardwareComponent & { newMaintenanceProtocol?: { date: Date; completedTasks: string[]; notes?: string } }): Promise<HardwareComponent> {
+  const encodedId = encodeURIComponent(component.id);
+  const response = await fetch(`/api/components/${encodedId}`, {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',

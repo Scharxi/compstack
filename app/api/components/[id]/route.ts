@@ -40,6 +40,40 @@ export async function PUT(
   try {
     const resolvedParams = await params;
     const data = await request.json();
+    
+    // Handle maintenance protocol if present
+    if (data.newMaintenanceProtocol) {
+      const { newMaintenanceProtocol, ...componentData } = data;
+      
+      // Create the maintenance protocol
+      await prisma.maintenanceProtocol.create({
+        data: {
+          date: new Date(newMaintenanceProtocol.date),
+          completedTasks: newMaintenanceProtocol.completedTasks,
+          notes: newMaintenanceProtocol.notes,
+          componentId: resolvedParams.id
+        }
+      });
+
+      // Update the component with the new last maintenance date
+      const component = await prisma.component.update({
+        where: {
+          id: resolvedParams.id,
+        },
+        data: {
+          ...componentData,
+          specifications: componentData.specifications || {},
+          lastMaintenanceDate: new Date()
+        },
+        include: {
+          maintenanceHistory: true,
+        },
+      });
+      
+      return NextResponse.json(component);
+    }
+
+    // Regular component update without maintenance
     const component = await prisma.component.update({
       where: {
         id: resolvedParams.id,
@@ -52,6 +86,7 @@ export async function PUT(
         maintenanceHistory: true,
       },
     });
+    
     return NextResponse.json(component);
   } catch (error) {
     console.error('Failed to update component:', error);
