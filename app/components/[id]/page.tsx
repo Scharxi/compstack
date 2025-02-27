@@ -29,12 +29,6 @@ import {
 import { useComponentsStore } from "@/app/store/components";
 import { fetchComponent } from '@/app/services/api';
 
-// Hilfsfunktion für einheitliche Datumsformatierung
-function formatDate(date: Date | string): string {
-  const d = new Date(date);
-  return `${d.getDate().toString().padStart(2, '0')}.${(d.getMonth() + 1).toString().padStart(2, '0')}.${d.getFullYear()}`;
-}
-
 interface ComponentDetailsProps {
   params: Promise<{
     id: string;
@@ -145,9 +139,6 @@ export default function ComponentDetailsPage({ params }: ComponentDetailsProps) 
 
       try {
         await updateComponent(updatedComponent);
-        const refreshedComponent = await fetchComponent(component.id);
-        setComponent(refreshedComponent);
-        setEditedComponent(refreshedComponent);
         setCompletedTasks([]);
         setMaintenanceNotes("");
       } catch (error) {
@@ -174,9 +165,6 @@ export default function ComponentDetailsPage({ params }: ComponentDetailsProps) 
 
   const renderValue = (field: keyof typeof component, isEditing: boolean) => {
     if (!isEditing) {
-      if (field === 'lastMaintenanceDate') {
-        return <p className="font-medium">{formatDate(String(component[field]))}</p>;
-      }
       return <p className="font-medium">{String(component[field])}</p>;
     }
 
@@ -239,9 +227,9 @@ export default function ComponentDetailsPage({ params }: ComponentDetailsProps) 
               <SelectValue placeholder="Wählen..." />
             </SelectTrigger>
             <SelectContent>
-              {Object.entries(STATUS).map(([key, value]) => (
-                <SelectItem key={key} value={key}>{value}</SelectItem>
-              ))}
+              <SelectItem value="AK">Aktiv</SelectItem>
+              <SelectItem value="IN">Inaktiv</SelectItem>
+              <SelectItem value="DE">Defekt</SelectItem>
             </SelectContent>
           </Select>
         );
@@ -294,8 +282,6 @@ export default function ComponentDetailsPage({ params }: ComponentDetailsProps) 
         return 'destructive';
       case 'IN':
         return 'warning';
-      case 'WA':
-        return 'secondary';
       default:
         return 'default';
     }
@@ -417,6 +403,20 @@ export default function ComponentDetailsPage({ params }: ComponentDetailsProps) 
           </CardContent>
         </Card>
 
+        <Card>
+          <CardHeader>
+            <CardTitle>Zeitliche Informationen</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {component.lastMaintenanceDate && (
+              <div>
+                <p className="text-sm text-muted-foreground">Letzte Wartung</p>
+                {renderValue('lastMaintenanceDate', isEditing)}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
         {component.assignedTo && (
           <Card>
             <CardHeader>
@@ -496,7 +496,7 @@ export default function ComponentDetailsPage({ params }: ComponentDetailsProps) 
                   <div key={index} className="border rounded-lg p-4">
                     <div className="flex justify-between items-start mb-4">
                       <h4 className="text-lg font-semibold">
-                        Wartung vom {formatDate(protocol.date)}
+                        Wartung vom {protocol.date.toLocaleDateString('de-DE')}
                       </h4>
                     </div>
                     <div className="space-y-4">

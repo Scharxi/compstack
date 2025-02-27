@@ -20,7 +20,6 @@ export const OWNERSHIPS = {
 export const STATUS = {
   AK: "Aktiv",
   IN: "Inaktiv",
-  WA: "Wartung",
   DE: "Defekt"
 } as const;
 

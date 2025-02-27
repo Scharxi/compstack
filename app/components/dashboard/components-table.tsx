@@ -53,8 +53,6 @@ const getStatusVariant = (status: string) => {
       return 'destructive';
     case 'IN':
       return 'warning';
-    case 'WA':
-      return 'secondary';
     default:
       return 'default';
   }
