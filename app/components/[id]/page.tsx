@@ -32,6 +32,7 @@ import {
   type Indicator,
   type MaintenanceProtocol
 } from "@/app/types/hardware";
+import { useComponentsStore } from "@/app/store/components";
 
 interface ComponentDetailsProps {
   params: Promise<{
@@ -72,27 +73,30 @@ const mockComponent: HardwareComponent = {
 export default function ComponentDetailsPage({ params }: ComponentDetailsProps) {
   const router = useRouter();
   const [isEditing, setIsEditing] = useState(false);
-  const [component, setComponent] = useState<HardwareComponent | null>(null);
-  const [editedComponent, setEditedComponent] = useState<HardwareComponent | null>(null);
   const [completedTasks, setCompletedTasks] = useState<string[]>([]);
   const [maintenanceNotes, setMaintenanceNotes] = useState("");
   const { id } = use(params);
+
+  const components = useComponentsStore((state) => state.components);
+  const updateComponent = useComponentsStore((state) => state.updateComponent);
+  const [component, setComponent] = useState<HardwareComponent | null>(null);
+  const [editedComponent, setEditedComponent] = useState<HardwareComponent | null>(null);
 
   useEffect(() => {
     // Decode the ID from the URL
     const decodedId = decodeURIComponent(id);
     
-    // TODO: Hier werden wir später die Komponente aus dem globalen State oder einer API laden
-    // Für jetzt verwenden wir Mock-Daten
-    if (decodedId === mockComponent.id) {
-      setComponent(mockComponent);
-      setEditedComponent(mockComponent);
+    // Find the component in the store
+    const foundComponent = components.find(c => c.id === decodedId);
+    if (foundComponent) {
+      setComponent(foundComponent);
+      setEditedComponent(foundComponent);
     }
-  }, [id]);
+  }, [id, components]);
 
   const handleSave = () => {
     if (editedComponent) {
-      // TODO: Hier werden wir später die Änderungen im globalen State oder einer API speichern
+      updateComponent(editedComponent);
       setComponent(editedComponent);
       setIsEditing(false);
     }
@@ -152,7 +156,7 @@ export default function ComponentDetailsPage({ params }: ComponentDetailsProps) 
         ]
       };
 
-      // TODO: Hier werden wir später die Änderungen im globalen State oder einer API speichern
+      updateComponent(updatedComponent);
       setComponent(updatedComponent);
       setEditedComponent(updatedComponent);
       setCompletedTasks([]);

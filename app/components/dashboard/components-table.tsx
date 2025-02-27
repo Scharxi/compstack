@@ -1,6 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import * as React from "react";
 import {
   Table,
   TableBody,
@@ -15,12 +16,110 @@ import {
   LOCATIONS, 
   STATUS, 
   INDICATORS,
-  type HardwareComponent 
+  type HardwareComponent,
+  type Category,
+  type Location,
+  type Status,
+  type Indicator
 } from "@/app/types/hardware";
 
 interface ComponentsTableProps {
   components: HardwareComponent[];
 }
+
+interface RowData {
+  getValue: (key: keyof HardwareComponent) => unknown;
+}
+
+interface Column {
+  accessorKey: keyof HardwareComponent;
+  header: string;
+  cell: (props: { row: RowData }) => JSX.Element;
+}
+
+const getStatusVariant = (status: Status) => {
+  switch (status) {
+    case 'AK':
+      return 'success';
+    case 'DE':
+      return 'destructive';
+    case 'IN':
+      return 'warning';
+    case 'WA':
+      return 'secondary';
+    default:
+      return 'default';
+  }
+};
+
+const columns: Column[] = [
+  {
+    accessorKey: "id",
+    header: "ID/Name",
+    cell: ({ row }) => {
+      const id = row.getValue("id") as string;
+      const name = row.getValue("name") as string;
+      return (
+        <div>
+          <div className="font-medium">{name}</div>
+          <div className="text-sm text-muted-foreground">{id}</div>
+        </div>
+      );
+    },
+  },
+  {
+    accessorKey: "category",
+    header: "Kategorie",
+    cell: ({ row }) => {
+      const category = row.getValue("category") as Category;
+      const indicator = row.getValue("indicator") as Indicator;
+      return (
+        <div>
+          <div>{CATEGORIES[category]}</div>
+          <div className="text-sm text-muted-foreground">
+            {INDICATORS[indicator]}
+          </div>
+        </div>
+      );
+    },
+  },
+  {
+    accessorKey: "location",
+    header: "Standort",
+    cell: ({ row }) => {
+      const location = row.getValue("location") as Location;
+      return LOCATIONS[location];
+    },
+  },
+  {
+    accessorKey: "status",
+    header: "Status",
+    cell: ({ row }) => {
+      const status = row.getValue("status") as Status;
+      return (
+        <Badge variant={getStatusVariant(status)}>
+          {STATUS[status]}
+        </Badge>
+      );
+    },
+  },
+  {
+    accessorKey: "lastMaintenanceDate",
+    header: "Letzte Wartung",
+    cell: ({ row }) => {
+      const date = row.getValue("lastMaintenanceDate") as Date | undefined;
+      return date ? (
+        <div className="font-medium">
+          {date.toLocaleDateString('de-DE')}
+        </div>
+      ) : (
+        <div className="text-muted-foreground">
+          Keine Wartung
+        </div>
+      );
+    },
+  },
+];
 
 export function ComponentsTable({ components }: ComponentsTableProps) {
   const router = useRouter();
@@ -31,31 +130,16 @@ export function ComponentsTable({ components }: ComponentsTableProps) {
     router.push(`/components/${encodedId}`);
   };
 
-  const getStatusVariant = (status: string) => {
-    switch (status) {
-      case 'AK':
-        return 'success';
-      case 'DE':
-        return 'destructive';
-      case 'IN':
-        return 'warning';
-      case 'WA':
-        return 'secondary';
-      default:
-        return 'default';
-    }
-  };
-
   return (
-    <div className="border rounded-md">
+    <div className="rounded-md border">
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>ID/Name</TableHead>
-            <TableHead>Kategorie</TableHead>
-            <TableHead>Standort</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>Letzte Wartung</TableHead>
+            {columns.map((column) => (
+              <TableHead key={column.accessorKey}>
+                {column.header}
+              </TableHead>
+            ))}
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -65,33 +149,15 @@ export function ComponentsTable({ components }: ComponentsTableProps) {
               onClick={() => handleRowClick(component.id)}
               className="cursor-pointer hover:bg-muted/50"
             >
-              <TableCell>
-                <div>
-                  <div className="font-medium">{component.name}</div>
-                  <div className="text-sm text-muted-foreground">{component.id}</div>
-                </div>
-              </TableCell>
-              <TableCell>
-                <div>
-                  <div>{CATEGORIES[component.category]}</div>
-                  <div className="text-sm text-muted-foreground">
-                    {INDICATORS[component.indicator]}
-                  </div>
-                </div>
-              </TableCell>
-              <TableCell>{LOCATIONS[component.location]}</TableCell>
-              <TableCell>
-                <Badge variant={getStatusVariant(component.status)}>
-                  {STATUS[component.status]}
-                </Badge>
-              </TableCell>
-              <TableCell>
-                {component.lastMaintenanceDate ? (
-                  component.lastMaintenanceDate.toLocaleDateString('de-DE')
-                ) : (
-                  <span className="text-muted-foreground">-</span>
-                )}
-              </TableCell>
+              {columns.map((column) => (
+                <TableCell key={column.accessorKey}>
+                  {column.cell({ 
+                    row: { 
+                      getValue: (key) => component[key as keyof HardwareComponent] 
+                    } 
+                  })}
+                </TableCell>
+              ))}
             </TableRow>
           ))}
         </TableBody>
