@@ -10,8 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
-import {
+import { 
   Select,
   SelectContent,
   SelectItem,
@@ -478,7 +477,7 @@ export default function ComponentDetailsPage({ params }: ComponentDetailsProps) 
                 </div>
               </div>
 
-              <Separator />
+              <hr className="my-6 border-t border-border" />
 
               <div className="flex justify-end">
                 <Button
