@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -9,14 +9,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -24,10 +17,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
 import { 
   CATEGORIES, 
   LOCATIONS, 
@@ -35,148 +24,305 @@ import {
   STATUS, 
   INDICATORS,
   generateComponentId,
-  type Indicator,
   type HardwareComponent,
   type Category,
   type Location,
   type Ownership,
   type Status,
+  type Indicator
 } from "@/app/types/hardware";
-
-// Spezifikationsfelder je nach Indikator
-const INDICATOR_SPECIFICATIONS: Record<Indicator, Array<{
-  key: string;
-  label: string;
-  placeholder?: string;
-}>> = {
-  PC: [
-    { key: "cpu", label: "Prozessor", placeholder: "z.B. Intel i7-1165G7" },
-    { key: "ram", label: "Arbeitsspeicher", placeholder: "z.B. 16GB" },
-    { key: "storage", label: "Speicher", placeholder: "z.B. 512GB SSD" },
-    { key: "gpu", label: "Grafikkarte", placeholder: "z.B. Intel Iris Xe / NVIDIA RTX 3050" },
-    { key: "os", label: "Betriebssystem", placeholder: "z.B. Windows 11 Pro" },
-  ],
-  LT: [
-    { key: "cpu", label: "Prozessor", placeholder: "z.B. Intel i7-1165G7" },
-    { key: "ram", label: "Arbeitsspeicher", placeholder: "z.B. 16GB" },
-    { key: "storage", label: "Speicher", placeholder: "z.B. 512GB SSD" },
-    { key: "gpu", label: "Grafikkarte", placeholder: "z.B. Intel Iris Xe / NVIDIA RTX 3050" },
-    { key: "display", label: "Display", placeholder: "z.B. 14 Zoll, 1920x1080" },
-    { key: "battery", label: "Akku", placeholder: "z.B. 57Wh" },
-    { key: "os", label: "Betriebssystem", placeholder: "z.B. Windows 11 Pro" },
-  ],
-  MON: [
-    { key: "size", label: "Größe", placeholder: "z.B. 27 Zoll" },
-    { key: "resolution", label: "Auflösung", placeholder: "z.B. 2560x1440" },
-    { key: "panel", label: "Panel-Typ", placeholder: "z.B. IPS, VA, TN" },
-    { key: "refreshRate", label: "Bildwiederholrate", placeholder: "z.B. 144Hz" },
-    { key: "ports", label: "Anschlüsse", placeholder: "z.B. 2x HDMI, 1x DisplayPort" },
-  ],
-  GR: [
-    { key: "chipset", label: "Chipset", placeholder: "z.B. NVIDIA RTX 4070" },
-    { key: "vram", label: "Videospeicher", placeholder: "z.B. 12GB GDDR6X" },
-    { key: "ports", label: "Anschlüsse", placeholder: "z.B. 3x DisplayPort, 1x HDMI" },
-    { key: "power", label: "Stromverbrauch", placeholder: "z.B. 200W" },
-  ],
-  CPU: [
-    { key: "model", label: "Modell", placeholder: "z.B. Intel i9-13900K" },
-    { key: "cores", label: "Kerne", placeholder: "z.B. 24 (8P+16E)" },
-    { key: "frequency", label: "Taktrate", placeholder: "z.B. 3.0-5.8 GHz" },
-    { key: "socket", label: "Sockel", placeholder: "z.B. LGA 1700" },
-  ],
-  RAM: [
-    { key: "capacity", label: "Kapazität", placeholder: "z.B. 32GB" },
-    { key: "type", label: "Typ", placeholder: "z.B. DDR5" },
-    { key: "speed", label: "Geschwindigkeit", placeholder: "z.B. 6000MHz" },
-    { key: "timings", label: "Timings", placeholder: "z.B. CL36" },
-  ],
-  SSD: [
-    { key: "capacity", label: "Kapazität", placeholder: "z.B. 1TB" },
-    { key: "type", label: "Typ", placeholder: "z.B. NVMe PCIe 4.0" },
-    { key: "readSpeed", label: "Lesegeschwindigkeit", placeholder: "z.B. 7000 MB/s" },
-    { key: "writeSpeed", label: "Schreibgeschwindigkeit", placeholder: "z.B. 5000 MB/s" },
-  ],
-  HDD: [
-    { key: "capacity", label: "Kapazität", placeholder: "z.B. 4TB" },
-    { key: "rpm", label: "Drehzahl", placeholder: "z.B. 7200 RPM" },
-    { key: "cacheSize", label: "Cache", placeholder: "z.B. 256MB" },
-    { key: "interface", label: "Schnittstelle", placeholder: "z.B. SATA 6Gb/s" },
-  ],
-};
-
-const formSchema = z.object({
-  name: z.string().min(1, "Name ist erforderlich"),
-  category: z.custom<Category>(),
-  location: z.custom<Location>(),
-  ownership: z.custom<Ownership>(),
-  status: z.custom<Status>(),
-  indicator: z.custom<Indicator>(),
-  serialNumber: z.string().min(1, "Seriennummer ist erforderlich"),
-  specifications: z.record(z.string()).optional(),
-});
+import { useComponentsStore } from "@/app/store/components";
 
 interface AddComponentFormProps {
-  onAddComponent: (component: HardwareComponent) => void;
   lastRunningNumber: number;
 }
 
-export function AddComponentForm({ onAddComponent, lastRunningNumber }: AddComponentFormProps) {
-  const [open, setOpen] = useState(false);
-  const [selectedIndicator, setSelectedIndicator] = useState<Indicator | null>(null);
-  const [specifications, setSpecifications] = useState<Record<string, string>>({});
-  
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      name: "",
-      serialNumber: "",
-      specifications: {},
+interface Specifications {
+  [key: string]: string;
+}
+
+const SPEC_FIELDS: { [key in Indicator]?: Array<{ 
+  label: string; 
+  key: string; 
+  hint?: string;
+  example?: string;
+  unit?: string;
+}> } = {
+  PC: [
+    { 
+      label: "CPU", 
+      key: "cpu",
+      hint: "Prozessor-Modell und Generation",
+      example: "Intel Core i7-12700K"
     },
-  });
+    { 
+      label: "RAM", 
+      key: "ram",
+      hint: "Arbeitsspeicher-Größe",
+      example: "16 GB",
+      unit: "GB"
+    },
+    { 
+      label: "Speicher", 
+      key: "storage",
+      hint: "Art und Größe des Speichers",
+      example: "1 TB SSD + 2 TB HDD"
+    },
+    { 
+      label: "Betriebssystem", 
+      key: "os",
+      hint: "Name und Version des Betriebssystems",
+      example: "Windows 11 Pro"
+    },
+    { 
+      label: "Grafikkarte", 
+      key: "gpu",
+      hint: "Modell der Grafikkarte",
+      example: "NVIDIA RTX 3060"
+    },
+  ],
+  LT: [
+    { 
+      label: "CPU", 
+      key: "cpu",
+      hint: "Prozessor-Modell und Generation",
+      example: "Intel Core i5-1240P"
+    },
+    { 
+      label: "RAM", 
+      key: "ram",
+      hint: "Arbeitsspeicher-Größe",
+      example: "16 GB",
+      unit: "GB"
+    },
+    { 
+      label: "Speicher", 
+      key: "storage",
+      hint: "Art und Größe des Speichers",
+      example: "512 GB SSD"
+    },
+    { 
+      label: "Display", 
+      key: "display",
+      hint: "Displaygröße und Auflösung",
+      example: "14 Zoll, 2560x1600"
+    },
+    { 
+      label: "Betriebssystem", 
+      key: "os",
+      hint: "Name und Version des Betriebssystems",
+      example: "Windows 11 Pro"
+    },
+    { 
+      label: "Grafikkarte", 
+      key: "gpu",
+      hint: "Modell der Grafikkarte",
+      example: "Intel Iris Xe"
+    },
+  ],
+  MON: [
+    { 
+      label: "Bildschirmgröße", 
+      key: "size",
+      hint: "Diagonale des Bildschirms",
+      example: "27 Zoll",
+      unit: "Zoll"
+    },
+    { 
+      label: "Auflösung", 
+      key: "resolution",
+      hint: "Horizontale x Vertikale Pixel",
+      example: "2560x1440"
+    },
+    { 
+      label: "Panel-Typ", 
+      key: "panelType",
+      hint: "Technologie des Displays",
+      example: "IPS, VA, oder TN"
+    },
+    { 
+      label: "Anschlüsse", 
+      key: "ports",
+      hint: "Verfügbare Anschlüsse",
+      example: "2x HDMI, 1x DisplayPort"
+    },
+    { 
+      label: "Helligkeit", 
+      key: "brightness",
+      hint: "Maximale Helligkeit",
+      example: "400",
+      unit: "cd/m²"
+    },
+  ],
+  GR: [
+    { 
+      label: "Chip", 
+      key: "chip",
+      hint: "Modell des Grafikchips",
+      example: "NVIDIA RTX 4070"
+    },
+    { 
+      label: "Speicher", 
+      key: "memory",
+      hint: "Größe des Grafikspeichers",
+      example: "8 GB",
+      unit: "GB"
+    },
+    { 
+      label: "Taktrate", 
+      key: "clockSpeed",
+      hint: "Basis-Taktrate des Chips",
+      example: "2310",
+      unit: "MHz"
+    },
+    { 
+      label: "Anschlüsse", 
+      key: "ports",
+      hint: "Verfügbare Anschlüsse",
+      example: "3x DisplayPort, 1x HDMI"
+    },
+    { 
+      label: "Stromverbrauch", 
+      key: "powerConsumption",
+      hint: "Maximale Leistungsaufnahme",
+      example: "200",
+      unit: "Watt"
+    },
+  ],
+  CPU: [
+    { 
+      label: "Modell", 
+      key: "model",
+      hint: "Vollständige Modellbezeichnung",
+      example: "AMD Ryzen 7 7700X"
+    },
+    { 
+      label: "Kerne", 
+      key: "cores",
+      hint: "Anzahl physischer/logischer Kerne",
+      example: "8/16"
+    },
+    { 
+      label: "Taktrate", 
+      key: "clockSpeed",
+      hint: "Basis/Boost Taktrate",
+      example: "4.5/5.4",
+      unit: "GHz"
+    },
+    { 
+      label: "Cache", 
+      key: "cache",
+      hint: "Größe des L3-Cache",
+      example: "32",
+      unit: "MB"
+    },
+    { 
+      label: "Sockel", 
+      key: "socket",
+      hint: "Prozessorsockel",
+      example: "AM5"
+    },
+  ],
+  RAM: [
+    { 
+      label: "Typ", 
+      key: "type",
+      hint: "RAM-Technologie und Generation",
+      example: "DDR5"
+    },
+    { 
+      label: "Kapazität", 
+      key: "capacity",
+      hint: "Größe des Arbeitsspeichers",
+      example: "32",
+      unit: "GB"
+    },
+    { 
+      label: "Taktrate", 
+      key: "clockSpeed",
+      hint: "Effektive Taktrate",
+      example: "6000",
+      unit: "MHz"
+    },
+    { 
+      label: "Latenz", 
+      key: "latency",
+      hint: "CAS-Latenz",
+      example: "CL36"
+    },
+  ],
+  SSD: [
+    { 
+      label: "Kapazität", 
+      key: "capacity",
+      hint: "Speicherkapazität",
+      example: "1000",
+      unit: "GB"
+    },
+    { 
+      label: "Formfaktor", 
+      key: "formFactor",
+      hint: "Bauform der SSD",
+      example: "M.2 2280"
+    },
+    { 
+      label: "Schnittstelle", 
+      key: "interface",
+      hint: "Anschlusstyp",
+      example: "PCIe 4.0 x4"
+    },
+    { 
+      label: "Lese-/Schreibgeschwindigkeit", 
+      key: "speed",
+      hint: "Sequentielle Lese-/Schreibrate",
+      example: "7000/5000",
+      unit: "MB/s"
+    },
+  ],
+  HDD: [
+    { 
+      label: "Kapazität", 
+      key: "capacity",
+      hint: "Speicherkapazität",
+      example: "2000",
+      unit: "GB"
+    },
+    { 
+      label: "Formfaktor", 
+      key: "formFactor",
+      hint: "Bauform der Festplatte",
+      example: "3.5 Zoll"
+    },
+    { 
+      label: "Drehzahl", 
+      key: "rpm",
+      hint: "Umdrehungen pro Minute",
+      example: "7200",
+      unit: "RPM"
+    },
+    { 
+      label: "Cache", 
+      key: "cache",
+      hint: "Größe des Festplatten-Cache",
+      example: "256",
+      unit: "MB"
+    },
+  ],
+};
 
-  // Aktualisiere Spezifikationen, wenn sich der Indikator ändert
-  useEffect(() => {
-    if (selectedIndicator) {
-      const newSpecs = INDICATOR_SPECIFICATIONS[selectedIndicator].reduce((acc, spec) => {
-        acc[spec.key] = specifications[spec.key] || "";
-        return acc;
-      }, {} as Record<string, string>);
-      setSpecifications(newSpecs);
-    }
-  }, [selectedIndicator]);
+export function AddComponentForm({ lastRunningNumber }: AddComponentFormProps) {
+  const [open, setOpen] = useState(false);
+  const [name, setName] = useState("");
+  const [category, setCategory] = useState<Category>("IT");
+  const [location, setLocation] = useState<Location>("HH");
+  const [ownership, setOwnership] = useState<Ownership>("FI");
+  const [status, setStatus] = useState<Status>("AK");
+  const [indicator, setIndicator] = useState<Indicator>("PC");
+  const [serialNumber, setSerialNumber] = useState("");
+  const [specifications, setSpecifications] = useState<Specifications>({});
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    const newRunningNumber = (lastRunningNumber + 1).toString().padStart(3, '0');
-    
-    const newComponent: HardwareComponent = {
-      id: generateComponentId(
-        values.category,
-        values.location,
-        values.ownership,
-        values.status,
-        values.indicator,
-        newRunningNumber
-      ),
-      name: values.name,
-      category: values.category as Category,
-      location: values.location as Location,
-      ownership: values.ownership as Ownership,
-      status: values.status as Status,
-      indicator: values.indicator as Indicator,
-      runningNumber: newRunningNumber,
-      serialNumber: values.serialNumber,
-      purchaseDate: new Date(),
-      specifications: specifications,
-    };
+  const updateComponent = useComponentsStore((state) => state.updateComponent);
 
-    onAddComponent(newComponent);
-    form.reset();
-    setSpecifications({});
-    setSelectedIndicator(null);
-    setOpen(false);
-  }
-
-  // Handler für Spezifikationsänderungen
   const handleSpecificationChange = (key: string, value: string) => {
     setSpecifications(prev => ({
       ...prev,
@@ -184,209 +330,199 @@ export function AddComponentForm({ onAddComponent, lastRunningNumber }: AddCompo
     }));
   };
 
+  const handleSubmit = () => {
+    const runningNumber = String(lastRunningNumber + 1).padStart(3, '0');
+    
+    const newComponent: HardwareComponent = {
+      id: generateComponentId(category, location, ownership, status, indicator, runningNumber),
+      name,
+      category,
+      location,
+      ownership,
+      status,
+      indicator,
+      runningNumber,
+      serialNumber,
+      purchaseDate: new Date(),
+      specifications: Object.fromEntries(
+        Object.entries(specifications).filter(([_, value]) => value !== "")
+      )
+    };
+
+    updateComponent(newComponent);
+    setOpen(false);
+    resetForm();
+  };
+
+  const resetForm = () => {
+    setName("");
+    setCategory("IT");
+    setLocation("HH");
+    setOwnership("FI");
+    setStatus("AK");
+    setIndicator("PC");
+    setSerialNumber("");
+    setSpecifications({});
+  };
+
+  const renderSpecificationFields = () => {
+    const fields = SPEC_FIELDS[indicator];
+    if (!fields) return null;
+
+    return (
+      <div className="border rounded-lg p-6 bg-muted/30">
+        <div className="space-y-6">
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <h3 className="text-lg font-semibold">Spezifikationen für {INDICATORS[indicator]}</h3>
+              <span className="text-sm text-muted-foreground">(Optional)</span>
+            </div>
+            <p className="text-sm text-muted-foreground">
+              Geben Sie die technischen Details für {INDICATORS[indicator]} ein. Alle Felder sind optional.
+            </p>
+          </div>
+
+          <div className="grid sm:grid-cols-2 gap-6">
+            {fields.map(({ label, key, hint, example, unit }) => (
+              <div key={key} className="space-y-2 bg-background rounded-lg p-4 shadow-sm border">
+                <div className="space-y-1">
+                  <label htmlFor={key} className="text-sm font-medium flex items-center gap-2">
+                    {label}
+                    {unit && <span className="text-xs text-muted-foreground">({unit})</span>}
+                  </label>
+                  {hint && (
+                    <p className="text-xs text-muted-foreground">{hint}</p>
+                  )}
+                </div>
+                <Input
+                  id={key}
+                  value={specifications[key] || ""}
+                  onChange={(e) => handleSpecificationChange(key, e.target.value)}
+                  placeholder={example || `${label} eingeben...`}
+                  className="bg-white/50"
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button>Neue Komponente</Button>
+        <Button>Komponente hinzufügen</Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Neue Komponente hinzufügen</DialogTitle>
         </DialogHeader>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Name</FormLabel>
-                  <FormControl>
-                    <Input placeholder="z.B. ThinkPad X1 Carbon" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
+        <div className="grid gap-6 py-4">
+          <div className="grid gap-2">
+            <label htmlFor="name">Name</label>
+            <Input
+              id="name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="z.B. ThinkPad X1 Carbon"
             />
-            
-            <div className="grid grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="category"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Kategorie</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Wählen..." />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {Object.entries(CATEGORIES).map(([key, value]) => (
-                          <SelectItem key={key} value={key}>
-                            {value}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="indicator"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Typ</FormLabel>
-                    <Select 
-                      onValueChange={(value) => {
-                        field.onChange(value as Indicator);
-                        setSelectedIndicator(value as Indicator);
-                      }} 
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Wählen..." />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {Object.entries(INDICATORS).map(([key, value]) => (
-                          <SelectItem key={key} value={key}>
-                            {value}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="location"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Standort</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Wählen..." />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {Object.entries(LOCATIONS).map(([key, value]) => (
-                          <SelectItem key={key} value={key}>
-                            {value}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="ownership"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Besitzverhältnis</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Wählen..." />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {Object.entries(OWNERSHIPS).map(([key, value]) => (
-                          <SelectItem key={key} value={key}>
-                            {value}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            <FormField
-              control={form.control}
-              name="status"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Status</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Wählen..." />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {Object.entries(STATUS).map(([key, value]) => (
-                        <SelectItem key={key} value={key}>
-                          {value}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="serialNumber"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Seriennummer</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Dynamische Spezifikationsfelder */}
-            {selectedIndicator && (
-              <div className="space-y-4">
-                <h3 className="font-medium">Spezifikationen</h3>
-                <div className="grid grid-cols-2 gap-4">
-                  {INDICATOR_SPECIFICATIONS[selectedIndicator].map((spec) => (
-                    <FormItem key={spec.key}>
-                      <FormLabel>
-                        {spec.label}
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder={spec.placeholder}
-                          value={specifications[spec.key] || ""}
-                          onChange={(e) => handleSpecificationChange(spec.key, e.target.value)}
-                        />
-                      </FormControl>
-                    </FormItem>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="grid gap-2">
+              <label htmlFor="category">Kategorie</label>
+              <Select value={category} onValueChange={(value: Category) => setCategory(value)}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {Object.entries(CATEGORIES).map(([key, value]) => (
+                    <SelectItem key={key} value={key}>{value}</SelectItem>
                   ))}
-                </div>
-              </div>
-            )}
-
-            <div className="flex justify-end space-x-4 pt-4">
-              <Button variant="outline" type="button" onClick={() => setOpen(false)}>
-                Abbrechen
-              </Button>
-              <Button type="submit">Hinzufügen</Button>
+                </SelectContent>
+              </Select>
             </div>
-          </form>
-        </Form>
+            <div className="grid gap-2">
+              <label htmlFor="indicator">Typ</label>
+              <Select value={indicator} onValueChange={(value: Indicator) => {
+                setIndicator(value);
+                setSpecifications({});
+              }}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {Object.entries(INDICATORS).map(([key, value]) => (
+                    <SelectItem key={key} value={key}>{value}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="grid gap-2">
+              <label htmlFor="location">Standort</label>
+              <Select value={location} onValueChange={(value: Location) => setLocation(value)}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {Object.entries(LOCATIONS).map(([key, value]) => (
+                    <SelectItem key={key} value={key}>{value}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="grid gap-2">
+              <label htmlFor="ownership">Besitzverhältnis</label>
+              <Select value={ownership} onValueChange={(value: Ownership) => setOwnership(value)}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {Object.entries(OWNERSHIPS).map(([key, value]) => (
+                    <SelectItem key={key} value={key}>{value}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="grid gap-2">
+              <label htmlFor="status">Status</label>
+              <Select value={status} onValueChange={(value: Status) => setStatus(value)}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {Object.entries(STATUS).map(([key, value]) => (
+                    <SelectItem key={key} value={key}>{value}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="grid gap-2">
+              <label htmlFor="serialNumber">Seriennummer</label>
+              <Input
+                id="serialNumber"
+                value={serialNumber}
+                onChange={(e) => setSerialNumber(e.target.value)}
+                placeholder="z.B. XYZ123"
+              />
+            </div>
+          </div>
+
+          {renderSpecificationFields()}
+
+          <div className="flex justify-end space-x-4">
+            <Button variant="outline" onClick={() => setOpen(false)}>
+              Abbrechen
+            </Button>
+            <Button onClick={handleSubmit} disabled={!name || !serialNumber}>
+              Hinzufügen
+            </Button>
+          </div>
+        </div>
       </DialogContent>
     </Dialog>
   );
