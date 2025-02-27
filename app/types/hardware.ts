@@ -1,17 +1,73 @@
+export const CATEGORIES = {
+  IT: "IT-Equipment",
+  WZG: "Werkzeug",
+  MS: "Messmittel",
+  K: "Kommunikation"
+} as const;
+
+export const LOCATIONS = {
+  HH: "Hamburg",
+  BE: "Berlin",
+  MUC: "München",
+  FFM: "Frankfurt"
+} as const;
+
+export const OWNERSHIPS = {
+  FI: "Firma",
+  MA: "Mitarbeiter",
+  LE: "Leasing",
+  KU: "Kunde"
+} as const;
+
+export const STATUS = {
+  AK: "Aktiv",
+  IN: "Inaktiv",
+  WA: "Wartung",
+  DE: "Defekt"
+} as const;
+
+export const INDICATORS = {
+  PC: "Computer",
+  LT: "Laptop",
+  MON: "Monitor",
+  GR: "Grafikkarte",
+  CPU: "Prozessor",
+  RAM: "Arbeitsspeicher",
+  SSD: "SSD-Festplatte",
+  HDD: "HDD-Festplatte"
+} as const;
+
+export type Category = keyof typeof CATEGORIES;
+export type Location = keyof typeof LOCATIONS;
+export type Ownership = keyof typeof OWNERSHIPS;
+export type Status = keyof typeof STATUS;
+export type Indicator = keyof typeof INDICATORS;
+
 export interface HardwareComponent {
   id: string;
   name: string;
-  category: keyof typeof CATEGORIES;
-  location: keyof typeof LOCATIONS;
-  ownership: keyof typeof OWNERSHIPS;
-  status: keyof typeof STATUS;
-  indicator: keyof typeof INDICATORS;
-  serialNumber: string;
+  category: Category;
+  location: Location;
+  ownership: Ownership;
+  status: Status;
+  indicator: Indicator;
   runningNumber: string;
+  serialNumber: string;
   purchaseDate: Date;
   lastMaintenanceDate?: Date;
   assignedTo?: string;
   specifications: Record<string, string>;
+}
+
+export function generateComponentId(
+  category: Category,
+  location: Location,
+  ownership: Ownership,
+  status: Status,
+  indicator: Indicator,
+  runningNumber: string
+): string {
+  return `${category}-${location}-${ownership}-${status}-${indicator}-${runningNumber}`;
 }
 
 export interface DashboardStats {
@@ -19,7 +75,12 @@ export interface DashboardStats {
   availableComponents: number;
   inUseComponents: number;
   maintenanceRequired: number;
-  recentActivities: Activity[];
+  recentActivities: {
+    id: string;
+    type: 'added' | 'updated' | 'removed';
+    component: HardwareComponent;
+    timestamp: Date;
+  }[];
 }
 
 export interface Activity {
@@ -30,50 +91,4 @@ export interface Activity {
   date: Date;
   user: string;
   details: string;
-}
-
-export const CATEGORIES = {
-  IT: 'IT-Gerät',
-  WZG: 'Werkzeug',
-  MS: 'Maschinen',
-  K: 'Komponenten',
-} as const;
-
-export const LOCATIONS = {
-  ZIT: 'ZIT',
-  VIMI_RZ: 'ViMi-RZ',
-  SCHULUNGSZENTRUM: 'Schulungszentrum',
-} as const;
-
-export const OWNERSHIPS = {
-  LIE: 'LIESKE',
-  ZIT: 'ZIT',
-  SZ: 'Schulungszentrum',
-} as const;
-
-export const STATUS = {
-  D: 'Defekt',
-  A: 'Anschauungsmaterial',
-  F: 'Funktional',
-} as const;
-
-export const INDICATORS = {
-  LT: 'Laptop',
-  PC: 'PC',
-  MON: 'Monitor',
-  SW: 'Switch',
-  RT: 'Router',
-  SER: 'Server',
-} as const;
-
-// Helper function to generate component ID
-export function generateComponentId(
-  category: keyof typeof CATEGORIES,
-  location: keyof typeof LOCATIONS,
-  ownership: keyof typeof OWNERSHIPS,
-  status: keyof typeof STATUS,
-  indicator: keyof typeof INDICATORS,
-  runningNumber: string
-): string {
-  return `${category}-${location}-${ownership}/${status}${indicator}/${runningNumber}`;
 } 
