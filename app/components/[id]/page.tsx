@@ -6,13 +6,26 @@ import { useRouter } from 'next/navigation';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { 
   CATEGORIES, 
   LOCATIONS, 
   OWNERSHIPS, 
   STATUS, 
   INDICATORS,
-  type HardwareComponent 
+  type HardwareComponent,
+  type Category,
+  type Location,
+  type Ownership,
+  type Status,
+  type Indicator
 } from "@/app/types/hardware";
 
 interface ComponentDetailsProps {
@@ -46,6 +59,7 @@ export default function ComponentDetailsPage({ params }: ComponentDetailsProps) 
   const router = useRouter();
   const [isEditing, setIsEditing] = useState(false);
   const [component, setComponent] = useState<HardwareComponent | null>(null);
+  const [editedComponent, setEditedComponent] = useState<HardwareComponent | null>(null);
   const { id } = use(params);
 
   useEffect(() => {
@@ -56,10 +70,44 @@ export default function ComponentDetailsPage({ params }: ComponentDetailsProps) 
     // Für jetzt verwenden wir Mock-Daten
     if (decodedId === mockComponent.id) {
       setComponent(mockComponent);
+      setEditedComponent(mockComponent);
     }
   }, [id]);
+
+  const handleSave = () => {
+    if (editedComponent) {
+      // TODO: Hier werden wir später die Änderungen im globalen State oder einer API speichern
+      setComponent(editedComponent);
+      setIsEditing(false);
+    }
+  };
+
+  const handleCancel = () => {
+    if (component) {
+      setEditedComponent(component);
+      setIsEditing(false);
+    }
+  };
+
+  const handleChange = (field: keyof HardwareComponent, value: string | Date | Record<string, string> | undefined) => {
+    if (editedComponent) {
+      setEditedComponent({ ...editedComponent, [field]: value });
+    }
+  };
+
+  const handleSpecificationChange = (key: string, value: string) => {
+    if (editedComponent) {
+      setEditedComponent({
+        ...editedComponent,
+        specifications: {
+          ...editedComponent.specifications,
+          [key]: value
+        }
+      });
+    }
+  };
   
-  if (!component) {
+  if (!component || !editedComponent) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <p>Komponente nicht gefunden</p>
@@ -67,11 +115,120 @@ export default function ComponentDetailsPage({ params }: ComponentDetailsProps) 
     );
   }
 
+  const renderValue = (field: keyof typeof component, isEditing: boolean) => {
+    if (!isEditing) {
+      if (field === 'purchaseDate' || field === 'lastMaintenanceDate') {
+        return <p className="font-medium">{(component[field] as Date)?.toLocaleDateString('de-DE')}</p>;
+      }
+      return <p className="font-medium">{String(component[field])}</p>;
+    }
+
+    switch (field) {
+      case 'category':
+        return (
+          <Select 
+            value={editedComponent.category} 
+            onValueChange={(value) => handleChange('category', value)}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Wählen..." />
+            </SelectTrigger>
+            <SelectContent>
+              {Object.entries(CATEGORIES).map(([key, value]) => (
+                <SelectItem key={key} value={key}>{value}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        );
+      case 'location':
+        return (
+          <Select 
+            value={editedComponent.location} 
+            onValueChange={(value) => handleChange('location', value)}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Wählen..." />
+            </SelectTrigger>
+            <SelectContent>
+              {Object.entries(LOCATIONS).map(([key, value]) => (
+                <SelectItem key={key} value={key}>{value}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        );
+      case 'ownership':
+        return (
+          <Select 
+            value={editedComponent.ownership} 
+            onValueChange={(value) => handleChange('ownership', value)}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Wählen..." />
+            </SelectTrigger>
+            <SelectContent>
+              {Object.entries(OWNERSHIPS).map(([key, value]) => (
+                <SelectItem key={key} value={key}>{value}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        );
+      case 'status':
+        return (
+          <Select 
+            value={editedComponent.status} 
+            onValueChange={(value) => handleChange('status', value)}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Wählen..." />
+            </SelectTrigger>
+            <SelectContent>
+              {Object.entries(STATUS).map(([key, value]) => (
+                <SelectItem key={key} value={key}>{value}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        );
+      case 'indicator':
+        return (
+          <Select 
+            value={editedComponent.indicator} 
+            onValueChange={(value) => handleChange('indicator', value)}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Wählen..." />
+            </SelectTrigger>
+            <SelectContent>
+              {Object.entries(INDICATORS).map(([key, value]) => (
+                <SelectItem key={key} value={key}>{value}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        );
+      default:
+        return (
+          <Input
+            value={String(editedComponent[field])}
+            onChange={(e) => handleChange(field, e.target.value)}
+          />
+        );
+    }
+  };
+
   return (
     <div className="container mx-auto p-8">
       <div className="flex justify-between items-center mb-8">
         <div className="space-y-1">
-          <h1 className="text-3xl font-bold">{component.name}</h1>
+          <h1 className="text-3xl font-bold">
+            {isEditing ? (
+              <Input
+                value={editedComponent.name}
+                onChange={(e) => handleChange('name', e.target.value)}
+                className="text-3xl font-bold h-auto py-0"
+              />
+            ) : (
+              component.name
+            )}
+          </h1>
           <p className="text-muted-foreground">
             ID: {component.id}
           </p>
@@ -83,11 +240,27 @@ export default function ComponentDetailsPage({ params }: ComponentDetailsProps) 
           >
             Zurück
           </Button>
-          <Button 
-            onClick={() => setIsEditing(!isEditing)}
-          >
-            {isEditing ? 'Abbrechen' : 'Bearbeiten'}
-          </Button>
+          {isEditing ? (
+            <>
+              <Button 
+                variant="outline"
+                onClick={handleCancel}
+              >
+                Abbrechen
+              </Button>
+              <Button 
+                onClick={handleSave}
+              >
+                Speichern
+              </Button>
+            </>
+          ) : (
+            <Button 
+              onClick={() => setIsEditing(true)}
+            >
+              Bearbeiten
+            </Button>
+          )}
         </div>
       </div>
 
@@ -100,27 +273,38 @@ export default function ComponentDetailsPage({ params }: ComponentDetailsProps) 
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <p className="text-sm text-muted-foreground">Kategorie</p>
-                <p className="font-medium">{CATEGORIES[component.category]}</p>
+                {renderValue('category', isEditing)}
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Typ</p>
-                <p className="font-medium">{INDICATORS[component.indicator]}</p>
+                {renderValue('indicator', isEditing)}
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Standort</p>
-                <p className="font-medium">{LOCATIONS[component.location]}</p>
+                {renderValue('location', isEditing)}
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Besitzverhältnis</p>
-                <p className="font-medium">{OWNERSHIPS[component.ownership]}</p>
+                {renderValue('ownership', isEditing)}
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Status</p>
-                <Badge>{STATUS[component.status]}</Badge>
+                {isEditing ? (
+                  renderValue('status', isEditing)
+                ) : (
+                  <Badge>{STATUS[component.status]}</Badge>
+                )}
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Seriennummer</p>
-                <p className="font-medium">{component.serialNumber}</p>
+                {isEditing ? (
+                  <Input
+                    value={editedComponent.serialNumber}
+                    onChange={(e) => handleChange('serialNumber', e.target.value)}
+                  />
+                ) : (
+                  <p className="font-medium">{component.serialNumber}</p>
+                )}
               </div>
             </div>
           </CardContent>
@@ -135,7 +319,14 @@ export default function ComponentDetailsPage({ params }: ComponentDetailsProps) 
               {Object.entries(component.specifications).map(([key, value]) => (
                 <div key={key}>
                   <p className="text-sm text-muted-foreground">{key}</p>
-                  <p className="font-medium">{value}</p>
+                  {isEditing ? (
+                    <Input
+                      value={editedComponent.specifications[key] || ''}
+                      onChange={(e) => handleSpecificationChange(key, e.target.value)}
+                    />
+                  ) : (
+                    <p className="font-medium">{value}</p>
+                  )}
                 </div>
               ))}
             </div>
@@ -149,16 +340,12 @@ export default function ComponentDetailsPage({ params }: ComponentDetailsProps) 
           <CardContent className="space-y-4">
             <div>
               <p className="text-sm text-muted-foreground">Kaufdatum</p>
-              <p className="font-medium">
-                {component.purchaseDate.toLocaleDateString('de-DE')}
-              </p>
+              {renderValue('purchaseDate', isEditing)}
             </div>
             {component.lastMaintenanceDate && (
               <div>
                 <p className="text-sm text-muted-foreground">Letzte Wartung</p>
-                <p className="font-medium">
-                  {component.lastMaintenanceDate.toLocaleDateString('de-DE')}
-                </p>
+                {renderValue('lastMaintenanceDate', isEditing)}
               </div>
             )}
           </CardContent>
@@ -171,7 +358,14 @@ export default function ComponentDetailsPage({ params }: ComponentDetailsProps) 
             </CardHeader>
             <CardContent>
               <p className="text-sm text-muted-foreground">Zugewiesen an</p>
-              <p className="font-medium">{component.assignedTo}</p>
+              {isEditing ? (
+                <Input
+                  value={editedComponent.assignedTo || ''}
+                  onChange={(e) => handleChange('assignedTo', e.target.value)}
+                />
+              ) : (
+                <p className="font-medium">{component.assignedTo}</p>
+              )}
             </CardContent>
           </Card>
         )}
