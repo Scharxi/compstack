@@ -73,20 +73,66 @@ const SPEC_FIELDS: Record<Indicator, SpecField[]> = {
       label: "RAM", 
       key: "ram",
       hint: "Arbeitsspeicher-Größe",
-      unit: "GB",
-      type: "text"
+      type: "select",
+      options: [
+        { label: "8 GB", value: "8 GB" },
+        { label: "16 GB", value: "16 GB" },
+        { label: "32 GB", value: "32 GB" },
+        { label: "64 GB", value: "64 GB" },
+      ]
     },
     { 
-      label: "Speicher", 
-      key: "storage",
+      label: "Primärspeicher", 
+      key: "primaryStorage",
       hint: "Hauptspeicher des Systems",
-      type: "text"
+      type: "select",
+      options: [
+        { label: "256 GB NVMe SSD", value: "256 GB NVMe" },
+        { label: "512 GB NVMe SSD", value: "512 GB NVMe" },
+        { label: "1 TB NVMe SSD", value: "1 TB NVMe" },
+        { label: "2 TB NVMe SSD", value: "2 TB NVMe" },
+        { label: "256 GB SATA SSD", value: "256 GB SATA" },
+        { label: "512 GB SATA SSD", value: "512 GB SATA" },
+        { label: "1 TB SATA SSD", value: "1 TB SATA" },
+        { label: "1 TB HDD", value: "1 TB HDD" },
+        { label: "2 TB HDD", value: "2 TB HDD" },
+        { label: "4 TB HDD", value: "4 TB HDD" },
+      ]
+    },
+    { 
+      label: "Sekundärspeicher", 
+      key: "secondaryStorage",
+      hint: "Zusätzlicher Speicher (optional)",
+      type: "select",
+      options: [
+        { label: "Keiner", value: "none" },
+        { label: "256 GB NVMe SSD", value: "256 GB NVMe" },
+        { label: "512 GB NVMe SSD", value: "512 GB NVMe" },
+        { label: "1 TB NVMe SSD", value: "1 TB NVMe" },
+        { label: "2 TB NVMe SSD", value: "2 TB NVMe" },
+        { label: "256 GB SATA SSD", value: "256 GB SATA" },
+        { label: "512 GB SATA SSD", value: "512 GB SATA" },
+        { label: "1 TB SATA SSD", value: "1 TB SATA" },
+        { label: "1 TB HDD", value: "1 TB HDD" },
+        { label: "2 TB HDD", value: "2 TB HDD" },
+        { label: "4 TB HDD", value: "4 TB HDD" },
+      ]
     },
     { 
       label: "Betriebssystem", 
       key: "os",
       hint: "Name und Version des Betriebssystems",
-      type: "text"
+      type: "select",
+      options: [
+        { label: "Windows 11 Pro", value: "Windows 11 Pro" },
+        { label: "Windows 11 Home", value: "Windows 11 Home" },
+        { label: "Windows 10 Pro", value: "Windows 10 Pro" },
+        { label: "Windows 10 Home", value: "Windows 10 Home" },
+        { label: "macOS Sonoma", value: "macOS Sonoma" },
+        { label: "macOS Ventura", value: "macOS Ventura" },
+        { label: "Ubuntu 22.04 LTS", value: "Ubuntu 22.04" },
+        { label: "Ubuntu 20.04 LTS", value: "Ubuntu 20.04" },
+      ]
     },
     { 
       label: "Anschlüsse", 
@@ -115,69 +161,296 @@ const SPEC_FIELDS: Record<Indicator, SpecField[]> = {
       example: "Intel Core i5-1240P",
       type: "text"
     },
-    // ... Add other LT fields
+    { 
+      label: "RAM", 
+      key: "ram",
+      hint: "Arbeitsspeicher-Größe",
+      type: "select",
+      options: [
+        { label: "8 GB", value: "8 GB" },
+        { label: "16 GB", value: "16 GB" },
+        { label: "32 GB", value: "32 GB" },
+        { label: "64 GB", value: "64 GB" },
+      ]
+    },
+    { 
+      label: "Speicher", 
+      key: "storage",
+      hint: "Hauptspeicher des Systems",
+      type: "select",
+      options: [
+        { label: "256 GB NVMe SSD", value: "256 GB NVMe" },
+        { label: "512 GB NVMe SSD", value: "512 GB NVMe" },
+        { label: "1 TB NVMe SSD", value: "1 TB NVMe" },
+        { label: "2 TB NVMe SSD", value: "2 TB NVMe" },
+      ]
+    },
+    { 
+      label: "Display", 
+      key: "display",
+      hint: "Bildschirmgröße und Auflösung",
+      type: "select",
+      options: [
+        { label: "13,3 Zoll (1920x1080)", value: "13,3 Zoll FHD" },
+        { label: "13,3 Zoll (2560x1600)", value: "13,3 Zoll 2.5K" },
+        { label: "14 Zoll (1920x1080)", value: "14 Zoll FHD" },
+        { label: "14 Zoll (2560x1600)", value: "14 Zoll 2.5K" },
+        { label: "15,6 Zoll (1920x1080)", value: "15,6 Zoll FHD" },
+        { label: "15,6 Zoll (2560x1600)", value: "15,6 Zoll 2.5K" },
+        { label: "16 Zoll (1920x1200)", value: "16 Zoll FHD+" },
+        { label: "16 Zoll (2560x1600)", value: "16 Zoll 2.5K" },
+      ]
+    },
+    { 
+      label: "Betriebssystem", 
+      key: "os",
+      hint: "Name und Version des Betriebssystems",
+      type: "select",
+      options: [
+        { label: "Windows 11 Pro", value: "Windows 11 Pro" },
+        { label: "Windows 11 Home", value: "Windows 11 Home" },
+        { label: "Windows 10 Pro", value: "Windows 10 Pro" },
+        { label: "Windows 10 Home", value: "Windows 10 Home" },
+        { label: "macOS Sonoma", value: "macOS Sonoma" },
+        { label: "macOS Ventura", value: "macOS Ventura" },
+        { label: "Ubuntu 22.04 LTS", value: "Ubuntu 22.04" },
+        { label: "Ubuntu 20.04 LTS", value: "Ubuntu 20.04" },
+      ]
+    },
+    { 
+      label: "Anschlüsse", 
+      key: "interfaces",
+      hint: "Verfügbare Anschlüsse (mehrere auswählbar)",
+      type: "multiselect",
+      options: [
+        { label: "USB 3.0", value: "USB 3.0" },
+        { label: "USB-C", value: "USB-C" },
+        { label: "Thunderbolt", value: "Thunderbolt" },
+        { label: "HDMI", value: "HDMI" },
+        { label: "DisplayPort", value: "DisplayPort" },
+        { label: "VGA", value: "VGA" },
+        { label: "RJ45 (LAN)", value: "RJ45" },
+        { label: "Audio Jack", value: "Audio" },
+        { label: "SD Card Reader", value: "SD" },
+      ]
+    },
   ],
   MON: [
     { 
       label: "Bildschirmgröße", 
       key: "size",
       hint: "Diagonale des Bildschirms",
-      unit: "Zoll",
-      type: "text"
+      type: "select",
+      options: [
+        { label: "24 Zoll", value: "24 Zoll" },
+        { label: "27 Zoll", value: "27 Zoll" },
+        { label: "32 Zoll", value: "32 Zoll" },
+        { label: "34 Zoll", value: "34 Zoll" },
+      ]
     },
-    // ... Add other MON fields
+    {
+      label: "Auflösung",
+      key: "resolution",
+      hint: "Bildschirmauflösung",
+      type: "select",
+      options: [
+        { label: "1920x1080 (FHD)", value: "1920x1080" },
+        { label: "2560x1440 (QHD)", value: "2560x1440" },
+        { label: "3440x1440 (UWQHD)", value: "3440x1440" },
+        { label: "3840x2160 (4K)", value: "3840x2160" },
+      ]
+    },
+    {
+      label: "Panel-Typ",
+      key: "panel",
+      hint: "Display-Technologie",
+      type: "select",
+      options: [
+        { label: "IPS", value: "IPS" },
+        { label: "VA", value: "VA" },
+        { label: "TN", value: "TN" },
+        { label: "OLED", value: "OLED" },
+      ]
+    },
+    { 
+      label: "Anschlüsse", 
+      key: "interfaces",
+      hint: "Verfügbare Anschlüsse (mehrere auswählbar)",
+      type: "multiselect",
+      options: [
+        { label: "HDMI", value: "HDMI" },
+        { label: "DisplayPort", value: "DisplayPort" },
+        { label: "VGA", value: "VGA" },
+        { label: "DVI", value: "DVI" },
+        { label: "USB-C", value: "USB-C" },
+        { label: "USB Hub", value: "USB Hub" },
+      ]
+    },
   ],
   GR: [
     { 
       label: "Chip", 
       key: "chip",
       hint: "Modell des Grafikchips",
-      example: "NVIDIA RTX 4070",
-      type: "text"
+      type: "select",
+      options: [
+        { label: "NVIDIA RTX 4090", value: "RTX 4090" },
+        { label: "NVIDIA RTX 4080", value: "RTX 4080" },
+        { label: "NVIDIA RTX 4070 Ti", value: "RTX 4070 Ti" },
+        { label: "NVIDIA RTX 4070", value: "RTX 4070" },
+        { label: "NVIDIA RTX 4060 Ti", value: "RTX 4060 Ti" },
+        { label: "NVIDIA RTX 4060", value: "RTX 4060" },
+        { label: "AMD RX 7900 XTX", value: "RX 7900 XTX" },
+        { label: "AMD RX 7900 XT", value: "RX 7900 XT" },
+        { label: "AMD RX 7800 XT", value: "RX 7800 XT" },
+        { label: "AMD RX 7700 XT", value: "RX 7700 XT" },
+      ]
     },
-    // ... Add other GR fields
+    {
+      label: "Speicher",
+      key: "memory",
+      hint: "Grafikspeicher",
+      type: "select",
+      options: [
+        { label: "8 GB GDDR6", value: "8 GB GDDR6" },
+        { label: "12 GB GDDR6X", value: "12 GB GDDR6X" },
+        { label: "16 GB GDDR6", value: "16 GB GDDR6" },
+        { label: "24 GB GDDR6X", value: "24 GB GDDR6X" },
+      ]
+    },
+    { 
+      label: "Anschlüsse", 
+      key: "interfaces",
+      hint: "Verfügbare Anschlüsse (mehrere auswählbar)",
+      type: "multiselect",
+      options: [
+        { label: "HDMI 2.1", value: "HDMI 2.1" },
+        { label: "DisplayPort 1.4", value: "DP 1.4" },
+        { label: "DisplayPort 2.1", value: "DP 2.1" },
+      ]
+    },
   ],
   CPU: [
     { 
       label: "Modell", 
       key: "model",
       hint: "Vollständige Modellbezeichnung",
-      example: "AMD Ryzen 7 7700X",
-      type: "text"
+      type: "select",
+      options: [
+        { label: "Intel Core i9-13900K", value: "i9-13900K" },
+        { label: "Intel Core i7-13700K", value: "i7-13700K" },
+        { label: "Intel Core i5-13600K", value: "i5-13600K" },
+        { label: "AMD Ryzen 9 7950X", value: "Ryzen 9 7950X" },
+        { label: "AMD Ryzen 7 7700X", value: "Ryzen 7 7700X" },
+        { label: "AMD Ryzen 5 7600X", value: "Ryzen 5 7600X" },
+      ]
     },
-    // ... Add other CPU fields
+    {
+      label: "Sockel",
+      key: "socket",
+      hint: "CPU-Sockel",
+      type: "select",
+      options: [
+        { label: "Intel LGA 1700", value: "LGA 1700" },
+        { label: "AMD AM5", value: "AM5" },
+        { label: "AMD AM4", value: "AM4" },
+      ]
+    },
   ],
   RAM: [
     { 
       label: "Typ", 
       key: "type",
       hint: "RAM-Technologie und Generation",
-      example: "DDR5",
-      type: "text"
+      type: "select",
+      options: [
+        { label: "DDR5-6000", value: "DDR5-6000" },
+        { label: "DDR5-5600", value: "DDR5-5600" },
+        { label: "DDR4-3600", value: "DDR4-3600" },
+        { label: "DDR4-3200", value: "DDR4-3200" },
+      ]
     },
-    // ... Add other RAM fields
+    {
+      label: "Kapazität",
+      key: "capacity",
+      hint: "Speicherkapazität pro Modul",
+      type: "select",
+      options: [
+        { label: "8 GB", value: "8 GB" },
+        { label: "16 GB", value: "16 GB" },
+        { label: "32 GB", value: "32 GB" },
+      ]
+    },
   ],
   SSD: [
+    { 
+      label: "Typ", 
+      key: "type",
+      hint: "SSD-Technologie",
+      type: "select",
+      options: [
+        { label: "NVMe PCIe 4.0", value: "NVMe PCIe 4.0" },
+        { label: "NVMe PCIe 3.0", value: "NVMe PCIe 3.0" },
+        { label: "SATA III", value: "SATA III" },
+      ]
+    },
     { 
       label: "Kapazität", 
       key: "capacity",
       hint: "Speicherkapazität",
-      example: "1000",
-      unit: "GB",
-      type: "text"
+      type: "select",
+      options: [
+        { label: "256 GB", value: "256 GB" },
+        { label: "512 GB", value: "512 GB" },
+        { label: "1 TB", value: "1 TB" },
+        { label: "2 TB", value: "2 TB" },
+        { label: "4 TB", value: "4 TB" },
+      ]
     },
-    // ... Add other SSD fields
+    { 
+      label: "Anschluss", 
+      key: "interface",
+      hint: "Physischer Anschluss",
+      type: "select",
+      options: [
+        { label: "M.2", value: "M.2" },
+        { label: "SATA", value: "SATA" },
+      ]
+    },
   ],
   HDD: [
     { 
       label: "Kapazität", 
       key: "capacity",
       hint: "Speicherkapazität",
-      example: "2000",
-      unit: "GB",
-      type: "text"
+      type: "select",
+      options: [
+        { label: "1 TB", value: "1 TB" },
+        { label: "2 TB", value: "2 TB" },
+        { label: "4 TB", value: "4 TB" },
+        { label: "8 TB", value: "8 TB" },
+        { label: "16 TB", value: "16 TB" },
+      ]
     },
-    // ... Add other HDD fields
+    {
+      label: "Drehzahl",
+      key: "rpm",
+      hint: "Umdrehungen pro Minute",
+      type: "select",
+      options: [
+        { label: "5400 RPM", value: "5400 RPM" },
+        { label: "7200 RPM", value: "7200 RPM" },
+      ]
+    },
+    { 
+      label: "Anschluss", 
+      key: "interface",
+      hint: "Physischer Anschluss",
+      type: "select",
+      options: [
+        { label: "SATA III", value: "SATA III" },
+      ]
+    },
   ]
 };
 
