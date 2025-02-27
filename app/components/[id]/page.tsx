@@ -29,6 +29,12 @@ import {
 import { useComponentsStore } from "@/app/store/components";
 import { fetchComponent } from '@/app/services/api';
 
+// Hilfsfunktion für einheitliche Datumsformatierung
+function formatDate(date: Date | string): string {
+  const d = new Date(date);
+  return `${d.getDate().toString().padStart(2, '0')}.${(d.getMonth() + 1).toString().padStart(2, '0')}.${d.getFullYear()}`;
+}
+
 interface ComponentDetailsProps {
   params: Promise<{
     id: string;
@@ -169,7 +175,7 @@ export default function ComponentDetailsPage({ params }: ComponentDetailsProps) 
   const renderValue = (field: keyof typeof component, isEditing: boolean) => {
     if (!isEditing) {
       if (field === 'lastMaintenanceDate') {
-        return <p className="font-medium">{new Date(String(component[field])).toLocaleDateString('de-DE')}</p>;
+        return <p className="font-medium">{formatDate(String(component[field]))}</p>;
       }
       return <p className="font-medium">{String(component[field])}</p>;
     }
@@ -490,7 +496,7 @@ export default function ComponentDetailsPage({ params }: ComponentDetailsProps) 
                   <div key={index} className="border rounded-lg p-4">
                     <div className="flex justify-between items-start mb-4">
                       <h4 className="text-lg font-semibold">
-                        Wartung vom {new Date(protocol.date).toLocaleDateString('de-DE')}
+                        Wartung vom {formatDate(protocol.date)}
                       </h4>
                     </div>
                     <div className="space-y-4">
