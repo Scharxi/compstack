@@ -5,6 +5,7 @@ interface ComponentsState {
   components: HardwareComponent[];
   setComponents: (components: HardwareComponent[]) => void;
   updateComponent: (updatedComponent: HardwareComponent) => void;
+  addComponent: (newComponent: HardwareComponent) => void;
 }
 
 // Initial mock data
@@ -38,5 +39,9 @@ export const useComponentsStore = create<ComponentsState>((set) => ({
       components: state.components.map((component) =>
         component.id === updatedComponent.id ? updatedComponent : component
       ),
+    })),
+  addComponent: (newComponent) =>
+    set((state) => ({
+      components: [...state.components, newComponent],
     })),
 })); 

@@ -41,44 +41,145 @@ interface Specifications {
   [key: string]: string;
 }
 
-const SPEC_FIELDS: { [key in Indicator]?: Array<{ 
-  label: string; 
-  key: string; 
+interface SpecField {
+  label: string;
+  key: string;
   hint?: string;
   example?: string;
   unit?: string;
-}> } = {
+  type?: 'text' | 'select';
+  options?: Array<{
+    label: string;
+    value: string;
+  }>;
+}
+
+const COMMON_VALUES = {
+  ramSizes: [
+    { label: "4 GB", value: "4" },
+    { label: "8 GB", value: "8" },
+    { label: "16 GB", value: "16" },
+    { label: "32 GB", value: "32" },
+    { label: "64 GB", value: "64" },
+  ],
+  storageTypes: [
+    { label: "NVMe SSD", value: "nvme" },
+    { label: "SATA SSD", value: "ssd" },
+    { label: "HDD", value: "hdd" },
+  ],
+  storageSizes: [
+    { label: "256 GB", value: "256" },
+    { label: "512 GB", value: "512" },
+    { label: "1 TB", value: "1000" },
+    { label: "2 TB", value: "2000" },
+    { label: "4 TB", value: "4000" },
+  ],
+  displaySizes: [
+    { label: "13 Zoll", value: "13" },
+    { label: "14 Zoll", value: "14" },
+    { label: "15.6 Zoll", value: "15.6" },
+    { label: "16 Zoll", value: "16" },
+    { label: "17 Zoll", value: "17" },
+  ],
+  monitorSizes: [
+    { label: "24 Zoll", value: "24" },
+    { label: "27 Zoll", value: "27" },
+    { label: "32 Zoll", value: "32" },
+    { label: "34 Zoll", value: "34" },
+  ],
+  resolutions: [
+    { label: "1920x1080 (Full HD)", value: "1920x1080" },
+    { label: "2560x1440 (QHD)", value: "2560x1440" },
+    { label: "3440x1440 (UWQHD)", value: "3440x1440" },
+    { label: "3840x2160 (4K)", value: "3840x2160" },
+  ],
+  panelTypes: [
+    { label: "IPS", value: "IPS" },
+    { label: "VA", value: "VA" },
+    { label: "TN", value: "TN" },
+    { label: "OLED", value: "OLED" },
+  ],
+  formFactors: [
+    { label: "2.5 Zoll", value: "2.5 Zoll" },
+    { label: "3.5 Zoll", value: "3.5 Zoll" },
+    { label: "M.2 2280", value: "M.2 2280" },
+    { label: "M.2 2242", value: "M.2 2242" },
+  ],
+  interfaces: [
+    { label: "SATA III", value: "SATA III" },
+    { label: "PCIe 3.0 x4", value: "PCIe 3.0 x4" },
+    { label: "PCIe 4.0 x4", value: "PCIe 4.0 x4" },
+    { label: "PCIe 5.0 x4", value: "PCIe 5.0 x4" },
+  ],
+  operatingSystems: [
+    { label: "Windows 11 Pro", value: "Windows 11 Pro" },
+    { label: "Windows 11 Home", value: "Windows 11 Home" },
+    { label: "Windows 10 Pro", value: "Windows 10 Pro" },
+    { label: "Windows 10 Home", value: "Windows 10 Home" },
+    { label: "macOS", value: "macOS" },
+    { label: "Linux", value: "Linux" },
+  ],
+  storage: [
+    { label: "256 GB NVMe SSD", value: "256GB NVMe" },
+    { label: "512 GB NVMe SSD", value: "512GB NVMe" },
+    { label: "1 TB NVMe SSD", value: "1TB NVMe" },
+    { label: "2 TB NVMe SSD", value: "2TB NVMe" },
+    { label: "256 GB SATA SSD", value: "256GB SATA" },
+    { label: "512 GB SATA SSD", value: "512GB SATA" },
+    { label: "1 TB SATA SSD", value: "1TB SATA" },
+    { label: "1 TB HDD", value: "1TB HDD" },
+    { label: "2 TB HDD", value: "2TB HDD" },
+    { label: "4 TB HDD", value: "4TB HDD" },
+  ],
+};
+
+const SPEC_FIELDS: { [key in Indicator]?: Array<SpecField> } = {
   PC: [
     { 
       label: "CPU", 
       key: "cpu",
       hint: "Prozessor-Modell und Generation",
-      example: "Intel Core i7-12700K"
+      example: "Intel Core i7-12700K",
+      type: "text"
     },
     { 
       label: "RAM", 
       key: "ram",
       hint: "Arbeitsspeicher-Größe",
-      example: "16 GB",
-      unit: "GB"
+      unit: "GB",
+      type: "select",
+      options: COMMON_VALUES.ramSizes
     },
     { 
-      label: "Speicher", 
+      label: "Primärer Speicher", 
       key: "storage",
-      hint: "Art und Größe des Speichers",
-      example: "1 TB SSD + 2 TB HDD"
+      hint: "Hauptspeicher des Systems",
+      type: "select",
+      options: COMMON_VALUES.storage
+    },
+    { 
+      label: "Zusatzspeicher", 
+      key: "additionalStorage",
+      hint: "Optionaler zusätzlicher Speicher",
+      type: "select",
+      options: [
+        { label: "Kein Zusatzspeicher", value: "none" },
+        ...COMMON_VALUES.storage
+      ]
     },
     { 
       label: "Betriebssystem", 
       key: "os",
       hint: "Name und Version des Betriebssystems",
-      example: "Windows 11 Pro"
+      type: "select",
+      options: COMMON_VALUES.operatingSystems
     },
     { 
       label: "Grafikkarte", 
       key: "gpu",
       hint: "Modell der Grafikkarte",
-      example: "NVIDIA RTX 3060"
+      example: "NVIDIA RTX 3060",
+      type: "text"
     },
   ],
   LT: [
@@ -86,38 +187,44 @@ const SPEC_FIELDS: { [key in Indicator]?: Array<{
       label: "CPU", 
       key: "cpu",
       hint: "Prozessor-Modell und Generation",
-      example: "Intel Core i5-1240P"
+      example: "Intel Core i5-1240P",
+      type: "text"
     },
     { 
       label: "RAM", 
       key: "ram",
       hint: "Arbeitsspeicher-Größe",
-      example: "16 GB",
-      unit: "GB"
+      unit: "GB",
+      type: "select",
+      options: COMMON_VALUES.ramSizes
     },
     { 
       label: "Speicher", 
       key: "storage",
-      hint: "Art und Größe des Speichers",
-      example: "512 GB SSD"
+      hint: "Hauptspeicher des Systems",
+      type: "select",
+      options: COMMON_VALUES.storage.filter(s => !s.value.includes("HDD"))
     },
     { 
       label: "Display", 
       key: "display",
-      hint: "Displaygröße und Auflösung",
-      example: "14 Zoll, 2560x1600"
+      hint: "Displaygröße",
+      type: "select",
+      options: COMMON_VALUES.displaySizes
     },
     { 
       label: "Betriebssystem", 
       key: "os",
       hint: "Name und Version des Betriebssystems",
-      example: "Windows 11 Pro"
+      type: "select",
+      options: COMMON_VALUES.operatingSystems
     },
     { 
-      label: "Grafikkarte", 
+      label: "Grafik", 
       key: "gpu",
-      hint: "Modell der Grafikkarte",
-      example: "Intel Iris Xe"
+      hint: "Grafikeinheit",
+      example: "Intel Iris Xe",
+      type: "text"
     },
   ],
   MON: [
@@ -125,33 +232,38 @@ const SPEC_FIELDS: { [key in Indicator]?: Array<{
       label: "Bildschirmgröße", 
       key: "size",
       hint: "Diagonale des Bildschirms",
-      example: "27 Zoll",
-      unit: "Zoll"
+      unit: "Zoll",
+      type: "select",
+      options: COMMON_VALUES.monitorSizes
     },
     { 
       label: "Auflösung", 
       key: "resolution",
       hint: "Horizontale x Vertikale Pixel",
-      example: "2560x1440"
+      type: "select",
+      options: COMMON_VALUES.resolutions
     },
     { 
       label: "Panel-Typ", 
       key: "panelType",
       hint: "Technologie des Displays",
-      example: "IPS, VA, oder TN"
+      type: "select",
+      options: COMMON_VALUES.panelTypes
     },
     { 
       label: "Anschlüsse", 
       key: "ports",
       hint: "Verfügbare Anschlüsse",
-      example: "2x HDMI, 1x DisplayPort"
+      example: "2x HDMI, 1x DisplayPort",
+      type: "text"
     },
     { 
       label: "Helligkeit", 
       key: "brightness",
       hint: "Maximale Helligkeit",
       example: "400",
-      unit: "cd/m²"
+      unit: "cd/m²",
+      type: "text"
     },
   ],
   GR: [
@@ -321,7 +433,7 @@ export function AddComponentForm({ lastRunningNumber }: AddComponentFormProps) {
   const [serialNumber, setSerialNumber] = useState("");
   const [specifications, setSpecifications] = useState<Specifications>({});
 
-  const updateComponent = useComponentsStore((state) => state.updateComponent);
+  const addComponent = useComponentsStore((state) => state.addComponent);
 
   const handleSpecificationChange = (key: string, value: string) => {
     setSpecifications(prev => ({
@@ -345,11 +457,11 @@ export function AddComponentForm({ lastRunningNumber }: AddComponentFormProps) {
       serialNumber,
       purchaseDate: new Date(),
       specifications: Object.fromEntries(
-        Object.entries(specifications).filter(([_, value]) => value !== "")
+        Object.entries(specifications).filter(([, value]) => value !== "" && value !== "none")
       )
     };
 
-    updateComponent(newComponent);
+    addComponent(newComponent);
     setOpen(false);
     resetForm();
   };
@@ -383,7 +495,7 @@ export function AddComponentForm({ lastRunningNumber }: AddComponentFormProps) {
           </div>
 
           <div className="grid sm:grid-cols-2 gap-6">
-            {fields.map(({ label, key, hint, example, unit }) => (
+            {fields.map(({ label, key, hint, example, unit, type, options }) => (
               <div key={key} className="space-y-2 bg-background rounded-lg p-4 shadow-sm border">
                 <div className="space-y-1">
                   <label htmlFor={key} className="text-sm font-medium flex items-center gap-2">
@@ -394,13 +506,31 @@ export function AddComponentForm({ lastRunningNumber }: AddComponentFormProps) {
                     <p className="text-xs text-muted-foreground">{hint}</p>
                   )}
                 </div>
-                <Input
-                  id={key}
-                  value={specifications[key] || ""}
-                  onChange={(e) => handleSpecificationChange(key, e.target.value)}
-                  placeholder={example || `${label} eingeben...`}
-                  className="bg-white/50"
-                />
+                {type === 'select' && options ? (
+                  <Select
+                    value={specifications[key] || ""}
+                    onValueChange={(value) => handleSpecificationChange(key, value)}
+                  >
+                    <SelectTrigger className="bg-white/50">
+                      <SelectValue placeholder={`${label} auswählen...`} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {options.map((option) => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                ) : (
+                  <Input
+                    id={key}
+                    value={specifications[key] || ""}
+                    onChange={(e) => handleSpecificationChange(key, e.target.value)}
+                    placeholder={example || `${label} eingeben...`}
+                    className="bg-white/50"
+                  />
+                )}
               </div>
             ))}
           </div>
