@@ -1,9 +1,6 @@
 'use client';
 
 import { ReactNode } from 'react';
-import Link from 'next/link';
-import { List } from 'lucide-react';
-import { usePathname } from 'next/navigation';
 import { Sidebar } from "@/app/components/dashboard/sidebar";
 import { ThemeToggle } from "@/app/components/theme-toggle";
 
@@ -12,13 +9,6 @@ interface DashboardLayoutProps {
 }
 
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
-  const pathname = usePathname();
-
-  const navigation = [
-    { name: 'Components', href: '/dashboard/components', icon: List },
-    { name: 'Listen', href: '/dashboard/lists', icon: List },
-  ];
-
   return (
     <div className="flex h-screen">
       <div className="fixed inset-y-0 w-64 border-r bg-background">
