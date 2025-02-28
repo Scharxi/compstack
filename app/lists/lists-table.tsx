@@ -1,20 +1,25 @@
 'use client';
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Edit2, Trash2, Loader2, Component } from "lucide-react";
+import { Edit2, Trash2, Loader2, Component, List as ListIcon } from "lucide-react";
 import { useListsStore } from "@/app/store/lists";
+import { useComponentsStore } from "@/app/store/components";
 import { toast } from "sonner";
+import { ListDetailsDialog } from "./list-details-dialog";
 
 export function ListsTable() {
   const router = useRouter();
   const { lists, isLoading, error, fetchLists, deleteList } = useListsStore();
+  const { components, fetchComponents } = useComponentsStore();
+  const [selectedList, setSelectedList] = useState<string | null>(null);
 
   useEffect(() => {
     fetchLists();
-  }, [fetchLists]);
+    fetchComponents();
+  }, [fetchLists, fetchComponents]);
 
   const handleDelete = async (e: React.MouseEvent, id: string) => {
     e.stopPropagation();
@@ -60,56 +65,80 @@ export function ListsTable() {
     );
   }
 
+  const selectedListData = lists.find(l => l.id === selectedList);
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-      {lists.map((list) => (
-        <Card 
-          key={list.id}
-          className="hover:bg-accent/5 transition-colors cursor-pointer"
-          onClick={() => router.push(`/lists/${list.id}`)}
-        >
-          <CardHeader className="pb-3">
-            <CardTitle className="flex items-start justify-between">
-              <span className="truncate text-xl">{list.name}</span>
-              <div className="flex items-center gap-1 ml-2">
-                <Button 
-                  variant="ghost" 
-                  size="icon"
-                  className="h-9 w-9"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    router.push(`/lists/${list.id}/edit`);
-                  }}
-                >
-                  <Edit2 className="h-4 w-4" />
-                </Button>
-                <Button 
-                  variant="ghost" 
-                  size="icon"
-                  className="h-9 w-9 text-destructive hover:text-destructive"
-                  onClick={(e) => handleDelete(e, list.id)}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
+    <>
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+        {lists.map((list) => (
+          <Card 
+            key={list.id}
+            className="hover:bg-accent/5 transition-colors cursor-pointer"
+            onClick={() => router.push(`/lists/${list.id}`)}
+          >
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-start justify-between">
+                <span className="truncate text-xl">{list.name}</span>
+                <div className="flex items-center gap-1 ml-2">
+                  <Button 
+                    variant="ghost" 
+                    size="icon"
+                    className="h-9 w-9"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedList(list.id);
+                    }}
+                  >
+                    <ListIcon className="h-4 w-4" />
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    size="icon"
+                    className="h-9 w-9"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      router.push(`/lists/${list.id}/edit`);
+                    }}
+                  >
+                    <Edit2 className="h-4 w-4" />
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    size="icon"
+                    className="h-9 w-9 text-destructive hover:text-destructive"
+                    onClick={(e) => handleDelete(e, list.id)}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="pb-4">
+              <p className="text-sm text-muted-foreground line-clamp-2 min-h-[2.5rem]">
+                {list.description || "Keine Beschreibung"}
+              </p>
+            </CardContent>
+            <CardFooter className="flex justify-between text-sm text-muted-foreground pt-3 border-t">
+              <div className="flex items-center gap-2">
+                <Component className="h-4 w-4" />
+                {list.itemCount} {list.itemCount === 1 ? 'Komponente' : 'Komponenten'}
               </div>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="pb-4">
-            <p className="text-sm text-muted-foreground line-clamp-2 min-h-[2.5rem]">
-              {list.description || "Keine Beschreibung"}
-            </p>
-          </CardContent>
-          <CardFooter className="flex justify-between text-sm text-muted-foreground pt-3 border-t">
-            <div className="flex items-center gap-2">
-              <Component className="h-4 w-4" />
-              {list.itemCount} {list.itemCount === 1 ? 'Komponente' : 'Komponenten'}
-            </div>
-            <div>
-              {new Date(list.createdAt).toLocaleDateString('de-DE')}
-            </div>
-          </CardFooter>
-        </Card>
-      ))}
-    </div>
+              <div>
+                {new Date(list.createdAt).toLocaleDateString('de-DE')}
+              </div>
+            </CardFooter>
+          </Card>
+        ))}
+      </div>
+
+      {selectedListData && (
+        <ListDetailsDialog
+          list={selectedListData}
+          components={components}
+          open={!!selectedList}
+          onOpenChange={(open) => !open && setSelectedList(null)}
+        />
+      )}
+    </>
   );
 } 
