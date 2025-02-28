@@ -11,8 +11,9 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Edit2, Trash2, FileSpreadsheet } from "lucide-react";
+import { Edit2, Trash2, FileSpreadsheet, Loader2 } from "lucide-react";
 import { useListsStore } from "@/app/store/lists";
+import { toast } from "sonner";
 
 export function ListsTable() {
   const router = useRouter();
@@ -23,30 +24,45 @@ export function ListsTable() {
   }, [fetchLists]);
 
   const handleDelete = async (e: React.MouseEvent, id: string) => {
-    e.stopPropagation(); // Prevent row click when deleting
-    await deleteList(id);
+    e.stopPropagation();
+    
+    try {
+      await deleteList(id);
+      toast.success("Liste erfolgreich gelöscht");
+    } catch (error) {
+      toast.error("Fehler beim Löschen der Liste");
+      console.error(error);
+    }
   };
 
   if (isLoading) {
     return (
       <div className="flex justify-center items-center py-8">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="flex justify-center items-center py-8 text-destructive">
-        {error}
+      <div className="flex flex-col items-center justify-center py-8 space-y-4">
+        <p className="text-destructive">{error}</p>
+        <Button onClick={() => fetchLists()} variant="outline">
+          Erneut versuchen
+        </Button>
       </div>
     );
   }
 
   if (lists.length === 0) {
     return (
-      <div className="flex justify-center items-center py-8 text-muted-foreground">
-        Keine Listen vorhanden. Erstellen Sie eine neue Liste.
+      <div className="flex flex-col items-center justify-center py-8 space-y-4">
+        <p className="text-muted-foreground">
+          Keine Listen vorhanden
+        </p>
+        <p className="text-sm text-muted-foreground">
+          Erstellen Sie eine neue Liste, um Komponenten zu gruppieren
+        </p>
       </div>
     );
   }
@@ -72,7 +88,7 @@ export function ListsTable() {
             >
               <TableCell className="font-medium">{list.name}</TableCell>
               <TableCell>{list.description}</TableCell>
-              <TableCell>{new Date(list.createdAt).toLocaleDateString()}</TableCell>
+              <TableCell>{new Date(list.createdAt).toLocaleDateString('de-DE')}</TableCell>
               <TableCell>{list.itemCount}</TableCell>
               <TableCell className="text-right">
                 <div className="flex justify-end gap-2">
@@ -91,7 +107,7 @@ export function ListsTable() {
                     size="icon"
                     onClick={(e) => {
                       e.stopPropagation();
-                      // TODO: Implement edit functionality
+                      router.push(`/lists/${list.id}/edit`);
                     }}
                   >
                     <Edit2 className="h-4 w-4" />
@@ -99,7 +115,7 @@ export function ListsTable() {
                   <Button 
                     variant="ghost" 
                     size="icon" 
-                    className="text-destructive"
+                    className="text-destructive hover:text-destructive"
                     onClick={(e) => handleDelete(e, list.id)}
                   >
                     <Trash2 className="h-4 w-4" />
