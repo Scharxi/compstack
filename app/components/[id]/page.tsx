@@ -140,6 +140,9 @@ export default function ComponentDetailsPage({ params }: ComponentDetailsProps) 
 
       try {
         await updateComponent(updatedComponent);
+        const refreshedData = await fetchComponent(id);
+        setComponent(refreshedData);
+        setEditedComponent(refreshedData);
         setCompletedTasks([]);
         setMaintenanceNotes("");
       } catch (error) {
