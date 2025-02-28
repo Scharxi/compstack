@@ -11,6 +11,7 @@ import { useComponentsStore } from '@/app/store/components';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { toast } from "sonner";
+import { STATUS } from '@/app/types/hardware';
 
 export default function ListDetailPage() {
   const params = useParams();
@@ -27,17 +28,39 @@ export default function ListDetailPage() {
     fetchComponents();
   }, [fetchLists, fetchComponents]);
 
+  // Set initial selected components when list is loaded
+  useEffect(() => {
+    if (list) {
+      setSelectedComponents(list.components);
+    }
+  }, [list]);
+
   const filteredComponents = components.filter(component => 
-    component.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    component.id.toLowerCase().includes(searchQuery.toLowerCase())
+    (component.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+     component.id.toLowerCase().includes(searchQuery.toLowerCase()))
   );
 
   const handleAddComponent = (componentId: string) => {
-    setSelectedComponents(prev => [...prev, componentId]);
+    if (!selectedComponents.includes(componentId)) {
+      setSelectedComponents(prev => [...prev, componentId]);
+    }
   };
 
   const handleRemoveComponent = (componentId: string) => {
     setSelectedComponents(prev => prev.filter(id => id !== componentId));
+  };
+
+  const getStatusVariant = (status: string) => {
+    switch (status) {
+      case 'AK':
+        return 'default';
+      case 'IN':
+        return 'secondary';
+      case 'DE':
+        return 'destructive';
+      default:
+        return 'default';
+    }
   };
 
   const handleSave = async () => {
@@ -101,7 +124,7 @@ export default function ListDetailPage() {
           </Button>
           <Button 
             onClick={handleSave} 
-            disabled={isSaving || selectedComponents.length === 0}
+            disabled={isSaving}
             className="gap-2"
           >
             <Save className="h-4 w-4" />
@@ -131,35 +154,40 @@ export default function ListDetailPage() {
             
             <div className="h-[600px] overflow-y-auto rounded-md border">
               <div className="p-4 space-y-2">
-                {filteredComponents.map((component) => (
-                  <Card 
-                    key={component.id}
-                    className={`${
-                      selectedComponents.includes(component.id) 
-                        ? 'opacity-50' 
-                        : 'hover:bg-accent hover:text-accent-foreground'
-                    } transition-colors`}
-                  >
-                    <CardContent className="p-4 flex items-center gap-4">
-                      <div className="flex-1">
-                        <div className="font-medium">{component.name}</div>
-                        <div className="text-sm text-muted-foreground">
-                          {component.id}
+                {filteredComponents.map((component) => {
+                  const isSelected = selectedComponents.includes(component.id);
+                  return (
+                    <Card 
+                      key={component.id}
+                      className={`${
+                        isSelected
+                          ? 'opacity-50' 
+                          : 'hover:bg-accent hover:text-accent-foreground'
+                      } transition-colors`}
+                    >
+                      <CardContent className="p-4 flex items-center gap-4">
+                        <div className="flex-1">
+                          <div className="font-medium">{component.name}</div>
+                          <div className="text-sm text-muted-foreground">
+                            {component.id}
+                          </div>
                         </div>
-                      </div>
-                      <Badge>{component.status}</Badge>
-                      {!selectedComponents.includes(component.id) && (
-                        <Button
-                          size="icon"
-                          variant="ghost"
-                          onClick={() => handleAddComponent(component.id)}
-                        >
-                          <Plus className="h-4 w-4" />
-                        </Button>
-                      )}
-                    </CardContent>
-                  </Card>
-                ))}
+                        <Badge variant={getStatusVariant(component.status)}>
+                          {STATUS[component.status]}
+                        </Badge>
+                        {!isSelected && (
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            onClick={() => handleAddComponent(component.id)}
+                          >
+                            <Plus className="h-4 w-4" />
+                          </Button>
+                        )}
+                      </CardContent>
+                    </Card>
+                  );
+                })}
                 {filteredComponents.length === 0 && (
                   <div className="text-center text-muted-foreground py-8">
                     Keine Komponenten gefunden
@@ -171,7 +199,9 @@ export default function ListDetailPage() {
 
           {/* Selected Components */}
           <div className="space-y-4">
-            <h2 className="text-lg font-semibold">Ausgewählte Komponenten</h2>
+            <h2 className="text-lg font-semibold">
+              Ausgewählte Komponenten ({selectedComponents.length})
+            </h2>
             <div className="h-[600px] overflow-y-auto rounded-md border">
               <div className="p-4 space-y-2">
                 {selectedComponents.map((componentId) => {
@@ -187,7 +217,9 @@ export default function ListDetailPage() {
                             {component.id}
                           </div>
                         </div>
-                        <Badge>{component.status}</Badge>
+                        <Badge variant={getStatusVariant(component.status)}>
+                          {STATUS[component.status]}
+                        </Badge>
                         <Button
                           size="icon"
                           variant="ghost"
