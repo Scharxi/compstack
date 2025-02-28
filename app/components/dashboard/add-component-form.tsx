@@ -1366,7 +1366,7 @@ export function AddComponentForm({ lastRunningNumber, initialData, mode = 'creat
             >
               Cancel
             </Button>
-            <Button onClick={handleSubmit} disabled={!name || !serialNumber}>
+            <Button onClick={handleSubmit} disabled={!name}>
               {mode === 'create' ? 'Add' : 'Save'}
             </Button>
           </div>
