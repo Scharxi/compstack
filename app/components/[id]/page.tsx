@@ -28,6 +28,7 @@ import {
 } from "@/app/types/hardware";
 import { useComponentsStore } from "@/app/store/components";
 import { fetchComponent } from '@/app/services/api';
+import { ThemeToggle } from "@/app/components/theme-toggle";
 
 interface ComponentDetailsProps {
   params: Promise<{
@@ -306,7 +307,8 @@ export default function ComponentDetailsPage({ params }: ComponentDetailsProps) 
             ID: {component.id}
           </p>
         </div>
-        <div className="space-x-4">
+        <div className="space-x-4 flex items-center">
+          <ThemeToggle />
           <Button 
             variant="outline" 
             onClick={() => router.back()}
