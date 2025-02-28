@@ -484,7 +484,7 @@ export default function ComponentDetailsPage({ params }: ComponentDetailsProps) 
                   <div key={index} className="border rounded-lg p-4">
                     <div className="flex justify-between items-start mb-4">
                       <h4 className="text-lg font-semibold">
-                        Wartung vom {protocol.date.toLocaleDateString('de-DE')}
+                        Wartung vom {new Date(protocol.date).toLocaleDateString('de-DE')}
                       </h4>
                     </div>
                     <div className="space-y-4">
