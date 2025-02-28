@@ -58,6 +58,7 @@ interface SpecField {
   unit?: string;
   type?: 'text' | 'select' | 'multiselect';
   options?: Option[];
+  required?: boolean;
 }
 
 const SPEC_FIELDS: Record<Indicator, SpecField[]> = {
@@ -451,7 +452,323 @@ const SPEC_FIELDS: Record<Indicator, SpecField[]> = {
         { label: "SATA III", value: "SATA III" },
       ]
     },
-  ]
+  ],
+  SW: [
+    { 
+      label: "Hersteller", 
+      key: "manufacturer",
+      hint: "Hersteller des Switches",
+      type: "text",
+      required: true
+    },
+    { 
+      label: "Modell", 
+      key: "model",
+      hint: "Modellbezeichnung",
+      type: "text",
+      required: true
+    },
+    { 
+      label: "Typ", 
+      key: "type",
+      hint: "Management-Level des Switches",
+      type: "select",
+      options: [
+        { label: "Unmanaged", value: "Unmanaged" },
+        { label: "Smart", value: "Smart" },
+        { label: "Managed Layer 2", value: "Managed Layer 2" },
+        { label: "Managed Layer 3", value: "Managed Layer 3" }
+      ],
+      required: true
+    },
+    { 
+      label: "Ports", 
+      key: "ports",
+      hint: "Anzahl der Ports",
+      type: "select",
+      options: [
+        { label: "8 Ports", value: "8 Ports" },
+        { label: "12 Ports", value: "12 Ports" },
+        { label: "16 Ports", value: "16 Ports" },
+        { label: "24 Ports", value: "24 Ports" },
+        { label: "48 Ports", value: "48 Ports" }
+      ],
+      required: true
+    },
+    { 
+      label: "Geschwindigkeit", 
+      key: "speed",
+      hint: "Port-Geschwindigkeit",
+      type: "select",
+      options: [
+        { label: "10/100 Mbps", value: "10/100 Mbps" },
+        { label: "10/100/1000 Mbps", value: "10/100/1000 Mbps" },
+        { label: "2.5 Gbps", value: "2.5 Gbps" },
+        { label: "5 Gbps", value: "5 Gbps" },
+        { label: "10 Gbps", value: "10 Gbps" }
+      ],
+      required: true
+    },
+    { 
+      label: "Management-IP", 
+      key: "management",
+      hint: "IP-Adresse für Management-Zugriff",
+      type: "text"
+    },
+    { 
+      label: "Features", 
+      key: "features",
+      hint: "Unterstützte Features",
+      type: "multiselect",
+      options: [
+        { label: "Basic", value: "Basic" },
+        { label: "VLAN", value: "VLAN" },
+        { label: "PoE", value: "PoE" },
+        { label: "PoE+", value: "PoE+" },
+        { label: "SFP", value: "SFP" },
+        { label: "SFP+", value: "SFP+" }
+      ],
+      required: true
+    }
+  ],
+  RT: [
+    { 
+      label: "Hersteller", 
+      key: "manufacturer",
+      hint: "Hersteller des Routers",
+      type: "text",
+      required: true
+    },
+    { 
+      label: "Modell", 
+      key: "model",
+      hint: "Modellbezeichnung",
+      type: "text",
+      required: true
+    },
+    { 
+      label: "Typ", 
+      key: "type",
+      hint: "Einsatzbereich des Routers",
+      type: "select",
+      options: [
+        { label: "SOHO", value: "SOHO" },
+        { label: "SMB", value: "SMB" },
+        { label: "Enterprise", value: "Enterprise" },
+        { label: "ISP-Grade", value: "ISP-Grade" }
+      ],
+      required: true
+    },
+    { 
+      label: "LAN-Ports", 
+      key: "ports",
+      hint: "Anzahl der LAN-Ports",
+      type: "select",
+      options: [
+        { label: "1 Port", value: "1 Port" },
+        { label: "4 Ports", value: "4 Ports" },
+        { label: "8 Ports", value: "8 Ports" },
+        { label: "12 Ports", value: "12 Ports" }
+      ],
+      required: true
+    },
+    { 
+      label: "WAN-Ports", 
+      key: "wanPorts",
+      hint: "Anzahl der WAN-Ports",
+      type: "select",
+      options: [
+        { label: "1 Port", value: "1 Port" },
+        { label: "2 Ports", value: "2 Ports" },
+        { label: "4 Ports", value: "4 Ports" }
+      ],
+      required: true
+    },
+    { 
+      label: "WLAN", 
+      key: "wifi",
+      hint: "WLAN-Standard",
+      type: "select",
+      options: [
+        { label: "Nein", value: "Nein" },
+        { label: "WiFi 5", value: "WiFi 5" },
+        { label: "WiFi 6", value: "WiFi 6" },
+        { label: "WiFi 6E", value: "WiFi 6E" }
+      ],
+      required: true
+    },
+    { 
+      label: "Features", 
+      key: "features",
+      hint: "Unterstützte Features",
+      type: "multiselect",
+      options: [
+        { label: "Basic", value: "Basic" },
+        { label: "VPN", value: "VPN" },
+        { label: "Firewall", value: "Firewall" },
+        { label: "QoS", value: "QoS" },
+        { label: "Advanced Security", value: "Advanced Security" }
+      ],
+      required: true
+    },
+    { 
+      label: "Management-IP", 
+      key: "management",
+      hint: "IP-Adresse für Management-Zugriff",
+      type: "text"
+    }
+  ],
+  AP: [
+    { 
+      label: "Hersteller", 
+      key: "manufacturer",
+      hint: "Hersteller des Access Points",
+      type: "text",
+      required: true
+    },
+    { 
+      label: "Modell", 
+      key: "model",
+      hint: "Modellbezeichnung",
+      type: "text",
+      required: true
+    },
+    { 
+      label: "Typ", 
+      key: "type",
+      hint: "Einsatzbereich des Access Points",
+      type: "select",
+      options: [
+        { label: "Indoor", value: "Indoor" },
+        { label: "Outdoor", value: "Outdoor" },
+        { label: "Industrial", value: "Industrial" }
+      ],
+      required: true
+    },
+    { 
+      label: "WLAN-Standard", 
+      key: "wifiStandard",
+      hint: "Unterstützter WLAN-Standard",
+      type: "select",
+      options: [
+        { label: "WiFi 5", value: "WiFi 5" },
+        { label: "WiFi 6", value: "WiFi 6" },
+        { label: "WiFi 6E", value: "WiFi 6E" }
+      ],
+      required: true
+    },
+    { 
+      label: "Frequenzbänder", 
+      key: "bands",
+      hint: "Unterstützte Frequenzbänder",
+      type: "select",
+      options: [
+        { label: "2.4 GHz", value: "2.4 GHz" },
+        { label: "5 GHz", value: "5 GHz" },
+        { label: "2.4 + 5 GHz", value: "2.4 + 5 GHz" },
+        { label: "2.4 + 5 + 6 GHz", value: "2.4 + 5 + 6 GHz" }
+      ],
+      required: true
+    },
+    { 
+      label: "Stromversorgung", 
+      key: "powerSupply",
+      hint: "Art der Stromversorgung",
+      type: "select",
+      options: [
+        { label: "Netzteil", value: "Netzteil" },
+        { label: "PoE", value: "PoE" },
+        { label: "PoE+", value: "PoE+" }
+      ],
+      required: true
+    },
+    { 
+      label: "Features", 
+      key: "features",
+      hint: "Unterstützte Features",
+      type: "multiselect",
+      options: [
+        { label: "Basic", value: "Basic" },
+        { label: "MIMO", value: "MIMO" },
+        { label: "MU-MIMO", value: "MU-MIMO" },
+        { label: "Mesh", value: "Mesh" }
+      ],
+      required: true
+    },
+    { 
+      label: "Management-IP", 
+      key: "management",
+      hint: "IP-Adresse für Management-Zugriff",
+      type: "text"
+    }
+  ],
+  NIC: [
+    { 
+      label: "Hersteller", 
+      key: "manufacturer",
+      hint: "Hersteller der Netzwerkkarte",
+      type: "text",
+      required: true
+    },
+    { 
+      label: "Modell", 
+      key: "model",
+      hint: "Modellbezeichnung",
+      type: "text",
+      required: true
+    },
+    { 
+      label: "Typ", 
+      key: "type",
+      hint: "Anschlusstyp der Netzwerkkarte",
+      type: "select",
+      options: [
+        { label: "PCIe", value: "PCIe" },
+        { label: "USB", value: "USB" },
+        { label: "M.2", value: "M.2" }
+      ],
+      required: true
+    },
+    { 
+      label: "Geschwindigkeit", 
+      key: "speed",
+      hint: "Maximale Übertragungsgeschwindigkeit",
+      type: "select",
+      options: [
+        { label: "100 Mbps", value: "100 Mbps" },
+        { label: "1 Gbps", value: "1 Gbps" },
+        { label: "2.5 Gbps", value: "2.5 Gbps" },
+        { label: "5 Gbps", value: "5 Gbps" },
+        { label: "10 Gbps", value: "10 Gbps" }
+      ],
+      required: true
+    },
+    { 
+      label: "Features", 
+      key: "features",
+      hint: "Unterstützte Features",
+      type: "multiselect",
+      options: [
+        { label: "Basic", value: "Basic" },
+        { label: "Wake-on-LAN", value: "Wake-on-LAN" },
+        { label: "SR-IOV", value: "SR-IOV" },
+        { label: "iSCSI Boot", value: "iSCSI Boot" }
+      ],
+      required: true
+    },
+    { 
+      label: "Anzahl Ports", 
+      key: "ports",
+      hint: "Anzahl der Netzwerkanschlüsse",
+      type: "select",
+      options: [
+        { label: "1 Port", value: "1 Port" },
+        { label: "2 Ports", value: "2 Ports" },
+        { label: "4 Ports", value: "4 Ports" }
+      ],
+      required: true
+    }
+  ],
 };
 
 interface MultiSelectCheckboxesProps {
@@ -597,7 +914,7 @@ export function AddComponentForm({ lastRunningNumber, initialData, mode = 'creat
           </div>
 
           <div className="grid sm:grid-cols-2 gap-6">
-            {fields.map(({ label, key, hint, example, unit, type, options }) => (
+            {fields.map(({ label, key, hint, example, unit, type, options, required }) => (
               <div key={key} 
                 className={`space-y-2 bg-background rounded-lg p-4 shadow-sm border ${
                   type === 'multiselect' ? 'sm:col-span-2' : ''
