@@ -28,13 +28,13 @@ export function ListDetailsDialog({ list, components, open, onOpenChange }: List
   const getStatusVariant = (status: string) => {
     switch (status) {
       case 'AK':
-        return 'default';
+        return 'success'; // Aktiv - Grün
       case 'IN':
-        return 'secondary';
+        return 'warning'; // In Reparatur - Orange/Gelb
       case 'DE':
-        return 'destructive';
+        return 'destructive'; // Defekt - Rot
       default:
-        return 'default';
+        return 'secondary';
     }
   };
 

@@ -1,7 +1,7 @@
 'use client';
 
 import { useDraggable } from '@dnd-kit/core';
-import { HardwareComponent } from '@/app/types/hardware';
+import { HardwareComponent, STATUS } from '@/app/types/hardware';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Computer } from 'lucide-react';
@@ -14,6 +14,19 @@ function DraggableComponent({ component }: DraggableComponentProps) {
   const { attributes, listeners, setNodeRef, isDragging, transform } = useDraggable({
     id: component.id,
   });
+
+  const getStatusVariant = (status: string) => {
+    switch (status) {
+      case 'AK':
+        return 'success'; // Aktiv - Grün
+      case 'IN':
+        return 'warning'; // In Reparatur - Orange/Gelb
+      case 'DE':
+        return 'destructive'; // Defekt - Rot
+      default:
+        return 'secondary';
+    }
+  };
 
   const style = transform ? {
     transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
@@ -32,7 +45,9 @@ function DraggableComponent({ component }: DraggableComponentProps) {
             <div className="font-medium">{component.name}</div>
             <div className="text-sm text-muted-foreground">{component.serialNumber}</div>
           </div>
-          <Badge>{component.status}</Badge>
+          <Badge variant={getStatusVariant(component.status)}>
+            {STATUS[component.status]}
+          </Badge>
         </CardContent>
       </Card>
     </div>
