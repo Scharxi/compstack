@@ -2,16 +2,9 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Edit2, Trash2, FileSpreadsheet, Loader2 } from "lucide-react";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Edit2, Trash2, Loader2, Component } from "lucide-react";
 import { useListsStore } from "@/app/store/lists";
 import { toast } from "sonner";
 
@@ -68,64 +61,55 @@ export function ListsTable() {
   }
 
   return (
-    <div className="rounded-md border">
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Name</TableHead>
-            <TableHead>Beschreibung</TableHead>
-            <TableHead>Erstellt am</TableHead>
-            <TableHead>Anzahl Einträge</TableHead>
-            <TableHead className="text-right">Aktionen</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {lists.map((list) => (
-            <TableRow 
-              key={list.id}
-              className="cursor-pointer hover:bg-muted/50"
-              onClick={() => router.push(`/lists/${list.id}`)}
-            >
-              <TableCell className="font-medium">{list.name}</TableCell>
-              <TableCell>{list.description}</TableCell>
-              <TableCell>{new Date(list.createdAt).toLocaleDateString('de-DE')}</TableCell>
-              <TableCell>{list.itemCount}</TableCell>
-              <TableCell className="text-right">
-                <div className="flex justify-end gap-2">
-                  <Button 
-                    variant="ghost" 
-                    size="icon"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      router.push(`/lists/${list.id}`);
-                    }}
-                  >
-                    <FileSpreadsheet className="h-4 w-4" />
-                  </Button>
-                  <Button 
-                    variant="ghost" 
-                    size="icon"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      router.push(`/lists/${list.id}/edit`);
-                    }}
-                  >
-                    <Edit2 className="h-4 w-4" />
-                  </Button>
-                  <Button 
-                    variant="ghost" 
-                    size="icon" 
-                    className="text-destructive hover:text-destructive"
-                    onClick={(e) => handleDelete(e, list.id)}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+      {lists.map((list) => (
+        <Card 
+          key={list.id}
+          className="hover:bg-accent/5 transition-colors cursor-pointer"
+          onClick={() => router.push(`/lists/${list.id}`)}
+        >
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-start justify-between">
+              <span className="truncate text-xl">{list.name}</span>
+              <div className="flex items-center gap-1 ml-2">
+                <Button 
+                  variant="ghost" 
+                  size="icon"
+                  className="h-9 w-9"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    router.push(`/lists/${list.id}/edit`);
+                  }}
+                >
+                  <Edit2 className="h-4 w-4" />
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  size="icon"
+                  className="h-9 w-9 text-destructive hover:text-destructive"
+                  onClick={(e) => handleDelete(e, list.id)}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pb-4">
+            <p className="text-sm text-muted-foreground line-clamp-2 min-h-[2.5rem]">
+              {list.description || "Keine Beschreibung"}
+            </p>
+          </CardContent>
+          <CardFooter className="flex justify-between text-sm text-muted-foreground pt-3 border-t">
+            <div className="flex items-center gap-2">
+              <Component className="h-4 w-4" />
+              {list.itemCount} {list.itemCount === 1 ? 'Komponente' : 'Komponenten'}
+            </div>
+            <div>
+              {new Date(list.createdAt).toLocaleDateString('de-DE')}
+            </div>
+          </CardFooter>
+        </Card>
+      ))}
     </div>
   );
 } 
