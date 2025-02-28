@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -24,6 +24,7 @@ import {
   OWNERSHIPS, 
   STATUS, 
   INDICATORS,
+  CATEGORY_INDICATORS,
   generateComponentId,
   type HardwareComponent,
   type Category,
@@ -58,6 +59,7 @@ interface SpecField {
   unit?: string;
   type?: 'text' | 'select' | 'multiselect';
   options?: Option[];
+  required?: boolean;
 }
 
 const SPEC_FIELDS: Record<Indicator, SpecField[]> = {
@@ -451,7 +453,587 @@ const SPEC_FIELDS: Record<Indicator, SpecField[]> = {
         { label: "SATA III", value: "SATA III" },
       ]
     },
-  ]
+  ],
+  SW: [
+    { 
+      label: "Hersteller", 
+      key: "manufacturer",
+      hint: "Hersteller des Switches",
+      type: "text",
+      required: true
+    },
+    { 
+      label: "Modell", 
+      key: "model",
+      hint: "Modellbezeichnung",
+      type: "text",
+      required: true
+    },
+    { 
+      label: "Typ", 
+      key: "type",
+      hint: "Management-Level des Switches",
+      type: "select",
+      options: [
+        { label: "Unmanaged", value: "Unmanaged" },
+        { label: "Smart", value: "Smart" },
+        { label: "Managed Layer 2", value: "Managed Layer 2" },
+        { label: "Managed Layer 3", value: "Managed Layer 3" }
+      ],
+      required: true
+    },
+    { 
+      label: "Ports", 
+      key: "ports",
+      hint: "Anzahl der Ports",
+      type: "select",
+      options: [
+        { label: "8 Ports", value: "8 Ports" },
+        { label: "12 Ports", value: "12 Ports" },
+        { label: "16 Ports", value: "16 Ports" },
+        { label: "24 Ports", value: "24 Ports" },
+        { label: "48 Ports", value: "48 Ports" }
+      ],
+      required: true
+    },
+    { 
+      label: "Geschwindigkeit", 
+      key: "speed",
+      hint: "Port-Geschwindigkeit",
+      type: "select",
+      options: [
+        { label: "10/100 Mbps", value: "10/100 Mbps" },
+        { label: "10/100/1000 Mbps", value: "10/100/1000 Mbps" },
+        { label: "2.5 Gbps", value: "2.5 Gbps" },
+        { label: "5 Gbps", value: "5 Gbps" },
+        { label: "10 Gbps", value: "10 Gbps" }
+      ],
+      required: true
+    },
+    { 
+      label: "Management-IP", 
+      key: "management",
+      hint: "IP-Adresse für Management-Zugriff",
+      type: "text"
+    },
+    { 
+      label: "Features", 
+      key: "features",
+      hint: "Unterstützte Features",
+      type: "multiselect",
+      options: [
+        { label: "Basic", value: "Basic" },
+        { label: "VLAN", value: "VLAN" },
+        { label: "PoE", value: "PoE" },
+        { label: "PoE+", value: "PoE+" },
+        { label: "SFP", value: "SFP" },
+        { label: "SFP+", value: "SFP+" }
+      ],
+      required: true
+    }
+  ],
+  RT: [
+    { 
+      label: "Hersteller", 
+      key: "manufacturer",
+      hint: "Hersteller des Routers",
+      type: "text",
+      required: true
+    },
+    { 
+      label: "Modell", 
+      key: "model",
+      hint: "Modellbezeichnung",
+      type: "text",
+      required: true
+    },
+    { 
+      label: "Typ", 
+      key: "type",
+      hint: "Einsatzbereich des Routers",
+      type: "select",
+      options: [
+        { label: "SOHO", value: "SOHO" },
+        { label: "SMB", value: "SMB" },
+        { label: "Enterprise", value: "Enterprise" },
+        { label: "ISP-Grade", value: "ISP-Grade" }
+      ],
+      required: true
+    },
+    { 
+      label: "LAN-Ports", 
+      key: "ports",
+      hint: "Anzahl der LAN-Ports",
+      type: "select",
+      options: [
+        { label: "1 Port", value: "1 Port" },
+        { label: "4 Ports", value: "4 Ports" },
+        { label: "8 Ports", value: "8 Ports" },
+        { label: "12 Ports", value: "12 Ports" }
+      ],
+      required: true
+    },
+    { 
+      label: "WAN-Ports", 
+      key: "wanPorts",
+      hint: "Anzahl der WAN-Ports",
+      type: "select",
+      options: [
+        { label: "1 Port", value: "1 Port" },
+        { label: "2 Ports", value: "2 Ports" },
+        { label: "4 Ports", value: "4 Ports" }
+      ],
+      required: true
+    },
+    { 
+      label: "WLAN", 
+      key: "wifi",
+      hint: "WLAN-Standard",
+      type: "select",
+      options: [
+        { label: "Nein", value: "Nein" },
+        { label: "WiFi 5", value: "WiFi 5" },
+        { label: "WiFi 6", value: "WiFi 6" },
+        { label: "WiFi 6E", value: "WiFi 6E" }
+      ],
+      required: true
+    },
+    { 
+      label: "Features", 
+      key: "features",
+      hint: "Unterstützte Features",
+      type: "multiselect",
+      options: [
+        { label: "Basic", value: "Basic" },
+        { label: "VPN", value: "VPN" },
+        { label: "Firewall", value: "Firewall" },
+        { label: "QoS", value: "QoS" },
+        { label: "Advanced Security", value: "Advanced Security" }
+      ],
+      required: true
+    },
+    { 
+      label: "Management-IP", 
+      key: "management",
+      hint: "IP-Adresse für Management-Zugriff",
+      type: "text"
+    }
+  ],
+  AP: [
+    { 
+      label: "Hersteller", 
+      key: "manufacturer",
+      hint: "Hersteller des Access Points",
+      type: "text",
+      required: true
+    },
+    { 
+      label: "Modell", 
+      key: "model",
+      hint: "Modellbezeichnung",
+      type: "text",
+      required: true
+    },
+    { 
+      label: "Typ", 
+      key: "type",
+      hint: "Einsatzbereich des Access Points",
+      type: "select",
+      options: [
+        { label: "Indoor", value: "Indoor" },
+        { label: "Outdoor", value: "Outdoor" },
+        { label: "Industrial", value: "Industrial" }
+      ],
+      required: true
+    },
+    { 
+      label: "WLAN-Standard", 
+      key: "wifiStandard",
+      hint: "Unterstützter WLAN-Standard",
+      type: "select",
+      options: [
+        { label: "WiFi 5", value: "WiFi 5" },
+        { label: "WiFi 6", value: "WiFi 6" },
+        { label: "WiFi 6E", value: "WiFi 6E" }
+      ],
+      required: true
+    },
+    { 
+      label: "Frequenzbänder", 
+      key: "bands",
+      hint: "Unterstützte Frequenzbänder",
+      type: "select",
+      options: [
+        { label: "2.4 GHz", value: "2.4 GHz" },
+        { label: "5 GHz", value: "5 GHz" },
+        { label: "2.4 + 5 GHz", value: "2.4 + 5 GHz" },
+        { label: "2.4 + 5 + 6 GHz", value: "2.4 + 5 + 6 GHz" }
+      ],
+      required: true
+    },
+    { 
+      label: "Stromversorgung", 
+      key: "powerSupply",
+      hint: "Art der Stromversorgung",
+      type: "select",
+      options: [
+        { label: "Netzteil", value: "Netzteil" },
+        { label: "PoE", value: "PoE" },
+        { label: "PoE+", value: "PoE+" }
+      ],
+      required: true
+    },
+    { 
+      label: "Features", 
+      key: "features",
+      hint: "Unterstützte Features",
+      type: "multiselect",
+      options: [
+        { label: "Basic", value: "Basic" },
+        { label: "MIMO", value: "MIMO" },
+        { label: "MU-MIMO", value: "MU-MIMO" },
+        { label: "Mesh", value: "Mesh" }
+      ],
+      required: true
+    },
+    { 
+      label: "Management-IP", 
+      key: "management",
+      hint: "IP-Adresse für Management-Zugriff",
+      type: "text"
+    }
+  ],
+  NIC: [
+    { 
+      label: "Hersteller", 
+      key: "manufacturer",
+      hint: "Hersteller der Netzwerkkarte",
+      type: "text",
+      required: true
+    },
+    { 
+      label: "Modell", 
+      key: "model",
+      hint: "Modellbezeichnung",
+      type: "text",
+      required: true
+    },
+    { 
+      label: "Typ", 
+      key: "type",
+      hint: "Anschlusstyp der Netzwerkkarte",
+      type: "select",
+      options: [
+        { label: "PCIe", value: "PCIe" },
+        { label: "USB", value: "USB" },
+        { label: "M.2", value: "M.2" }
+      ],
+      required: true
+    },
+    { 
+      label: "Geschwindigkeit", 
+      key: "speed",
+      hint: "Maximale Übertragungsgeschwindigkeit",
+      type: "select",
+      options: [
+        { label: "100 Mbps", value: "100 Mbps" },
+        { label: "1 Gbps", value: "1 Gbps" },
+        { label: "2.5 Gbps", value: "2.5 Gbps" },
+        { label: "5 Gbps", value: "5 Gbps" },
+        { label: "10 Gbps", value: "10 Gbps" }
+      ],
+      required: true
+    },
+    { 
+      label: "Features", 
+      key: "features",
+      hint: "Unterstützte Features",
+      type: "multiselect",
+      options: [
+        { label: "Basic", value: "Basic" },
+        { label: "Wake-on-LAN", value: "Wake-on-LAN" },
+        { label: "SR-IOV", value: "SR-IOV" },
+        { label: "iSCSI Boot", value: "iSCSI Boot" }
+      ],
+      required: true
+    },
+    { 
+      label: "Anzahl Ports", 
+      key: "ports",
+      hint: "Anzahl der Netzwerkanschlüsse",
+      type: "select",
+      options: [
+        { label: "1 Port", value: "1 Port" },
+        { label: "2 Ports", value: "2 Ports" },
+        { label: "4 Ports", value: "4 Ports" }
+      ],
+      required: true
+    }
+  ],
+  SR: [
+    { 
+      label: "Hersteller", 
+      key: "manufacturer",
+      hint: "Hersteller des Servers",
+      type: "text",
+      required: true
+    },
+    { 
+      label: "Modell", 
+      key: "model",
+      hint: "Modellbezeichnung",
+      type: "text",
+      required: true
+    },
+    { 
+      label: "CPU", 
+      key: "cpu",
+      hint: "Prozessor(en)",
+      type: "select",
+      options: [
+        { label: "Intel Xeon Silver 4310", value: "Xeon Silver 4310" },
+        { label: "Intel Xeon Gold 6330", value: "Xeon Gold 6330" },
+        { label: "Intel Xeon Platinum 8358", value: "Xeon Platinum 8358" },
+        { label: "AMD EPYC 7443", value: "EPYC 7443" },
+        { label: "AMD EPYC 7543", value: "EPYC 7543" },
+        { label: "AMD EPYC 7643", value: "EPYC 7643" }
+      ],
+      required: true
+    },
+    { 
+      label: "CPU Anzahl", 
+      key: "cpuCount",
+      hint: "Anzahl der installierten Prozessoren",
+      type: "select",
+      options: [
+        { label: "1 CPU", value: "1" },
+        { label: "2 CPUs", value: "2" },
+        { label: "4 CPUs", value: "4" }
+      ],
+      required: true
+    },
+    { 
+      label: "RAM", 
+      key: "ram",
+      hint: "Arbeitsspeicher",
+      type: "select",
+      options: [
+        { label: "32 GB", value: "32 GB" },
+        { label: "64 GB", value: "64 GB" },
+        { label: "128 GB", value: "128 GB" },
+        { label: "256 GB", value: "256 GB" },
+        { label: "512 GB", value: "512 GB" },
+        { label: "1 TB", value: "1 TB" }
+      ],
+      required: true
+    },
+    { 
+      label: "RAM Typ", 
+      key: "ramType",
+      hint: "Speichertyp und Geschwindigkeit",
+      type: "select",
+      options: [
+        { label: "DDR4-3200 ECC", value: "DDR4-3200 ECC" },
+        { label: "DDR4-2933 ECC", value: "DDR4-2933 ECC" },
+        { label: "DDR5-4800 ECC", value: "DDR5-4800 ECC" },
+        { label: "DDR5-5600 ECC", value: "DDR5-5600 ECC" }
+      ],
+      required: true
+    },
+    { 
+      label: "Primärspeicher", 
+      key: "primaryStorage",
+      hint: "Hauptspeicher-Konfiguration",
+      type: "select",
+      options: [
+        { label: "2x 480GB SSD RAID1", value: "2x 480GB SSD RAID1" },
+        { label: "2x 960GB SSD RAID1", value: "2x 960GB SSD RAID1" },
+        { label: "2x 1.92TB SSD RAID1", value: "2x 1.92TB SSD RAID1" },
+        { label: "4x 480GB SSD RAID10", value: "4x 480GB SSD RAID10" },
+        { label: "4x 960GB SSD RAID10", value: "4x 960GB SSD RAID10" },
+        { label: "4x 1.92TB SSD RAID10", value: "4x 1.92TB SSD RAID10" }
+      ],
+      required: true
+    },
+    { 
+      label: "Sekundärspeicher", 
+      key: "secondaryStorage",
+      hint: "Zusätzliche Speicher-Konfiguration",
+      type: "select",
+      options: [
+        { label: "Keine", value: "none" },
+        { label: "4x 2TB HDD RAID5", value: "4x 2TB HDD RAID5" },
+        { label: "4x 4TB HDD RAID5", value: "4x 4TB HDD RAID5" },
+        { label: "6x 2TB HDD RAID6", value: "6x 2TB HDD RAID6" },
+        { label: "6x 4TB HDD RAID6", value: "6x 4TB HDD RAID6" },
+        { label: "8x 2TB HDD RAID6", value: "8x 2TB HDD RAID6" },
+        { label: "8x 4TB HDD RAID6", value: "8x 4TB HDD RAID6" }
+      ]
+    },
+    { 
+      label: "RAID Controller", 
+      key: "raidController",
+      hint: "RAID Controller Modell",
+      type: "select",
+      options: [
+        { label: "Onboard RAID", value: "Onboard RAID" },
+        { label: "LSI MegaRAID 9460-16i", value: "LSI MegaRAID 9460-16i" },
+        { label: "Broadcom MegaRAID 9560-8i", value: "Broadcom MegaRAID 9560-8i" },
+        { label: "HPE Smart Array P408i-a", value: "HPE Smart Array P408i-a" }
+      ],
+      required: true
+    },
+    { 
+      label: "Netzwerk", 
+      key: "network",
+      hint: "Netzwerkschnittstellen",
+      type: "select",
+      options: [
+        { label: "2x 1GbE", value: "2x 1GbE" },
+        { label: "4x 1GbE", value: "4x 1GbE" },
+        { label: "2x 10GbE", value: "2x 10GbE" },
+        { label: "4x 10GbE", value: "4x 10GbE" },
+        { label: "2x 25GbE", value: "2x 25GbE" }
+      ],
+      required: true
+    },
+    { 
+      label: "Betriebssystem", 
+      key: "os",
+      hint: "Installiertes Betriebssystem",
+      type: "select",
+      options: [
+        { label: "Windows Server 2022 Standard", value: "Windows Server 2022 Standard" },
+        { label: "Windows Server 2022 Datacenter", value: "Windows Server 2022 Datacenter" },
+        { label: "VMware ESXi 8.0", value: "VMware ESXi 8.0" },
+        { label: "VMware ESXi 7.0", value: "VMware ESXi 7.0" },
+        { label: "Proxmox VE 8", value: "Proxmox VE 8" },
+        { label: "Ubuntu Server 22.04 LTS", value: "Ubuntu Server 22.04 LTS" },
+        { label: "Red Hat Enterprise Linux 9", value: "RHEL 9" }
+      ],
+      required: true
+    },
+    { 
+      label: "Formfaktor", 
+      key: "formFactor",
+      hint: "Gehäusetyp",
+      type: "select",
+      options: [
+        { label: "1U Rack", value: "1U" },
+        { label: "2U Rack", value: "2U" },
+        { label: "4U Rack", value: "4U" },
+        { label: "Tower", value: "Tower" }
+      ],
+      required: true
+    },
+    { 
+      label: "Remote Management", 
+      key: "remoteManagement",
+      hint: "Remote Management Interface",
+      type: "text",
+      required: true
+    }
+  ],
+  PK: [
+    { 
+      label: "Kategorie", 
+      key: "category",
+      hint: "Kabelkategorie",
+      type: "select",
+      options: [
+        { label: "CAT 5e", value: "CAT 5e" },
+        { label: "CAT 6", value: "CAT 6" },
+        { label: "CAT 6a", value: "CAT 6a" },
+        { label: "CAT 7", value: "CAT 7" },
+        { label: "CAT 8", value: "CAT 8" }
+      ],
+      required: true
+    },
+    { 
+      label: "Länge", 
+      key: "length",
+      hint: "Kabellänge in Metern",
+      type: "select",
+      options: [
+        { label: "0.5m", value: "0.5m" },
+        { label: "1m", value: "1m" },
+        { label: "2m", value: "2m" },
+        { label: "3m", value: "3m" },
+        { label: "5m", value: "5m" },
+        { label: "7m", value: "7m" },
+        { label: "10m", value: "10m" },
+        { label: "15m", value: "15m" },
+        { label: "20m", value: "20m" },
+        { label: "30m", value: "30m" }
+      ],
+      required: true
+    },
+    { 
+      label: "Farbe", 
+      key: "color",
+      hint: "Kabelfarbe",
+      type: "select",
+      options: [
+        { label: "Grau", value: "Grau" },
+        { label: "Schwarz", value: "Schwarz" },
+        { label: "Blau", value: "Blau" },
+        { label: "Rot", value: "Rot" },
+        { label: "Gelb", value: "Gelb" },
+        { label: "Grün", value: "Grün" },
+        { label: "Orange", value: "Orange" },
+        { label: "Weiß", value: "Weiß" }
+      ],
+      required: true
+    },
+    { 
+      label: "Steckertyp A", 
+      key: "connectorA",
+      hint: "Steckertyp Ende A",
+      type: "select",
+      options: [
+        { label: "RJ45", value: "RJ45" },
+        { label: "SFP", value: "SFP" },
+        { label: "SFP+", value: "SFP+" },
+        { label: "LC", value: "LC" },
+        { label: "SC", value: "SC" }
+      ],
+      required: true
+    },
+    { 
+      label: "Steckertyp B", 
+      key: "connectorB",
+      hint: "Steckertyp Ende B",
+      type: "select",
+      options: [
+        { label: "RJ45", value: "RJ45" },
+        { label: "SFP", value: "SFP" },
+        { label: "SFP+", value: "SFP+" },
+        { label: "LC", value: "LC" },
+        { label: "SC", value: "SC" }
+      ],
+      required: true
+    },
+    { 
+      label: "Schirmung", 
+      key: "shielding",
+      hint: "Kabelschirmung",
+      type: "select",
+      options: [
+        { label: "U/UTP (Ungeschirmt)", value: "U/UTP" },
+        { label: "F/UTP (Foliengeschirmt)", value: "F/UTP" },
+        { label: "SF/UTP (Geflecht- und Foliengeschirmt)", value: "SF/UTP" },
+        { label: "S/FTP (Geflecht- und Paarfoliengeschirmt)", value: "S/FTP" }
+      ],
+      required: true
+    },
+    { 
+      label: "Hersteller", 
+      key: "manufacturer",
+      hint: "Kabelhersteller",
+      type: "text",
+      required: true
+    },
+  ],
 };
 
 interface MultiSelectCheckboxesProps {
@@ -519,6 +1101,17 @@ export function AddComponentForm({ lastRunningNumber, initialData, mode = 'creat
 
   const addComponent = useComponentsStore((state) => state.addComponent);
   const updateComponent = useComponentsStore((state) => state.updateComponent);
+
+  // Filtered indicators based on selected category
+  const availableIndicators = CATEGORY_INDICATORS[category] as Indicator[];
+
+  // Update indicator when category changes
+  useEffect(() => {
+    if (!availableIndicators.includes(indicator)) {
+      setIndicator(availableIndicators[0] as Indicator);
+      setSpecifications({});
+    }
+  }, [category, availableIndicators, indicator]);
 
   const handleSpecificationChange = (key: string, value: string) => {
     setSpecifications(prev => ({
@@ -597,7 +1190,7 @@ export function AddComponentForm({ lastRunningNumber, initialData, mode = 'creat
           </div>
 
           <div className="grid sm:grid-cols-2 gap-6">
-            {fields.map(({ label, key, hint, example, unit, type, options }) => (
+            {fields.map(({ label, key, hint, example, unit, type, options, required }) => (
               <div key={key} 
                 className={`space-y-2 bg-background rounded-lg p-4 shadow-sm border ${
                   type === 'multiselect' ? 'sm:col-span-2' : ''
@@ -700,8 +1293,8 @@ export function AddComponentForm({ lastRunningNumber, initialData, mode = 'creat
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {Object.entries(INDICATORS).map(([key, value]) => (
-                    <SelectItem key={key} value={key}>{value}</SelectItem>
+                  {availableIndicators.map((key) => (
+                    <SelectItem key={key} value={key as Indicator}>{INDICATORS[key as Indicator]}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -773,7 +1366,7 @@ export function AddComponentForm({ lastRunningNumber, initialData, mode = 'creat
             >
               Cancel
             </Button>
-            <Button onClick={handleSubmit} disabled={!name || !serialNumber}>
+            <Button onClick={handleSubmit} disabled={!name}>
               {mode === 'create' ? 'Add' : 'Save'}
             </Button>
           </div>

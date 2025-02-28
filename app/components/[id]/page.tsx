@@ -24,7 +24,11 @@ import {
   STATUS, 
   INDICATORS,
   MAINTENANCE_TASKS,
-  type HardwareComponent
+  CATEGORY_INDICATORS,
+  SPECIFICATIONS_CONFIG,
+  type HardwareComponent,
+  type Category,
+  type Indicator
 } from "@/app/types/hardware";
 import { useComponentsStore } from "@/app/store/components";
 import { fetchComponent } from '@/app/services/api';
@@ -35,29 +39,6 @@ interface ComponentDetailsProps {
     id: string;
   }>;
 }
-
-// Spezifikations-Labels
-const SPEC_LABELS: Record<string, string> = {
-  CPU: "CPU",
-  RAM: "RAM",
-  Storage: "Storage",
-  Display: "Display",
-  OS: "Operating System",
-  interfaces: "Interfaces",
-  primaryStorage: "Primary Storage",
-  secondaryStorage: "Secondary Storage",
-  size: "Screen Size",
-  resolution: "Resolution",
-  panel: "Panel Type",
-  chip: "Chip",
-  memory: "Memory",
-  model: "Model",
-  socket: "Socket",
-  type: "Type",
-  capacity: "Capacity",
-  interface: "Interface",
-  rpm: "RPM"
-};
 
 export default function ComponentDetailsPage({ params }: ComponentDetailsProps) {
   const router = useRouter();
@@ -107,9 +88,59 @@ export default function ComponentDetailsPage({ params }: ComponentDetailsProps) 
     }
   };
 
+  // Funktion zum Filtern der verfügbaren Indikatoren basierend auf der Kategorie
+  const getAvailableIndicators = (category: Category) => {
+    return CATEGORY_INDICATORS[category] as Indicator[];
+  };
+
+  // Funktion zum Abrufen der verfügbaren Spezifikationen
+  const getSpecificationFields = (category: string, indicator: string) => {
+    return SPECIFICATIONS_CONFIG[category as Category]?.[indicator] || {};
+  };
+
+  // Aktualisierte handleChange Funktion
   const handleChange = (field: keyof HardwareComponent, value: string | Date | Record<string, string> | undefined) => {
     if (editedComponent) {
-      setEditedComponent({ ...editedComponent, [field]: value });
+      if (field === 'category') {
+        // Wenn die Kategorie geändert wird, setze den Indikator zurück und leere die Spezifikationen
+        const newCategory = value as Category;
+        const availableIndicators = getAvailableIndicators(newCategory);
+        const defaultIndicator = availableIndicators[0] as Indicator;
+        setEditedComponent({
+          ...editedComponent,
+          category: newCategory,
+          indicator: defaultIndicator,
+          specifications: {}
+        });
+      } else if (field === 'indicator') {
+        // Wenn der Indikator geändert wird, initialisiere die Spezifikationen neu
+        const newIndicator = value as Indicator;
+        const specFields = getSpecificationFields(editedComponent.category, newIndicator);
+        const newSpecs: Record<string, string> = {};
+        Object.keys(specFields).forEach(key => {
+          newSpecs[key] = editedComponent.specifications[key] || '';
+        });
+        setEditedComponent({
+          ...editedComponent,
+          indicator: newIndicator,
+          specifications: newSpecs
+        });
+      } else {
+        setEditedComponent({ ...editedComponent, [field]: value });
+      }
+    }
+  };
+
+  // Funktion zum Aktualisieren einer einzelnen Spezifikation
+  const handleSpecificationChange = (key: string, value: string) => {
+    if (editedComponent) {
+      setEditedComponent({
+        ...editedComponent,
+        specifications: {
+          ...editedComponent.specifications,
+          [key]: value
+        }
+      });
     }
   };
 
@@ -242,13 +273,14 @@ export default function ComponentDetailsPage({ params }: ComponentDetailsProps) 
           <Select 
             value={editedComponent.indicator} 
             onValueChange={(value) => handleChange('indicator', value)}
+            disabled={!editedComponent.category}
           >
             <SelectTrigger>
               <SelectValue placeholder="Wählen..." />
             </SelectTrigger>
             <SelectContent>
-              {Object.entries(INDICATORS).map(([key, value]) => (
-                <SelectItem key={key} value={key}>{value}</SelectItem>
+              {getAvailableIndicators(editedComponent.category as Category).map(indicator => (
+                <SelectItem key={indicator} value={indicator}>{INDICATORS[indicator]}</SelectItem>
               ))}
             </SelectContent>
           </Select>
@@ -351,11 +383,44 @@ export default function ComponentDetailsPage({ params }: ComponentDetailsProps) 
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <p className="text-sm text-muted-foreground">Kategorie</p>
-                {renderValue('category', isEditing)}
+                {isEditing ? (
+                  <Select 
+                    value={editedComponent.category} 
+                    onValueChange={(value) => handleChange('category', value)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Wählen..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {Object.entries(CATEGORIES).map(([key, value]) => (
+                        <SelectItem key={key} value={key}>{value}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                ) : (
+                  <p className="font-medium">{CATEGORIES[component.category as Category]}</p>
+                )}
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Typ</p>
-                {renderValue('indicator', isEditing)}
+                {isEditing ? (
+                  <Select 
+                    value={editedComponent.indicator} 
+                    onValueChange={(value) => handleChange('indicator', value)}
+                    disabled={!editedComponent.category}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Wählen..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {getAvailableIndicators(editedComponent.category as Category).map(indicator => (
+                        <SelectItem key={indicator} value={indicator}>{INDICATORS[indicator]}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                ) : (
+                  <p className="font-medium">{INDICATORS[component.indicator]}</p>
+                )}
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Standort</p>
@@ -396,14 +461,46 @@ export default function ComponentDetailsPage({ params }: ComponentDetailsProps) 
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {Object.entries(component.specifications).map(([key, value]) => (
-                <div key={key} className="space-y-1">
-                  <p className="text-sm text-muted-foreground">
-                    {SPEC_LABELS[key] || key}
-                  </p>
-                  {renderSpecificationValue(key, value)}
-                </div>
-              ))}
+              {isEditing ? (
+                Object.entries(getSpecificationFields(editedComponent.category, editedComponent.indicator)).map(([key, field]) => (
+                  <div key={key} className="space-y-2">
+                    <Label htmlFor={key} className="text-sm text-muted-foreground">
+                      {field.label}{field.required && ' *'}
+                    </Label>
+                    {field.type === 'select' ? (
+                      <Select
+                        value={editedComponent.specifications[key] || ''}
+                        onValueChange={(value) => handleSpecificationChange(key, value)}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Wählen..." />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {field.options?.map(option => (
+                            <SelectItem key={option} value={option}>{option}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    ) : (
+                      <Input
+                        id={key}
+                        value={editedComponent.specifications[key] || ''}
+                        onChange={(e) => handleSpecificationChange(key, e.target.value)}
+                        required={field.required}
+                      />
+                    )}
+                  </div>
+                ))
+              ) : (
+                Object.entries(component.specifications).map(([key, value]) => (
+                  <div key={key} className="space-y-1">
+                    <p className="text-sm text-muted-foreground">
+                      {getSpecificationFields(component.category, component.indicator)[key]?.label || key}
+                    </p>
+                    {renderSpecificationValue(key, value)}
+                  </div>
+                ))
+              )}
             </div>
           </CardContent>
         </Card>
