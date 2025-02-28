@@ -21,7 +21,7 @@ export function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <nav className="flex-1 space-y-1 p-6 overflow-y-auto">
+    <nav className="space-y-1 px-2">
       {navigation.map((item) => {
         const isActive = pathname === item.href;
         return (
