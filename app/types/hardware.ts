@@ -27,7 +27,7 @@ export const STATUS = {
 
 export type Indicator = "PC" | "LT" | "TB" | "SR" | "PR" | "MO" | // IT
                        "GPU" | "RAM" | "SSD" | "HDD" | // IT Components
-                       "SW" | "RT" | "AP" | "NIC" | // Network Components
+                       "SW" | "RT" | "AP" | "NIC" | "PK" | // Network Components
                        "MM" | "LK" | "NT" | "EW" | "OZ" | // Werkzeug (Multimeter, Lötkolben, Netzwerktester, Elektrowerkzeug, Oszilloskop)
                        "ST" | "HD" | // Mobile
                        "SO"; // Sonstiges
@@ -50,6 +50,7 @@ export const INDICATORS: Record<Indicator, string> = {
   RT: "Router",
   AP: "Access Point",
   NIC: "Netzwerkkarte",
+  PK: "Patch-Kabel",
   // Werkzeug
   MM: "Multimeter",
   LK: "Lötkolben",
@@ -159,7 +160,7 @@ export const MAINTENANCE_TASKS: MaintenanceTask[] = [
 
 // Mapping von Kategorien zu erlaubten Indikatoren
 export const CATEGORY_INDICATORS: Record<Category, string[]> = {
-  IT: ["PC", "LT", "TB", "SR", "PR", "MO", "GPU", "RAM", "SSD", "HDD", "SW", "RT", "AP", "NIC"],
+  IT: ["PC", "LT", "TB", "SR", "PR", "MO", "GPU", "RAM", "SSD", "HDD", "SW", "RT", "AP", "NIC", "PK"],
   WZ: ["MM", "LK", "NT", "EW", "OZ"],
   MB: ["TB", "ST", "HD"],
   SO: ["SO"]
@@ -425,6 +426,47 @@ export const SPECIFICATIONS_CONFIG: Record<Category, Record<string, Specificatio
         options: ["1 Port", "2 Ports", "4 Ports"],
         required: true 
       }
+    },
+    PK: {
+      category: { 
+        label: "Kategorie", 
+        type: "select", 
+        options: ["CAT 5e", "CAT 6", "CAT 6a", "CAT 7", "CAT 8"],
+        required: true 
+      },
+      length: { 
+        label: "Länge", 
+        type: "select", 
+        options: ["0.5m", "1m", "2m", "3m", "5m", "7m", "10m", "15m", "20m", "30m"],
+        required: true 
+      },
+      color: { 
+        label: "Farbe", 
+        type: "select", 
+        options: ["Grau", "Schwarz", "Blau", "Rot", "Gelb", "Grün", "Orange", "Weiß"],
+        required: true 
+      },
+      connectorA: { 
+        label: "Steckertyp A", 
+        type: "select", 
+        options: ["RJ45", "SFP", "SFP+", "LC", "SC"],
+        required: true 
+      },
+      connectorB: { 
+        label: "Steckertyp B", 
+        type: "select", 
+        options: ["RJ45", "SFP", "SFP+", "LC", "SC"],
+        required: true 
+      },
+      shielding: { 
+        label: "Schirmung", 
+        type: "select", 
+        options: ["U/UTP", "F/UTP", "SF/UTP", "S/FTP"],
+        required: true 
+      },
+      manufacturer: { label: "Hersteller", type: "text", required: true },
+      locationA: { label: "Standort A", type: "text", required: true },
+      locationB: { label: "Standort B", type: "text", required: true }
     }
   },
   WZ: {

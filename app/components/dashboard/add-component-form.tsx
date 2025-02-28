@@ -934,6 +934,106 @@ const SPEC_FIELDS: Record<Indicator, SpecField[]> = {
       required: true
     }
   ],
+  PK: [
+    { 
+      label: "Kategorie", 
+      key: "category",
+      hint: "Kabelkategorie",
+      type: "select",
+      options: [
+        { label: "CAT 5e", value: "CAT 5e" },
+        { label: "CAT 6", value: "CAT 6" },
+        { label: "CAT 6a", value: "CAT 6a" },
+        { label: "CAT 7", value: "CAT 7" },
+        { label: "CAT 8", value: "CAT 8" }
+      ],
+      required: true
+    },
+    { 
+      label: "Länge", 
+      key: "length",
+      hint: "Kabellänge in Metern",
+      type: "select",
+      options: [
+        { label: "0.5m", value: "0.5m" },
+        { label: "1m", value: "1m" },
+        { label: "2m", value: "2m" },
+        { label: "3m", value: "3m" },
+        { label: "5m", value: "5m" },
+        { label: "7m", value: "7m" },
+        { label: "10m", value: "10m" },
+        { label: "15m", value: "15m" },
+        { label: "20m", value: "20m" },
+        { label: "30m", value: "30m" }
+      ],
+      required: true
+    },
+    { 
+      label: "Farbe", 
+      key: "color",
+      hint: "Kabelfarbe",
+      type: "select",
+      options: [
+        { label: "Grau", value: "Grau" },
+        { label: "Schwarz", value: "Schwarz" },
+        { label: "Blau", value: "Blau" },
+        { label: "Rot", value: "Rot" },
+        { label: "Gelb", value: "Gelb" },
+        { label: "Grün", value: "Grün" },
+        { label: "Orange", value: "Orange" },
+        { label: "Weiß", value: "Weiß" }
+      ],
+      required: true
+    },
+    { 
+      label: "Steckertyp A", 
+      key: "connectorA",
+      hint: "Steckertyp Ende A",
+      type: "select",
+      options: [
+        { label: "RJ45", value: "RJ45" },
+        { label: "SFP", value: "SFP" },
+        { label: "SFP+", value: "SFP+" },
+        { label: "LC", value: "LC" },
+        { label: "SC", value: "SC" }
+      ],
+      required: true
+    },
+    { 
+      label: "Steckertyp B", 
+      key: "connectorB",
+      hint: "Steckertyp Ende B",
+      type: "select",
+      options: [
+        { label: "RJ45", value: "RJ45" },
+        { label: "SFP", value: "SFP" },
+        { label: "SFP+", value: "SFP+" },
+        { label: "LC", value: "LC" },
+        { label: "SC", value: "SC" }
+      ],
+      required: true
+    },
+    { 
+      label: "Schirmung", 
+      key: "shielding",
+      hint: "Kabelschirmung",
+      type: "select",
+      options: [
+        { label: "U/UTP (Ungeschirmt)", value: "U/UTP" },
+        { label: "F/UTP (Foliengeschirmt)", value: "F/UTP" },
+        { label: "SF/UTP (Geflecht- und Foliengeschirmt)", value: "SF/UTP" },
+        { label: "S/FTP (Geflecht- und Paarfoliengeschirmt)", value: "S/FTP" }
+      ],
+      required: true
+    },
+    { 
+      label: "Hersteller", 
+      key: "manufacturer",
+      hint: "Kabelhersteller",
+      type: "text",
+      required: true
+    },
+  ],
 };
 
 interface MultiSelectCheckboxesProps {
