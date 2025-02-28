@@ -4,6 +4,7 @@ export interface List {
   description: string;
   createdAt: Date;
   itemCount: number;
+  components: string[];
 }
 
 export interface ListItem {

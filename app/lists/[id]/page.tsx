@@ -5,20 +5,22 @@ import { useParams, useRouter } from 'next/navigation';
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input";
-import { ArrowLeft, Plus, Search, X } from "lucide-react";
+import { ArrowLeft, Plus, Search, X, Save } from "lucide-react";
 import { useListsStore } from "@/app/store/lists";
 import { useComponentsStore } from '@/app/store/components';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { toast } from "sonner";
 
 export default function ListDetailPage() {
   const params = useParams();
   const router = useRouter();
-  const { lists, fetchLists } = useListsStore();
+  const { lists, fetchLists, updateList } = useListsStore();
   const { components, fetchComponents, isLoading } = useComponentsStore();
   const list = lists.find(l => l.id === params.id);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedComponents, setSelectedComponents] = useState<string[]>([]);
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     fetchLists();
@@ -27,7 +29,7 @@ export default function ListDetailPage() {
 
   const filteredComponents = components.filter(component => 
     component.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    component.serialNumber.toLowerCase().includes(searchQuery.toLowerCase())
+    component.id.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const handleAddComponent = (componentId: string) => {
@@ -36,6 +38,25 @@ export default function ListDetailPage() {
 
   const handleRemoveComponent = (componentId: string) => {
     setSelectedComponents(prev => prev.filter(id => id !== componentId));
+  };
+
+  const handleSave = async () => {
+    if (!list) return;
+    
+    setIsSaving(true);
+    try {
+      await updateList({
+        ...list,
+        components: selectedComponents
+      });
+      toast.success("Liste erfolgreich gespeichert");
+      router.refresh();
+    } catch (error) {
+      toast.error("Fehler beim Speichern der Liste");
+      console.error(error);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   if (!list) {
@@ -73,10 +94,18 @@ export default function ListDetailPage() {
   return (
     <div className="h-full flex flex-col">
       <div className="p-8 space-y-8">
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center justify-between">
           <Button variant="ghost" onClick={() => router.back()}>
             <ArrowLeft className="h-4 w-4 mr-2" />
             Zurück
+          </Button>
+          <Button 
+            onClick={handleSave} 
+            disabled={isSaving || selectedComponents.length === 0}
+            className="gap-2"
+          >
+            <Save className="h-4 w-4" />
+            {isSaving ? "Wird gespeichert..." : "Liste speichern"}
           </Button>
         </div>
         
@@ -115,7 +144,7 @@ export default function ListDetailPage() {
                       <div className="flex-1">
                         <div className="font-medium">{component.name}</div>
                         <div className="text-sm text-muted-foreground">
-                          {component.serialNumber}
+                          {component.id}
                         </div>
                       </div>
                       <Badge>{component.status}</Badge>
@@ -155,7 +184,7 @@ export default function ListDetailPage() {
                         <div className="flex-1">
                           <div className="font-medium">{component.name}</div>
                           <div className="text-sm text-muted-foreground">
-                            {component.serialNumber}
+                            {component.id}
                           </div>
                         </div>
                         <Badge>{component.status}</Badge>
