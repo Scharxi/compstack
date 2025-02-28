@@ -6,8 +6,8 @@ import { ThemeProvider } from "./providers/theme-provider";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Inventarisierungssystem",
-  description: "Ein System zur Verwaltung von Hardware-Komponenten",
+  title: "CompStack",
+  description: "Manage and track your hardware components efficiently",
 };
 
 export default function RootLayout({
