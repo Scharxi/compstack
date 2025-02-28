@@ -1,7 +1,6 @@
 'use client';
 
-import { Button } from "@/components/ui/button";
-import { PlusCircle } from "lucide-react";
+import { CreateListDialog } from "./create-list-dialog";
 
 export function ListsHeader() {
   return (
@@ -13,10 +12,10 @@ export function ListsHeader() {
         </p>
       </div>
       <div className="flex items-center space-x-2">
-        <Button>
-          <PlusCircle className="mr-2 h-4 w-4" />
-          Neue Liste
-        </Button>
+        <CreateListDialog onListCreated={() => {
+          // TODO: Implement refresh of lists
+          console.log("List created, refreshing...");
+        }} />
       </div>
     </div>
   );
