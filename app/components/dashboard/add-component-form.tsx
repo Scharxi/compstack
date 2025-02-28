@@ -770,6 +770,170 @@ const SPEC_FIELDS: Record<Indicator, SpecField[]> = {
       required: true
     }
   ],
+  SR: [
+    { 
+      label: "Hersteller", 
+      key: "manufacturer",
+      hint: "Hersteller des Servers",
+      type: "text",
+      required: true
+    },
+    { 
+      label: "Modell", 
+      key: "model",
+      hint: "Modellbezeichnung",
+      type: "text",
+      required: true
+    },
+    { 
+      label: "CPU", 
+      key: "cpu",
+      hint: "Prozessor(en)",
+      type: "select",
+      options: [
+        { label: "Intel Xeon Silver 4310", value: "Xeon Silver 4310" },
+        { label: "Intel Xeon Gold 6330", value: "Xeon Gold 6330" },
+        { label: "Intel Xeon Platinum 8358", value: "Xeon Platinum 8358" },
+        { label: "AMD EPYC 7443", value: "EPYC 7443" },
+        { label: "AMD EPYC 7543", value: "EPYC 7543" },
+        { label: "AMD EPYC 7643", value: "EPYC 7643" }
+      ],
+      required: true
+    },
+    { 
+      label: "CPU Anzahl", 
+      key: "cpuCount",
+      hint: "Anzahl der installierten Prozessoren",
+      type: "select",
+      options: [
+        { label: "1 CPU", value: "1" },
+        { label: "2 CPUs", value: "2" },
+        { label: "4 CPUs", value: "4" }
+      ],
+      required: true
+    },
+    { 
+      label: "RAM", 
+      key: "ram",
+      hint: "Arbeitsspeicher",
+      type: "select",
+      options: [
+        { label: "32 GB", value: "32 GB" },
+        { label: "64 GB", value: "64 GB" },
+        { label: "128 GB", value: "128 GB" },
+        { label: "256 GB", value: "256 GB" },
+        { label: "512 GB", value: "512 GB" },
+        { label: "1 TB", value: "1 TB" }
+      ],
+      required: true
+    },
+    { 
+      label: "RAM Typ", 
+      key: "ramType",
+      hint: "Speichertyp und Geschwindigkeit",
+      type: "select",
+      options: [
+        { label: "DDR4-3200 ECC", value: "DDR4-3200 ECC" },
+        { label: "DDR4-2933 ECC", value: "DDR4-2933 ECC" },
+        { label: "DDR5-4800 ECC", value: "DDR5-4800 ECC" },
+        { label: "DDR5-5600 ECC", value: "DDR5-5600 ECC" }
+      ],
+      required: true
+    },
+    { 
+      label: "Primärspeicher", 
+      key: "primaryStorage",
+      hint: "Hauptspeicher-Konfiguration",
+      type: "select",
+      options: [
+        { label: "2x 480GB SSD RAID1", value: "2x 480GB SSD RAID1" },
+        { label: "2x 960GB SSD RAID1", value: "2x 960GB SSD RAID1" },
+        { label: "2x 1.92TB SSD RAID1", value: "2x 1.92TB SSD RAID1" },
+        { label: "4x 480GB SSD RAID10", value: "4x 480GB SSD RAID10" },
+        { label: "4x 960GB SSD RAID10", value: "4x 960GB SSD RAID10" },
+        { label: "4x 1.92TB SSD RAID10", value: "4x 1.92TB SSD RAID10" }
+      ],
+      required: true
+    },
+    { 
+      label: "Sekundärspeicher", 
+      key: "secondaryStorage",
+      hint: "Zusätzliche Speicher-Konfiguration",
+      type: "select",
+      options: [
+        { label: "Keine", value: "none" },
+        { label: "4x 2TB HDD RAID5", value: "4x 2TB HDD RAID5" },
+        { label: "4x 4TB HDD RAID5", value: "4x 4TB HDD RAID5" },
+        { label: "6x 2TB HDD RAID6", value: "6x 2TB HDD RAID6" },
+        { label: "6x 4TB HDD RAID6", value: "6x 4TB HDD RAID6" },
+        { label: "8x 2TB HDD RAID6", value: "8x 2TB HDD RAID6" },
+        { label: "8x 4TB HDD RAID6", value: "8x 4TB HDD RAID6" }
+      ]
+    },
+    { 
+      label: "RAID Controller", 
+      key: "raidController",
+      hint: "RAID Controller Modell",
+      type: "select",
+      options: [
+        { label: "Onboard RAID", value: "Onboard RAID" },
+        { label: "LSI MegaRAID 9460-16i", value: "LSI MegaRAID 9460-16i" },
+        { label: "Broadcom MegaRAID 9560-8i", value: "Broadcom MegaRAID 9560-8i" },
+        { label: "HPE Smart Array P408i-a", value: "HPE Smart Array P408i-a" }
+      ],
+      required: true
+    },
+    { 
+      label: "Netzwerk", 
+      key: "network",
+      hint: "Netzwerkschnittstellen",
+      type: "select",
+      options: [
+        { label: "2x 1GbE", value: "2x 1GbE" },
+        { label: "4x 1GbE", value: "4x 1GbE" },
+        { label: "2x 10GbE", value: "2x 10GbE" },
+        { label: "4x 10GbE", value: "4x 10GbE" },
+        { label: "2x 25GbE", value: "2x 25GbE" }
+      ],
+      required: true
+    },
+    { 
+      label: "Betriebssystem", 
+      key: "os",
+      hint: "Installiertes Betriebssystem",
+      type: "select",
+      options: [
+        { label: "Windows Server 2022 Standard", value: "Windows Server 2022 Standard" },
+        { label: "Windows Server 2022 Datacenter", value: "Windows Server 2022 Datacenter" },
+        { label: "VMware ESXi 8.0", value: "VMware ESXi 8.0" },
+        { label: "VMware ESXi 7.0", value: "VMware ESXi 7.0" },
+        { label: "Proxmox VE 8", value: "Proxmox VE 8" },
+        { label: "Ubuntu Server 22.04 LTS", value: "Ubuntu Server 22.04 LTS" },
+        { label: "Red Hat Enterprise Linux 9", value: "RHEL 9" }
+      ],
+      required: true
+    },
+    { 
+      label: "Formfaktor", 
+      key: "formFactor",
+      hint: "Gehäusetyp",
+      type: "select",
+      options: [
+        { label: "1U Rack", value: "1U" },
+        { label: "2U Rack", value: "2U" },
+        { label: "4U Rack", value: "4U" },
+        { label: "Tower", value: "Tower" }
+      ],
+      required: true
+    },
+    { 
+      label: "Remote Management", 
+      key: "remoteManagement",
+      hint: "Remote Management Interface",
+      type: "text",
+      required: true
+    }
+  ],
 };
 
 interface MultiSelectCheckboxesProps {
