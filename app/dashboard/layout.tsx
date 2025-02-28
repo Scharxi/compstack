@@ -1,6 +1,6 @@
 'use client';
 
-import { ReactNode } from 'react';
+import { ReactNode, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Sidebar } from "@/app/components/dashboard/sidebar";
 import { ThemeToggle } from "@/app/components/theme-toggle";
@@ -14,8 +14,17 @@ interface DashboardLayoutProps {
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const router = useRouter();
 
+  useEffect(() => {
+    // Überprüfe ob ein Auth Token existiert
+    const authToken = localStorage.getItem('authToken');
+    if (!authToken) {
+      router.push('/login');
+    }
+  }, [router]);
+
   const handleLogout = () => {
-    // Hier können später Session/Token Cleanup hinzugefügt werden
+    // Auth Token entfernen
+    localStorage.removeItem('authToken');
     router.push('/login');
   };
 

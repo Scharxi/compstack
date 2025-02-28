@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,6 +11,14 @@ export default function LoginPage() {
   const router = useRouter();
   const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    // Wenn bereits eingeloggt, zum Dashboard weiterleiten
+    const authToken = localStorage.getItem('authToken');
+    if (authToken) {
+      router.push('/dashboard');
+    }
+  }, [router]);
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -28,11 +36,14 @@ export default function LoginPage() {
         body: JSON.stringify({ username, password }),
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        const data = await response.json();
         throw new Error(data.error || "Login fehlgeschlagen");
       }
 
+      // Nach erfolgreichem Login Token speichern
+      localStorage.setItem('authToken', data.token);
       router.push("/dashboard");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Ein Fehler ist aufgetreten");
