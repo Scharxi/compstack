@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -24,6 +24,7 @@ import {
   OWNERSHIPS, 
   STATUS, 
   INDICATORS,
+  CATEGORY_INDICATORS,
   generateComponentId,
   type HardwareComponent,
   type Category,
@@ -837,6 +838,17 @@ export function AddComponentForm({ lastRunningNumber, initialData, mode = 'creat
   const addComponent = useComponentsStore((state) => state.addComponent);
   const updateComponent = useComponentsStore((state) => state.updateComponent);
 
+  // Filtered indicators based on selected category
+  const availableIndicators = CATEGORY_INDICATORS[category] as Indicator[];
+
+  // Update indicator when category changes
+  useEffect(() => {
+    if (!availableIndicators.includes(indicator)) {
+      setIndicator(availableIndicators[0] as Indicator);
+      setSpecifications({});
+    }
+  }, [category, availableIndicators, indicator]);
+
   const handleSpecificationChange = (key: string, value: string) => {
     setSpecifications(prev => ({
       ...prev,
@@ -1017,8 +1029,8 @@ export function AddComponentForm({ lastRunningNumber, initialData, mode = 'creat
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {Object.entries(INDICATORS).map(([key, value]) => (
-                    <SelectItem key={key} value={key}>{value}</SelectItem>
+                  {availableIndicators.map((key) => (
+                    <SelectItem key={key} value={key as Indicator}>{INDICATORS[key as Indicator]}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
