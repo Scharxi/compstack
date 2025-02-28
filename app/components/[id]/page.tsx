@@ -483,7 +483,9 @@ export default function ComponentDetailsPage({ params }: ComponentDetailsProps) 
             </CardHeader>
             <CardContent>
               <div className="space-y-6">
-                {component.maintenanceHistory.map((protocol, index) => (
+                {[...component.maintenanceHistory]
+                  .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+                  .map((protocol, index) => (
                   <div key={index} className="border rounded-lg p-4">
                     <div className="flex justify-between items-start mb-4">
                       <h4 className="text-lg font-semibold">
