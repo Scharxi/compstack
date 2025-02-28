@@ -42,7 +42,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       <div className="fixed inset-y-0 w-72 border-r bg-background flex flex-col">
         <div className="p-4 border-b">
           <div className="flex items-center justify-between">
-            <h1 className="text-xl font-semibold">Inventarisierung</h1>
+            <h1 className="text-xl font-semibold">CompStack</h1>
             <div className="flex items-center gap-2">
               <ThemeToggle />
               <Button 
