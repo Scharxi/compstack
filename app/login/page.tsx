@@ -1,24 +1,18 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
+import { ThemeToggle } from "@/app/components/theme-toggle";
 
 export default function LoginPage() {
   const router = useRouter();
   const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    // Wenn bereits eingeloggt, zum Dashboard weiterleiten
-    const authToken = localStorage.getItem('authToken');
-    if (authToken) {
-      router.push('/dashboard');
-    }
-  }, [router]);
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -30,23 +24,20 @@ export default function LoginPage() {
     const password = formData.get("password") as string;
 
     try {
-      const response = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password }),
+      const result = await signIn("credentials", {
+        username,
+        password,
+        redirect: false,
       });
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "Login fehlgeschlagen");
+      if (result?.error) {
+        setError("Ungültige Anmeldedaten");
+      } else {
+        router.push("/dashboard");
+        router.refresh();
       }
-
-      // Nach erfolgreichem Login Token speichern
-      localStorage.setItem('authToken', data.token);
-      router.push("/dashboard");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Ein Fehler ist aufgetreten");
+      setError("Ein Fehler ist aufgetreten");
     } finally {
       setLoading(false);
     }
@@ -55,8 +46,9 @@ export default function LoginPage() {
   return (
     <div className="flex h-screen items-center justify-center">
       <Card className="w-[350px]">
-        <CardHeader>
+        <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>Login</CardTitle>
+          <ThemeToggle />
         </CardHeader>
         <CardContent>
           <form onSubmit={onSubmit} className="space-y-4">

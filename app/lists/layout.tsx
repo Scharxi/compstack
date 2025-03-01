@@ -8,11 +8,11 @@ import { ThemeToggle } from "@/app/components/theme-toggle";
 import { Button } from "@/components/ui/button";
 import { LogOut } from "lucide-react";
 
-interface DashboardLayoutProps {
+interface ListsLayoutProps {
   children: ReactNode;
 }
 
-export default function DashboardLayout({ children }: DashboardLayoutProps) {
+export default function ListsLayout({ children }: ListsLayoutProps) {
   const router = useRouter();
   const { data: session, status } = useSession();
 
