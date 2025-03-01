@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
+import { ThemeToggle } from "@/app/components/theme-toggle";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -45,8 +46,9 @@ export default function LoginPage() {
   return (
     <div className="flex h-screen items-center justify-center">
       <Card className="w-[350px]">
-        <CardHeader>
+        <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>Login</CardTitle>
+          <ThemeToggle />
         </CardHeader>
         <CardContent>
           <form onSubmit={onSubmit} className="space-y-4">
