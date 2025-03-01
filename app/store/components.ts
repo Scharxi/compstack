@@ -45,12 +45,18 @@ export const useComponentsStore = create<ComponentsState>((set) => ({
       const component = await updateComponentApi(updatedComponent);
       set((state) => ({
         components: state.components.map((c) =>
-          c.id === component.id ? component : c
+          c.id === component.id ? {
+            ...component,
+            maintenanceHistory: component.maintenanceHistory || []
+          } : c
         ),
-        isLoading: false
+        isLoading: false,
+        error: null
       }));
     } catch (error) {
+      console.error('Failed to update component:', error);
       set({ error: 'Failed to update component', isLoading: false });
+      throw error; // Re-throw the error to handle it in the component
     }
   },
   deleteComponent: async (id) => {

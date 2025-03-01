@@ -158,17 +158,18 @@ export default function ComponentDetailsPage({ params }: ComponentDetailsProps) 
     setMaintenanceNotes(e.target.value);
   };
 
-  const handleSaveMaintenance = async () => {
-    if (component && completedTasks.length > 0) {
+  const handleSaveMaintenance = async (data: { completedTasks: string[], notes: string }) => {
+    if (component) {
       const newMaintenanceProtocol = {
         date: new Date(),
-        completedTasks,
-        notes: maintenanceNotes || undefined
+        completedTasks: data.completedTasks,
+        notes: data.notes
       };
 
       const updatedComponent = {
         ...component,
-        newMaintenanceProtocol
+        newMaintenanceProtocol,
+        lastMaintenanceDate: new Date()
       };
 
       try {
@@ -176,8 +177,6 @@ export default function ComponentDetailsPage({ params }: ComponentDetailsProps) 
         const refreshedData = await fetchComponent(id);
         setComponent(refreshedData);
         setEditedComponent(refreshedData);
-        setCompletedTasks([]);
-        setMaintenanceNotes("");
       } catch (error) {
         console.error('Failed to save maintenance protocol:', error);
       }
