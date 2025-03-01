@@ -8,12 +8,15 @@ import { de } from 'date-fns/locale';
 import { motion } from "framer-motion";
 import { Wrench, CalendarDays, ScrollText } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { MaintenanceDialog } from "./maintenance-dialog";
 
 interface MaintenanceHistoryProps {
   protocols: MaintenanceProtocol[];
+  onSave: (data: { completedTasks: string[], notes: string }) => void;
+  isLoading?: boolean;
 }
 
-export function MaintenanceHistory({ protocols }: MaintenanceHistoryProps) {
+export function MaintenanceHistory({ protocols, onSave, isLoading }: MaintenanceHistoryProps) {
   const sortedProtocols = [...protocols].sort((a, b) => 
     new Date(b.date).getTime() - new Date(a.date).getTime()
   );
@@ -31,9 +34,12 @@ export function MaintenanceHistory({ protocols }: MaintenanceHistoryProps) {
               Übersicht aller durchgeführten Wartungen
             </CardDescription>
           </div>
-          <Badge variant="outline" className="h-7">
-            {protocols.length} {protocols.length === 1 ? 'Eintrag' : 'Einträge'}
-          </Badge>
+          <div className="flex items-center gap-4">
+            <Badge variant="outline" className="h-7">
+              {protocols.length} {protocols.length === 1 ? 'Eintrag' : 'Einträge'}
+            </Badge>
+            <MaintenanceDialog onSave={onSave} isLoading={isLoading} />
+          </div>
         </div>
       </CardHeader>
       <CardContent>

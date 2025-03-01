@@ -33,7 +33,7 @@ import {
 import { useComponentsStore } from "@/app/store/components";
 import { fetchComponent } from '@/app/services/api';
 import { ThemeToggle } from "@/app/components/theme-toggle";
-import { MaintenanceForm } from "@/app/components/maintenance/maintenance-form";
+import { MaintenanceDialog } from "@/app/components/maintenance/maintenance-dialog";
 import { MaintenanceHistory } from "@/app/components/maintenance/maintenance-history";
 
 interface ComponentDetailsProps {
@@ -526,13 +526,10 @@ export default function ComponentDetailsPage({ params }: ComponentDetailsProps) 
         )}
 
         <div className="md:col-span-2 space-y-6">
-          <MaintenanceForm 
-            onSave={handleSaveMaintenance}
-            isLoading={isLoading}
-          />
-
           <MaintenanceHistory 
             protocols={component.maintenanceHistory || []}
+            onSave={handleSaveMaintenance}
+            isLoading={isLoading}
           />
         </div>
       </div>
