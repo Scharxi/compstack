@@ -33,6 +33,8 @@ import {
 import { useComponentsStore } from "@/app/store/components";
 import { fetchComponent } from '@/app/services/api';
 import { ThemeToggle } from "@/app/components/theme-toggle";
+import { MaintenanceDialog } from "@/app/components/maintenance/maintenance-dialog";
+import { MaintenanceHistory } from "@/app/components/maintenance/maintenance-history";
 
 interface ComponentDetailsProps {
   params: Promise<{
@@ -156,17 +158,18 @@ export default function ComponentDetailsPage({ params }: ComponentDetailsProps) 
     setMaintenanceNotes(e.target.value);
   };
 
-  const handleSaveMaintenance = async () => {
-    if (component && completedTasks.length > 0) {
+  const handleSaveMaintenance = async (data: { completedTasks: string[], notes: string }) => {
+    if (component) {
       const newMaintenanceProtocol = {
         date: new Date(),
-        completedTasks,
-        notes: maintenanceNotes || undefined
+        completedTasks: data.completedTasks,
+        notes: data.notes
       };
 
       const updatedComponent = {
         ...component,
-        newMaintenanceProtocol
+        newMaintenanceProtocol,
+        lastMaintenanceDate: new Date()
       };
 
       try {
@@ -174,8 +177,6 @@ export default function ComponentDetailsPage({ params }: ComponentDetailsProps) 
         const refreshedData = await fetchComponent(id);
         setComponent(refreshedData);
         setEditedComponent(refreshedData);
-        setCompletedTasks([]);
-        setMaintenanceNotes("");
       } catch (error) {
         console.error('Failed to save maintenance protocol:', error);
       }
@@ -524,96 +525,13 @@ export default function ComponentDetailsPage({ params }: ComponentDetailsProps) 
           </Card>
         )}
 
-        <Card className="md:col-span-2">
-          <CardHeader>
-            <CardTitle>Wartung durchführen</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div className="space-y-4">
-                  <h3 className="text-lg font-semibold">Wartungsaufgaben</h3>
-                  {MAINTENANCE_TASKS.map(task => (
-                    <div key={task.id} className="flex items-center space-x-4">
-                      <Switch
-                        id={task.id}
-                        checked={completedTasks.includes(task.id)}
-                        onCheckedChange={() => handleMaintenanceTaskToggle(task.id)}
-                      />
-                      <div className="grid gap-1.5">
-                        <Label htmlFor={task.id}>{task.label}</Label>
-                        <p className="text-sm text-muted-foreground">{task.description}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="space-y-4">
-                  <h3 className="text-lg font-semibold">Anmerkungen</h3>
-                  <Textarea
-                    value={maintenanceNotes}
-                    onChange={handleMaintenanceNotesChange}
-                    placeholder="Zusätzliche Anmerkungen zur Wartung..."
-                    className="min-h-[200px]"
-                  />
-                </div>
-              </div>
-
-              <hr className="my-6 border-t border-border" />
-
-              <div className="flex justify-end">
-                <Button
-                  onClick={handleSaveMaintenance}
-                  disabled={completedTasks.length === 0}
-                >
-                  Wartung protokollieren
-                </Button>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {component.maintenanceHistory && component.maintenanceHistory.length > 0 && (
-          <Card className="md:col-span-2">
-            <CardHeader>
-              <CardTitle>Wartungshistorie</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-6">
-                {[...component.maintenanceHistory]
-                  .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-                  .map((protocol, index) => (
-                  <div key={index} className="border rounded-lg p-4">
-                    <div className="flex justify-between items-start mb-4">
-                      <h4 className="text-lg font-semibold">
-                        Wartung vom {new Date(protocol.date).toLocaleDateString('de-DE')}
-                      </h4>
-                    </div>
-                    <div className="space-y-4">
-                      <div>
-                        <h5 className="font-medium mb-2">Durchgeführte Aufgaben:</h5>
-                        <ul className="list-disc list-inside space-y-1">
-                          {protocol.completedTasks.map(taskId => {
-                            const task = MAINTENANCE_TASKS.find(t => t.id === taskId);
-                            return task ? (
-                              <li key={taskId}>{task.label}</li>
-                            ) : null;
-                          })}
-                        </ul>
-                      </div>
-                      {protocol.notes && (
-                        <div>
-                          <h5 className="font-medium mb-2">Anmerkungen:</h5>
-                          <p className="text-muted-foreground">{protocol.notes}</p>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        )}
+        <div className="md:col-span-2 space-y-6">
+          <MaintenanceHistory 
+            protocols={component.maintenanceHistory || []}
+            onSave={handleSaveMaintenance}
+            isLoading={isLoading}
+          />
+        </div>
       </div>
     </div>
   );

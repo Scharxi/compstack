@@ -45,32 +45,44 @@ export async function PUT(
     if (data.newMaintenanceProtocol) {
       const { newMaintenanceProtocol, maintenanceHistory, ...componentData } = data;
       
-      // Create the maintenance protocol
-      await prisma.maintenanceProtocol.create({
-        data: {
-          date: new Date(newMaintenanceProtocol.date),
-          completedTasks: newMaintenanceProtocol.completedTasks,
-          notes: newMaintenanceProtocol.notes,
-          componentId: resolvedParams.id
-        }
-      });
+      try {
+        // Create the maintenance protocol
+        await prisma.maintenanceProtocol.create({
+          data: {
+            date: new Date(newMaintenanceProtocol.date),
+            completedTasks: newMaintenanceProtocol.completedTasks,
+            notes: newMaintenanceProtocol.notes,
+            componentId: resolvedParams.id
+          }
+        });
 
-      // Update the component with the new last maintenance date
-      const component = await prisma.component.update({
-        where: {
-          id: resolvedParams.id,
-        },
-        data: {
-          ...componentData,
-          specifications: componentData.specifications || {},
-          lastMaintenanceDate: new Date()
-        },
-        include: {
-          maintenanceHistory: true,
-        },
-      });
-      
-      return NextResponse.json(component);
+        // Update the component with the new last maintenance date
+        const component = await prisma.component.update({
+          where: {
+            id: resolvedParams.id,
+          },
+          data: {
+            ...componentData,
+            specifications: componentData.specifications || {},
+            lastMaintenanceDate: new Date()
+          },
+          include: {
+            maintenanceHistory: {
+              orderBy: {
+                date: 'desc'
+              }
+            }
+          },
+        });
+        
+        return NextResponse.json(component);
+      } catch (error) {
+        console.error('Failed to save maintenance protocol:', error);
+        return NextResponse.json(
+          { error: 'Failed to save maintenance protocol' },
+          { status: 500 }
+        );
+      }
     }
 
     // Regular component update without maintenance
@@ -84,7 +96,11 @@ export async function PUT(
         specifications: updateData.specifications || {},
       },
       include: {
-        maintenanceHistory: true,
+        maintenanceHistory: {
+          orderBy: {
+            date: 'desc'
+          }
+        }
       },
     });
     
