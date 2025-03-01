@@ -11,8 +11,8 @@ const navigation = [
     icon: LayoutGrid,
   },
   {
-    name: 'Liste',
-    href: '/dashboard/list',
+    name: 'Listen',
+    href: '/lists',
     icon: List,
   },
 ];
