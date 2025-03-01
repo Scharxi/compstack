@@ -122,14 +122,21 @@ export async function DELETE(
     const resolvedParams = await params;
     const decodedId = decodeURIComponent(resolvedParams.id);
 
-    // First delete all maintenance protocols for this component
+    // First delete all list items that reference this component
+    await prisma.listItem.deleteMany({
+      where: {
+        componentId: decodedId
+      }
+    });
+
+    // Then delete all maintenance protocols for this component
     await prisma.maintenanceProtocol.deleteMany({
       where: {
         componentId: decodedId
       }
     });
 
-    // Then delete the component
+    // Finally delete the component
     const component = await prisma.component.delete({
       where: {
         id: decodedId
