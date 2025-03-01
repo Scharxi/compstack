@@ -1,9 +1,23 @@
-import NextAuth from "next-auth"
+import NextAuth, { DefaultSession, NextAuthOptions } from "next-auth"
 import CredentialsProvider from "next-auth/providers/credentials"
 import { compare } from "bcrypt"
 import { prisma } from "@/lib/prisma"
 
-const handler = NextAuth({
+// Erweitern Sie die Session-Types
+declare module "next-auth" {
+  interface Session extends DefaultSession {
+    user: {
+      id: string
+      username: string
+    } & DefaultSession["user"]
+  }
+
+  interface User {
+    username: string
+  }
+}
+
+export const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
       name: 'Credentials',
@@ -55,12 +69,15 @@ const handler = NextAuth({
       if (token) {
         session.user = {
           id: token.id as string,
-          username: token.username as string
+          username: token.username as string,
+          ...session.user
         }
       }
       return session
     }
   }
-})
+}
+
+const handler = NextAuth(authOptions)
 
 export { handler as GET, handler as POST } 
