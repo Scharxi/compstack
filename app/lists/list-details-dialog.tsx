@@ -54,23 +54,24 @@ export function ListDetailsDialog({ list, components, open, onOpenChange }: List
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl max-h-[80vh] flex flex-col">
-        <DialogHeader>
-          <DialogTitle className="text-2xl">{list.name}</DialogTitle>
-          <p className="text-muted-foreground">{list.description}</p>
-        </DialogHeader>
-        
-        <div className="flex items-center justify-between text-sm text-muted-foreground py-2">
-          <div>
-            {list.itemCount} {list.itemCount === 1 ? 'Komponente' : 'Komponenten'}
-          </div>
-          <div>
-            Erstellt am {new Date(list.createdAt).toLocaleDateString('de-DE')}
-          </div>
+      <DialogContent className="max-w-3xl max-h-[85vh] p-0">
+        <div className="p-6 pb-0">
+          <DialogHeader className="pb-4">
+            <DialogTitle className="text-2xl">{list.name}</DialogTitle>
+            <p className="text-muted-foreground">{list.description}</p>
+            <div className="flex items-center justify-between text-sm text-muted-foreground pt-2">
+              <div>
+                {list.itemCount} {list.itemCount === 1 ? 'Komponente' : 'Komponenten'}
+              </div>
+              <div>
+                Erstellt am {new Date(list.createdAt).toLocaleDateString('de-DE')}
+              </div>
+            </div>
+          </DialogHeader>
         </div>
 
-        <ScrollArea className="flex-1 -mx-6 px-6">
-          <div className="space-y-2 py-4">
+        <ScrollArea className="h-[calc(85vh-140px)] px-6 pb-6">
+          <div className="space-y-2">
             <Accordion type="multiple" className="space-y-2">
               {listComponents.map((component) => (
                 <AccordionItem 
@@ -82,23 +83,25 @@ export function ListDetailsDialog({ list, components, open, onOpenChange }: List
                     <div className="flex items-center gap-4 w-full">
                       <Computer className="h-5 w-5 text-muted-foreground shrink-0" />
                       <div className="flex-1">
-                        <div className="font-medium text-left">{component.name}</div>
-                        <div className="text-sm text-muted-foreground text-left">
-                          {component.serialNumber}
+                        <div className="flex items-center gap-2">
+                          <div className="font-medium">{component.name}</div>
+                        </div>
+                        <div className="text-sm text-muted-foreground">
+                          {component.id}
                         </div>
                       </div>
-                      <div className="flex items-center gap-3">
-                        <div className="text-sm text-muted-foreground">
-                          {LOCATIONS[component.location]}
-                        </div>
+                      <div className="flex items-center gap-3 min-w-[200px] justify-end">
+                        <Badge variant="secondary" className="font-normal">
+                          {INDICATORS[component.indicator]}
+                        </Badge>
                         <Badge variant={getStatusVariant(component.status)}>
                           {STATUS[component.status]}
                         </Badge>
                       </div>
                     </div>
                   </AccordionTrigger>
-                  <AccordionContent className="pb-4 pt-2">
-                    <div className="space-y-6 px-9">
+                  <AccordionContent>
+                    <div className="space-y-6 px-9 pb-4">
                       <div className="grid grid-cols-2 gap-6">
                         <div className="space-y-4">
                           <div className="flex items-center gap-3">

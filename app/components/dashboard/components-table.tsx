@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Pencil, Trash2, Eye, Wrench } from "lucide-react";
+import { Pencil, Trash2, Eye, Wrench, ListPlus } from "lucide-react";
 import {
   ContextMenu,
   ContextMenuContent,
@@ -31,6 +31,7 @@ import {
   type HardwareComponent,
 } from "@/app/types/hardware";
 import { useComponentsStore } from "@/app/store/components";
+import { useListsStore } from "@/app/store/lists";
 import {
   Dialog,
   DialogContent,
@@ -39,6 +40,9 @@ import {
 } from "@/components/ui/dialog";
 import { MaintenanceForm } from "@/app/components/maintenance/maintenance-form";
 import { toast } from "sonner";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Card, CardContent } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 
 // Hilfsfunktion für einheitliche Datumsformatierung
 function formatDate(date: Date | string | undefined): string {
@@ -151,7 +155,14 @@ export function ComponentsTable({ components }: ComponentsTableProps) {
   const [deletingComponent, setDeletingComponent] = React.useState<HardwareComponent | null>(null);
   const [maintenanceComponent, setMaintenanceComponent] = React.useState<HardwareComponent | null>(null);
   const [maintenanceDialogOpen, setMaintenanceDialogOpen] = React.useState(false);
+  const [addToListComponent, setAddToListComponent] = React.useState<HardwareComponent | null>(null);
+  const [addToListDialogOpen, setAddToListDialogOpen] = React.useState(false);
   const { deleteComponent, updateComponent } = useComponentsStore();
+  const { lists, fetchLists, updateList } = useListsStore();
+
+  React.useEffect(() => {
+    fetchLists();
+  }, [fetchLists]);
 
   const handleRowClick = (id: string) => {
     const encodedId = encodeURIComponent(id);
@@ -172,6 +183,12 @@ export function ComponentsTable({ components }: ComponentsTableProps) {
     e.stopPropagation();
     setMaintenanceComponent(component);
     setMaintenanceDialogOpen(true);
+  };
+
+  const handleAddToListClick = (e: React.MouseEvent<HTMLDivElement>, component: HardwareComponent) => {
+    e.stopPropagation();
+    setAddToListComponent(component);
+    setAddToListDialogOpen(true);
   };
 
   const handleConfirmDelete = async () => {
@@ -205,6 +222,28 @@ export function ComponentsTable({ components }: ComponentsTableProps) {
         console.error('Failed to save maintenance protocol:', error);
         toast.error('Fehler beim Speichern des Wartungsprotokolls');
       }
+    }
+  };
+
+  const handleAddToList = async (listId: string) => {
+    if (!addToListComponent) return;
+
+    try {
+      const list = lists.find(l => l.id === listId);
+      if (!list) return;
+
+      const updatedList = {
+        ...list,
+        components: [...list.components, addToListComponent.id]
+      };
+
+      await updateList(updatedList);
+      setAddToListComponent(null);
+      setAddToListDialogOpen(false);
+      toast.success('Komponente zur Liste hinzugefügt');
+    } catch (error) {
+      console.error('Failed to add component to list:', error);
+      toast.error('Fehler beim Hinzufügen zur Liste');
     }
   };
 
@@ -276,6 +315,11 @@ export function ComponentsTable({ components }: ComponentsTableProps) {
                     Wartung durchführen
                   </ContextMenuItem>
                   <ContextMenuSeparator />
+                  <ContextMenuItem onClick={(e) => handleAddToListClick(e, component)} className="gap-2">
+                    <ListPlus className="h-4 w-4" />
+                    Zu Liste hinzufügen
+                  </ContextMenuItem>
+                  <ContextMenuSeparator />
                   <ContextMenuItem 
                     onClick={(e) => handleDeleteClick(e, component)} 
                     className="gap-2 text-destructive focus:text-destructive"
@@ -322,6 +366,52 @@ export function ComponentsTable({ components }: ComponentsTableProps) {
                 onOpenChange={setMaintenanceDialogOpen}
               />
             </div>
+          </DialogContent>
+        </Dialog>
+      )}
+
+      {addToListComponent && (
+        <Dialog open={addToListDialogOpen} onOpenChange={setAddToListDialogOpen}>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogTitle className="flex items-center gap-2">
+              <ListPlus className="h-5 w-5" />
+              Zu Liste hinzufügen
+            </DialogTitle>
+            <ScrollArea className="max-h-[300px] pr-4">
+              <div className="space-y-2">
+                {lists.map((list) => (
+                  <Card
+                    key={list.id}
+                    className={cn(
+                      "hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer",
+                      list.components.includes(addToListComponent.id) && "opacity-50 cursor-not-allowed"
+                    )}
+                    onClick={() => {
+                      if (!list.components.includes(addToListComponent.id)) {
+                        handleAddToList(list.id);
+                      }
+                    }}
+                  >
+                    <CardContent className="p-4 flex items-center justify-between">
+                      <div>
+                        <div className="font-medium">{list.name}</div>
+                        <div className="text-sm text-muted-foreground">
+                          {list.itemCount} {list.itemCount === 1 ? 'Komponente' : 'Komponenten'}
+                        </div>
+                      </div>
+                      {list.components.includes(addToListComponent.id) && (
+                        <Badge variant="secondary">Bereits hinzugefügt</Badge>
+                      )}
+                    </CardContent>
+                  </Card>
+                ))}
+                {lists.length === 0 && (
+                  <div className="text-center text-muted-foreground py-8">
+                    Keine Listen verfügbar
+                  </div>
+                )}
+              </div>
+            </ScrollArea>
           </DialogContent>
         </Dialog>
       )}
