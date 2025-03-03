@@ -40,29 +40,38 @@ export type Indicator =
   | "NIC" // Network Card
   | "SR"  // Server
   | "PK"  // Patch Cable
-  | "VR"  // VR Headset
-  | "ST"  // Smartphone
-  | "HD"  // Headset
-  | "SO"; // Sonstiges
+  | "VR"; // VR Headset
 
 export const INDICATORS: Record<Indicator, string> = {
   PC: "Desktop Computer",
   LT: "Laptop",
-  MON: "Monitor",
+  TB: "Tablet",
+  SR: "Server",
+  PR: "Drucker",
+  MO: "Monitor",
+  // IT-Komponenten
   GPU: "Grafikkarte",
   CPU: "Prozessor",
   RAM: "Arbeitsspeicher",
-  SSD: "SSD-Speicher",
-  HDD: "HDD-Speicher",
+  SSD: "SSD-Festplatte",
+  HDD: "HDD-Festplatte",
+  // Netzwerk-Komponenten
   SW: "Switch",
   RT: "Router",
   AP: "Access Point",
   NIC: "Netzwerkkarte",
-  SR: "Server",
-  PK: "Patchkabel",
-  VR: "VR-Headset",
+  PK: "Patch-Kabel",
+  // Werkzeug
+  MM: "Multimeter",
+  LK: "Lötkolben",
+  NT: "Netzwerktester",
+  EW: "Elektrowerkzeug",
+  OZ: "Oszilloskop",
+  // Mobile Geräte
   ST: "Smartphone",
   HD: "Headset",
+  VR: "VR-Brille",
+  // Sonstiges
   SO: "Sonstiges"
 };
 
