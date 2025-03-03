@@ -19,12 +19,13 @@ model Component {
   status              String
   indicator           String
   runningNumber       String
-  serialNumber        String
+  serialNumber        String?
   lastMaintenanceDate DateTime?
   assignedTo          String?
   specifications      Json
   maintenanceHistory  MaintenanceProtocol[]
   listItems           ListItem[]
+  activities          Activity[]
   createdAt           DateTime             @default(now())
   updatedAt           DateTime             @updatedAt
 }
@@ -70,4 +71,21 @@ model ListItem {
 
   @@index([listId])
   @@index([componentId])
+}
+
+model Activity {
+  id            String    @id @default(cuid())
+  type          String
+  componentId   String?
+  component     Component? @relation(fields: [componentId], references: [id], onDelete: SetNull)
+  componentName String
+  date          DateTime  @default(now())
+  user          String
+  details       String
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([componentId])
+  @@index([type])
+  @@index([date])
 } 

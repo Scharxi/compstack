@@ -15,12 +15,20 @@ import {
   SPECIFICATIONS_CONFIG,
   type HardwareComponent,
   type Category,
+  type MaintenanceProtocol
 } from "@/app/types/hardware";
 import { useComponentsStore } from "@/app/store/components";
 import { fetchComponent } from '@/app/services/api';
 import { ThemeToggle } from "@/app/components/theme-toggle";
 import { MaintenanceHistory } from "@/app/components/maintenance/maintenance-history";
 import { toast } from "sonner";
+import { useActivitiesStore } from '@/app/store/activities';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { format } from 'date-fns';
+import { de } from 'date-fns/locale';
 
 interface ComponentDetailsProps {
   params: Promise<{
@@ -30,13 +38,26 @@ interface ComponentDetailsProps {
 
 export default function ComponentDetailsPage({ params }: ComponentDetailsProps) {
   const router = useRouter();
+  const { updateComponent } = useComponentsStore();
+  const { logActivity } = useActivitiesStore();
+  
+  // Komponenten-Zustand
+  const [component, setComponent] = useState<HardwareComponent | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [component, setComponent] = useState<HardwareComponent | null>(null);
-  const updateComponent = useComponentsStore((state) => state.updateComponent);
+  
+  // Formular-Zustände
+  const [assignedTo, setAssignedTo] = useState('');
+  const [isAssigning, setIsAssigning] = useState(false);
+  const [completedTasks, setCompletedTasks] = useState<string[]>([]);
+  const [maintenanceNotes, setMaintenanceNotes] = useState('');
+  const [isPerformingMaintenance, setIsPerformingMaintenance] = useState(false);
+  
+  // Parameter auflösen
   const resolvedParams = use(params);
   const { id } = resolvedParams;
 
+  // Komponente laden
   useEffect(() => {
     async function loadComponent() {
       try {
@@ -62,30 +83,124 @@ export default function ComponentDetailsPage({ params }: ComponentDetailsProps) 
     loadComponent();
   }, [id]);
 
+  // Wartung speichern
   const handleMaintenanceSave = async (data: { completedTasks: string[], notes: string }) => {
     if (component) {
-      const newMaintenanceProtocol = {
+      const newMaintenanceProtocol: MaintenanceProtocol = {
         date: new Date(),
         completedTasks: data.completedTasks,
-        notes: data.notes
-      };
-
-      const updatedComponent = {
-        ...component,
-        newMaintenanceProtocol,
-        maintenanceHistory: [...(component.maintenanceHistory || [])],
-        lastMaintenanceDate: new Date()
+        notes: data.notes || undefined
       };
 
       try {
+        const updatedComponent = {
+          ...component,
+          lastMaintenanceDate: new Date(),
+          maintenanceHistory: [
+            ...(component.maintenanceHistory || []),
+            newMaintenanceProtocol
+          ]
+        };
+
         await updateComponent(updatedComponent);
-        const refreshedData = await fetchComponent(id);
-        setComponent(refreshedData);
-        toast.success('Wartungsprotokoll erfolgreich gespeichert');
+        setComponent(updatedComponent);
+        
+        // Protokolliere die Wartungsaktivität
+        await logActivity({
+          type: 'maintenance',
+          componentId: component.id,
+          componentName: component.name,
+          user: 'System',
+          details: `Wartung für Komponente "${component.name}" durchgeführt`
+        });
+        
+        toast.success('Wartung erfolgreich gespeichert');
       } catch (error) {
-        console.error('Failed to save maintenance protocol:', error);
-        toast.error('Fehler beim Speichern des Wartungsprotokolls');
+        console.error('Fehler beim Speichern der Wartung:', error);
+        toast.error('Fehler beim Speichern der Wartung');
       }
+    }
+  };
+
+  // Zuweisung speichern
+  const handleAssign = async () => {
+    if (!component) return;
+    
+    setIsAssigning(true);
+    try {
+      const updatedComponent = {
+        ...component,
+        assignedTo: assignedTo.trim() || undefined
+      };
+      
+      await updateComponent(updatedComponent);
+      setComponent(updatedComponent);
+      
+      // Protokolliere die Zuweisungsaktivität
+      await logActivity({
+        type: 'assignment',
+        componentId: component.id,
+        componentName: component.name,
+        user: 'System',
+        details: assignedTo.trim() 
+          ? `Komponente "${component.name}" wurde ${assignedTo} zugewiesen` 
+          : `Zuweisung für Komponente "${component.name}" wurde entfernt`
+      });
+      
+      setAssignedTo('');
+      toast.success(assignedTo.trim() 
+        ? `Komponente wurde ${assignedTo} zugewiesen` 
+        : 'Zuweisung wurde entfernt'
+      );
+    } catch (error) {
+      console.error('Fehler bei der Zuweisung:', error);
+      toast.error('Fehler bei der Zuweisung');
+    } finally {
+      setIsAssigning(false);
+    }
+  };
+
+  const handleMaintenance = async () => {
+    if (!component) return;
+    
+    setIsPerformingMaintenance(true);
+    try {
+      const maintenanceProtocol = {
+        date: new Date(),
+        completedTasks,
+        notes: maintenanceNotes.trim() || undefined
+      };
+      
+      const updatedComponent = {
+        ...component,
+        lastMaintenanceDate: new Date(),
+        maintenanceHistory: [
+          ...(component.maintenanceHistory || []),
+          maintenanceProtocol
+        ]
+      };
+      
+      await updateComponent(updatedComponent);
+      setComponent(updatedComponent);
+      
+      // Protokolliere die Wartungsaktivität
+      await logActivity({
+        type: 'maintenance',
+        componentId: component.id,
+        componentName: component.name,
+        user: 'System',
+        details: `Wartung für Komponente "${component.name}" durchgeführt`
+      });
+      
+      setCompletedTasks([]);
+      setMaintenanceNotes('');
+      setIsPerformingMaintenance(false);
+      
+      toast.success('Wartung erfolgreich gespeichert');
+    } catch (error) {
+      console.error('Fehler beim Speichern der Wartung:', error);
+      toast.error('Fehler beim Speichern der Wartung');
+      setIsPerformingMaintenance(false);
     }
   };
 

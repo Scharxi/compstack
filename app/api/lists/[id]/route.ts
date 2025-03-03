@@ -4,7 +4,7 @@ import { auth } from '@/lib/auth';
 
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Check authentication
@@ -31,7 +31,11 @@ export async function PUT(
       );
     }
 
-    const list = await updateList(params.id, { name, description, components });
+    // Extrahiere die ID aus den Parametern
+    const resolvedParams = await params;
+    const listId = resolvedParams.id;
+    
+    const list = await updateList(listId, { name, description, components });
     return NextResponse.json(list);
   } catch (error) {
     console.error('Failed to update list:', error);
@@ -44,7 +48,7 @@ export async function PUT(
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Check authentication
@@ -53,7 +57,11 @@ export async function DELETE(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    await deleteList(params.id);
+    // Extrahiere die ID aus den Parametern
+    const resolvedParams = await params;
+    const listId = resolvedParams.id;
+    
+    await deleteList(listId);
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Failed to delete list:', error);

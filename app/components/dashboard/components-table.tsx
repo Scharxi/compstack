@@ -22,7 +22,6 @@ import {
 } from "@/components/ui/context-menu";
 import { AddComponentForm } from "./add-component-form";
 import { DeleteComponentDialog } from "./delete-component-dialog";
-import { MaintenanceDialog } from "@/app/components/maintenance/maintenance-dialog";
 import { 
   CATEGORIES, 
   LOCATIONS, 
@@ -35,7 +34,6 @@ import { useListsStore } from "@/app/store/lists";
 import {
   Dialog,
   DialogContent,
-  DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
 import { MaintenanceForm } from "@/app/components/maintenance/maintenance-form";
@@ -43,6 +41,7 @@ import { toast } from "sonner";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import { useActivitiesStore } from "@/app/store/activities";
 
 // Hilfsfunktion für einheitliche Datumsformatierung
 function formatDate(date: Date | string | undefined): string {
@@ -152,13 +151,15 @@ const columns: Column[] = [
 export function ComponentsTable({ components }: ComponentsTableProps) {
   const router = useRouter();
   const [editingComponent, setEditingComponent] = React.useState<HardwareComponent | null>(null);
+  const { deleteComponent, updateComponent } = useComponentsStore();
   const [deletingComponent, setDeletingComponent] = React.useState<HardwareComponent | null>(null);
   const [maintenanceComponent, setMaintenanceComponent] = React.useState<HardwareComponent | null>(null);
   const [maintenanceDialogOpen, setMaintenanceDialogOpen] = React.useState(false);
   const [addToListComponent, setAddToListComponent] = React.useState<HardwareComponent | null>(null);
   const [addToListDialogOpen, setAddToListDialogOpen] = React.useState(false);
-  const { deleteComponent, updateComponent } = useComponentsStore();
   const { lists, fetchLists, updateList } = useListsStore();
+  const { logActivity } = useActivitiesStore();
+  const [, setIsDeleting] = React.useState<string | null>(null);
 
   React.useEffect(() => {
     fetchLists();
@@ -193,8 +194,30 @@ export function ComponentsTable({ components }: ComponentsTableProps) {
 
   const handleConfirmDelete = async () => {
     if (deletingComponent) {
-      await deleteComponent(deletingComponent.id);
-      setDeletingComponent(null);
+      setIsDeleting(deletingComponent.id);
+      try {
+        // Speichere Informationen über die zu löschende Komponente
+        const componentInfo = {
+          id: deletingComponent.id,
+          name: deletingComponent.name
+        };
+        
+        // Protokolliere die Löschaktivität
+        await logActivity({
+          type: 'retirement',
+          componentId: componentInfo.id, // Jetzt können wir die tatsächliche ID verwenden
+          componentName: componentInfo.name,
+          user: 'System',
+          details: `Komponente "${componentInfo.name}" wurde gelöscht`
+        });
+        
+        await deleteComponent(deletingComponent.id);
+      } catch (error) {
+        console.error("Fehler beim Löschen der Komponente:", error);
+      } finally {
+        setDeletingComponent(null);
+        setIsDeleting(null);
+      }
     }
   };
 
@@ -215,6 +238,16 @@ export function ComponentsTable({ components }: ComponentsTableProps) {
         };
 
         await updateComponent(updatedComponent);
+        
+        // Protokolliere die Wartungsaktivität
+        await logActivity({
+          type: 'maintenance',
+          componentId: maintenanceComponent.id,
+          componentName: maintenanceComponent.name,
+          user: 'System',
+          details: `Wartung für Komponente "${maintenanceComponent.name}" durchgeführt`
+        });
+        
         setMaintenanceComponent(null);
         setMaintenanceDialogOpen(false);
         toast.success('Wartungsprotokoll erfolgreich gespeichert');
@@ -226,24 +259,30 @@ export function ComponentsTable({ components }: ComponentsTableProps) {
   };
 
   const handleAddToList = async (listId: string) => {
-    if (!addToListComponent) return;
-
-    try {
-      const list = lists.find(l => l.id === listId);
-      if (!list) return;
-
-      const updatedList = {
-        ...list,
-        components: [...list.components, addToListComponent.id]
-      };
-
-      await updateList(updatedList);
-      setAddToListComponent(null);
-      setAddToListDialogOpen(false);
-      toast.success('Komponente zur Liste hinzugefügt');
-    } catch (error) {
-      console.error('Failed to add component to list:', error);
-      toast.error('Fehler beim Hinzufügen zur Liste');
+    if (addToListComponent) {
+      try {
+        await updateList({
+          ...lists.find(l => l.id === listId)!,
+          components: [...lists.find(l => l.id === listId)!.components, addToListComponent.id]
+        });
+        
+        // Protokolliere die Aktivität
+        await logActivity({
+          type: 'update',
+          componentId: addToListComponent.id,
+          componentName: addToListComponent.name,
+          user: 'System',
+          details: `Komponente "${addToListComponent.name}" wurde zu einer Liste hinzugefügt`
+        });
+        
+        toast.success('Komponente zur Liste hinzugefügt');
+      } catch (error) {
+        console.error('Fehler beim Hinzufügen zur Liste:', error);
+        toast.error('Fehler beim Hinzufügen zur Liste');
+      } finally {
+        setAddToListComponent(null);
+        setAddToListDialogOpen(false);
+      }
     }
   };
 

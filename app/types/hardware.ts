@@ -95,6 +95,7 @@ export interface HardwareComponent {
   assignedTo?: string;
   specifications: Record<string, string>;
   maintenanceHistory?: MaintenanceProtocol[];
+  notes?: string;
 }
 
 export function generateComponentId(
@@ -118,7 +119,7 @@ export interface DashboardStats {
 
 export interface Activity {
   id: string;
-  type: 'assignment' | 'maintenance' | 'addition' | 'retirement';
+  type: 'assignment' | 'maintenance' | 'addition' | 'retirement' | 'update';
   componentId: string;
   componentName: string;
   date: Date;
