@@ -43,6 +43,13 @@ export default function ComponentDetailsPage({ params }: ComponentDetailsProps) 
         setIsLoading(true);
         setError(null);
         const data = await fetchComponent(id);
+        
+        // Korrektur für VR-Brillen, die in der falschen Kategorie gespeichert sind
+        if (data.indicator === 'VR' && data.category !== 'IT') {
+          console.log('Korrigiere Kategorie für VR-Brille von', data.category, 'zu IT');
+          data.category = 'IT';
+        }
+        
         setComponent(data);
       } catch (err) {
         setError('Failed to load component');
@@ -159,9 +166,13 @@ export default function ComponentDetailsPage({ params }: ComponentDetailsProps) 
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
+              
               {Object.entries(component.specifications).map(([key, value]) => {
-                const specFields = SPECIFICATIONS_CONFIG[component.category]?.[component.indicator];
+                const specFields = SPECIFICATIONS_CONFIG[component.category as Category]?.[component.indicator];
                 const label = specFields?.[key]?.label || key;
+                
+                console.log(`Spec key: ${key}, Category: ${component.category}, Indicator: ${component.indicator}`);
+                console.log(`Label found: ${label}, Config exists: ${specFields ? 'Yes' : 'No'}`);
                 
                 return (
                   <div key={key} className="space-y-1">
