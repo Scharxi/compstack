@@ -161,10 +161,10 @@ export const MAINTENANCE_TASKS: MaintenanceTask[] = [
 ];
 
 // Mapping von Kategorien zu erlaubten Indikatoren
-export const CATEGORY_INDICATORS: Record<Category, Indicator[]> = {
-  IT: ["PC", "LT", "MON", "GPU", "CPU", "RAM", "SSD", "HDD", "SR", "VR"],
-  WZ: ["SW", "RT", "AP", "NIC", "PK"],
-  MB: ["ST", "HD"],
+export const CATEGORY_INDICATORS: Record<Category, string[]> = {
+  IT: ["PC", "LT", "TB", "SR", "PR", "MO", "GPU", "RAM", "SSD", "HDD", "SW", "RT", "AP", "NIC", "PK"],
+  WZ: ["MM", "LK", "NT", "EW", "OZ"],
+  MB: ["TB", "ST", "HD", "VR"],
   SO: ["SO"]
 };
 
