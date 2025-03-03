@@ -4,7 +4,7 @@ export const CATEGORIES: Record<Category, string> = {
   IT: "IT-Equipment",
   WZ: "Werkzeug",
   MB: "Mobile Geräte",
-  SO: "Sonstiges"
+  SO: "Sonstiges",
 };
 
 export const LOCATIONS = {
@@ -25,12 +25,22 @@ export const STATUS = {
   DE: "Defekt"
 } as const;
 
-export type Indicator = "PC" | "LT" | "TB" | "SR" | "PR" | "MO" | // IT
-                       "GPU" | "RAM" | "SSD" | "HDD" | // IT Components
-                       "SW" | "RT" | "AP" | "NIC" | "PK" | // Network Components
-                       "MM" | "LK" | "NT" | "EW" | "OZ" | // Werkzeug (Multimeter, Lötkolben, Netzwerktester, Elektrowerkzeug, Oszilloskop)
-                       "ST" | "HD" | // Mobile
-                       "SO"; // Sonstiges
+export type Indicator = 
+  | "PC"  // Desktop Computer
+  | "LT"  // Laptop
+  | "MON" // Monitor
+  | "GPU"  // Graphics Card
+  | "CPU" // Processor
+  | "RAM" // Memory
+  | "SSD" // SSD Storage
+  | "HDD" // HDD Storage
+  | "SW"  // Network Switch
+  | "RT"  // Router
+  | "AP"  // Access Point
+  | "NIC" // Network Card
+  | "SR"  // Server
+  | "PK"  // Patch Cable
+  | "VR"; // VR Headset
 
 export const INDICATORS: Record<Indicator, string> = {
   // IT-Equipment
@@ -60,6 +70,7 @@ export const INDICATORS: Record<Indicator, string> = {
   // Mobile Geräte
   ST: "Smartphone",
   HD: "Headset",
+  VR: "VR-Brille",
   // Sonstiges
   SO: "Sonstiges"
 };
@@ -162,7 +173,7 @@ export const MAINTENANCE_TASKS: MaintenanceTask[] = [
 export const CATEGORY_INDICATORS: Record<Category, string[]> = {
   IT: ["PC", "LT", "TB", "SR", "PR", "MO", "GPU", "RAM", "SSD", "HDD", "SW", "RT", "AP", "NIC", "PK"],
   WZ: ["MM", "LK", "NT", "EW", "OZ"],
-  MB: ["TB", "ST", "HD"],
+  MB: ["TB", "ST", "HD", "VR"],
   SO: ["SO"]
 };
 

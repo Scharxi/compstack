@@ -1034,6 +1034,144 @@ const SPEC_FIELDS: Record<Indicator, SpecField[]> = {
       required: true
     },
   ],
+  VR: [
+    { 
+      label: "Hersteller", 
+      key: "manufacturer",
+      hint: "Hersteller der VR-Brille",
+      type: "select",
+      options: [
+        { label: "Meta (Oculus)", value: "Meta" },
+        { label: "HTC", value: "HTC" },
+        { label: "Valve", value: "Valve" },
+        { label: "HP", value: "HP" },
+        { label: "Pico", value: "Pico" },
+        { label: "Sony", value: "Sony" },
+      ],
+      required: true
+    },
+    { 
+      label: "Modell", 
+      key: "model",
+      hint: "Modellbezeichnung",
+      type: "select",
+      options: [
+        { label: "Meta Quest 2", value: "Quest 2" },
+        { label: "Meta Quest 3", value: "Quest 3" },
+        { label: "Meta Quest Pro", value: "Quest Pro" },
+        { label: "Valve Index", value: "Index" },
+        { label: "HTC Vive Pro 2", value: "Vive Pro 2" },
+        { label: "HP Reverb G2", value: "Reverb G2" },
+        { label: "Pico 4", value: "Pico 4" },
+        { label: "PlayStation VR2", value: "PSVR2" },
+      ],
+      required: true
+    },
+    { 
+      label: "Typ", 
+      key: "type",
+      hint: "Art der VR-Brille",
+      type: "select",
+      options: [
+        { label: "Standalone", value: "STANDALONE" },
+        { label: "PC-Tethered", value: "TETHERED" },
+        { label: "Smartphone", value: "SMARTPHONE" }
+      ],
+      required: true
+    },
+    { 
+      label: "Display-Auflösung", 
+      key: "displayResolution",
+      hint: "Auflösung pro Auge",
+      type: "select",
+      options: [
+        { label: "1832 x 1920 pro Auge", value: "1832x1920" },
+        { label: "2160 x 2160 pro Auge", value: "2160x2160" },
+        { label: "2448 x 2448 pro Auge", value: "2448x2448" },
+      ],
+      required: true
+    },
+    { 
+      label: "Bildwiederholrate", 
+      key: "refreshRate",
+      hint: "Maximale Bildwiederholrate in Hz",
+      type: "select",
+      options: [
+        { label: "72 Hz", value: "72" },
+        { label: "90 Hz", value: "90" },
+        { label: "120 Hz", value: "120" },
+        { label: "144 Hz", value: "144" }
+      ],
+      required: true
+    },
+    { 
+      label: "Sichtfeld", 
+      key: "fieldOfView",
+      hint: "Horizontales Sichtfeld in Grad",
+      type: "select",
+      options: [
+        { label: "90°", value: "90" },
+        { label: "100°", value: "100" },
+        { label: "110°", value: "110" },
+        { label: "120°", value: "120" }
+      ],
+      required: true
+    },
+    { 
+      label: "Tracking", 
+      key: "tracking",
+      hint: "Tracking-System",
+      type: "select",
+      options: [
+        { label: "Inside-Out (Kamera)", value: "Inside-Out" },
+        { label: "Outside-In (Basisstationen)", value: "Outside-In" },
+        { label: "Hybrid", value: "Hybrid" }
+      ],
+      required: true
+    },
+    { 
+      label: "Controller", 
+      key: "controllers",
+      hint: "Art der Controller",
+      type: "select",
+      options: [
+        { label: "Touch Controller", value: "Touch" },
+        { label: "Knuckles Controller", value: "Knuckles" },
+        { label: "Vive Controller", value: "Vive" },
+        { label: "Hand-Tracking", value: "Hand-Tracking" }
+      ],
+      required: true
+    },
+    { 
+      label: "Konnektivität", 
+      key: "connectivity",
+      hint: "Verbindungsoptionen",
+      type: "multiselect",
+      options: [
+        { label: "USB-C", value: "USB-C" },
+        { label: "DisplayPort", value: "DisplayPort" },
+        { label: "HDMI", value: "HDMI" },
+        { label: "Wireless", value: "Wireless" },
+        { label: "Bluetooth", value: "Bluetooth" },
+        { label: "WiFi 6E", value: "WiFi 6E" }
+      ],
+      required: true
+    },
+    { 
+      label: "Zubehör", 
+      key: "accessories",
+      hint: "Verfügbares Zubehör",
+      type: "multiselect",
+      options: [
+        { label: "Facial Interface", value: "Facial Interface" },
+        { label: "Elite Strap", value: "Elite Strap" },
+        { label: "Carrying Case", value: "Carrying Case" },
+        { label: "Link Cable", value: "Link Cable" },
+        { label: "Prescription Lenses", value: "Prescription Lenses" },
+        { label: "Extra Battery", value: "Extra Battery" }
+      ]
+    }
+  ],
 };
 
 interface MultiSelectCheckboxesProps {
