@@ -1,10 +1,11 @@
-export type Category = "IT" | "WZ" | "MB" | "SO";
+export type Category = "IT" | "WZ" | "MB" | "SO" | "NW";
 
 export const CATEGORIES: Record<Category, string> = {
   IT: "IT-Equipment",
   WZ: "Werkzeug",
   MB: "Mobile Geräte",
   SO: "Sonstiges",
+  NW: "Netzwerk-Komponenten"
 };
 
 export const LOCATIONS = {
@@ -29,7 +30,7 @@ export type Indicator =
   | "PC"  // Desktop Computer
   | "LT"  // Laptop
   | "MON" // Monitor
-  | "GPU"  // Graphics Card
+  | "GPU" // Graphics Card
   | "CPU" // Processor
   | "RAM" // Memory
   | "SSD" // SSD Storage
@@ -40,39 +41,40 @@ export type Indicator =
   | "NIC" // Network Card
   | "SR"  // Server
   | "PK"  // Patch Cable
-  | "VR"; // VR Headset
+  | "VR"  // VR Headset
+  | "ST"  // Smartphone
+  | "HD"  // Headset
+  | "SO"  // Sonstiges
+  | "MM"  // Multimeter
+  | "LK"  // Lötkolben
+  | "NT"  // Netzwerktester
+  | "EW"  // Elektrowerkzeug
+  | "OZ"; // Oszilloskop
 
 export const INDICATORS: Record<Indicator, string> = {
   PC: "Desktop Computer",
   LT: "Laptop",
-  TB: "Tablet",
-  SR: "Server",
-  PR: "Drucker",
-  MO: "Monitor",
-  // IT-Komponenten
+  MON: "Monitor",
   GPU: "Grafikkarte",
   CPU: "Prozessor",
   RAM: "Arbeitsspeicher",
-  SSD: "SSD-Festplatte",
-  HDD: "HDD-Festplatte",
-  // Netzwerk-Komponenten
+  SSD: "SSD-Speicher",
+  HDD: "HDD-Speicher",
   SW: "Switch",
   RT: "Router",
   AP: "Access Point",
   NIC: "Netzwerkkarte",
-  PK: "Patch-Kabel",
-  // Werkzeug
+  PK: "Patchkabel",
+  SR: "Server",
+  VR: "VR-Headset",
+  ST: "Smartphone",
+  HD: "Headset",
+  SO: "Sonstiges",
   MM: "Multimeter",
   LK: "Lötkolben",
   NT: "Netzwerktester",
   EW: "Elektrowerkzeug",
-  OZ: "Oszilloskop",
-  // Mobile Geräte
-  ST: "Smartphone",
-  HD: "Headset",
-  VR: "VR-Brille",
-  // Sonstiges
-  SO: "Sonstiges"
+  OZ: "Oszilloskop"
 };
 
 export type Location = keyof typeof LOCATIONS;
@@ -170,10 +172,11 @@ export const MAINTENANCE_TASKS: MaintenanceTask[] = [
 ];
 
 // Mapping von Kategorien zu erlaubten Indikatoren
-export const CATEGORY_INDICATORS: Record<Category, string[]> = {
-  IT: ["PC", "LT", "TB", "SR", "PR", "MO", "GPU", "RAM", "SSD", "HDD", "SW", "RT", "AP", "NIC", "PK"],
+export const CATEGORY_INDICATORS: Record<Category, Indicator[]> = {
+  IT: ["PC", "LT", "MON", "GPU", "CPU", "RAM", "SSD", "HDD", "VR"],
+  NW: ["SW", "RT", "AP", "NIC", "PK", "SR"],
   WZ: ["MM", "LK", "NT", "EW", "OZ"],
-  MB: ["TB", "ST", "HD", "VR"],
+  MB: ["ST", "HD"],
   SO: ["SO"]
 };
 
@@ -538,72 +541,38 @@ export const SPECIFICATIONS_CONFIG: Record<Category, Record<string, Specificatio
   },
   WZ: {
     MM: {
-      type: { 
-        label: "Gerätetyp", 
-        type: "select", 
-        options: ["Digital", "Analog", "True RMS"], 
-        required: true 
-      },
       manufacturer: { label: "Hersteller", type: "text", required: true },
       model: { label: "Modell", type: "text", required: true },
-      measuringRange: { 
-        label: "Messbereich", 
-        type: "select", 
-        options: ["Basis", "Erweitert", "Professional"], 
-        required: true 
-      },
+      displayType: { label: "Display-Typ", type: "select", options: ["Analog", "Digital", "Digital mit Hintergrundbeleuchtung"], required: true },
       accuracy: { label: "Genauigkeit", type: "text", required: true },
-      calibrationDate: { label: "Letzte Kalibrierung", type: "text" }
+      functions: { label: "Funktionen", type: "text", required: true }
     },
     LK: {
-      type: { 
-        label: "Typ", 
-        type: "select", 
-        options: ["Temperaturgeregelt", "Einfach"], 
-        required: true 
-      },
-      power: { label: "Leistung (Watt)", type: "text", required: true },
-      temperature: { label: "Temperaturbereich", type: "text" },
-      tips: { label: "Verfügbare Spitzen", type: "text" }
-    },
-    NT: {
-      type: { 
-        label: "Gerätetyp", 
-        type: "select", 
-        options: ["Kabeltester", "Netzwerkanalysator", "PoE-Tester"], 
-        required: true 
-      },
-      features: { 
-        label: "Funktionen", 
-        type: "select", 
-        options: ["Basis (Durchgang)", "Erweitert (Länge/Fehlerort)", "Professional (Zertifizierung)"], 
-        required: true 
-      },
-      supportedStandards: { label: "Unterstützte Standards", type: "text", required: true },
-      maxSpeed: { label: "Max. Testgeschwindigkeit", type: "text" }
-    },
-    EW: {
-      type: { 
-        label: "Gerätetyp", 
-        type: "select", 
-        options: ["Schraubendreher", "Crimpzange", "Abisolierzange", "Seitenschneider"], 
-        required: true 
-      },
       manufacturer: { label: "Hersteller", type: "text", required: true },
       model: { label: "Modell", type: "text", required: true },
-      features: { label: "Besondere Merkmale", type: "text" }
+      power: { label: "Leistung", type: "text", required: true },
+      temperatureRange: { label: "Temperaturbereich", type: "text", required: true },
+      tips: { label: "Spitzen", type: "text", required: false }
+    },
+    NT: {
+      manufacturer: { label: "Hersteller", type: "text", required: true },
+      model: { label: "Modell", type: "text", required: true },
+      cableTypes: { label: "Kabeltypen", type: "text", required: true },
+      features: { label: "Funktionen", type: "text", required: true }
+    },
+    EW: {
+      manufacturer: { label: "Hersteller", type: "text", required: true },
+      model: { label: "Modell", type: "text", required: true },
+      type: { label: "Typ", type: "text", required: true },
+      power: { label: "Leistung", type: "text", required: false },
+      accessories: { label: "Zubehör", type: "text", required: false }
     },
     OZ: {
-      type: { 
-        label: "Gerätetyp", 
-        type: "select", 
-        options: ["Digital", "Mixed-Signal", "Handheld"], 
-        required: true 
-      },
+      manufacturer: { label: "Hersteller", type: "text", required: true },
+      model: { label: "Modell", type: "text", required: true },
       bandwidth: { label: "Bandbreite", type: "text", required: true },
-      channels: { label: "Anzahl Kanäle", type: "text", required: true },
-      sampleRate: { label: "Abtastrate", type: "text", required: true },
-      features: { label: "Besondere Funktionen", type: "text" }
+      channels: { label: "Kanäle", type: "select", options: ["1", "2", "4", "8"], required: true },
+      sampleRate: { label: "Abtastrate", type: "text", required: true }
     }
   },
   MB: {
@@ -626,6 +595,43 @@ export const SPECIFICATIONS_CONFIG: Record<Category, Record<string, Specificatio
     SO: {
       type: { label: "Typ", type: "text", required: true },
       description: { label: "Beschreibung", type: "text", required: true }
+    }
+  },
+  NW: {
+    SW: {
+      manufacturer: { label: "Hersteller", type: "text", required: true },
+      model: { label: "Modell", type: "text", required: true },
+      ports: { label: "Anzahl Ports", type: "text", required: true },
+      manageable: { label: "Managebar", type: "select", options: ["Ja", "Nein"], required: true },
+      poe: { label: "PoE-Unterstützung", type: "select", options: ["Keine", "PoE", "PoE+", "PoE++"], required: true },
+      speed: { label: "Geschwindigkeit", type: "select", options: ["10/100 Mbps", "1 Gbps", "2.5 Gbps", "5 Gbps", "10 Gbps"], required: true }
+    },
+    RT: {
+      manufacturer: { label: "Hersteller", type: "text", required: true },
+      model: { label: "Modell", type: "text", required: true },
+      lanPorts: { label: "LAN-Ports", type: "text", required: true },
+      wanPorts: { label: "WAN-Ports", type: "text", required: true },
+      wifi: { label: "WLAN", type: "select", options: ["Nein", "WiFi 5", "WiFi 6", "WiFi 6E"], required: true },
+      features: { label: "Features", type: "text", required: false }
+    },
+    AP: {
+      manufacturer: { label: "Hersteller", type: "text", required: true },
+      model: { label: "Modell", type: "text", required: true },
+      wifiStandard: { label: "WLAN-Standard", type: "select", options: ["WiFi 5", "WiFi 6", "WiFi 6E"], required: true },
+      poe: { label: "PoE-Unterstützung", type: "select", options: ["Ja", "Nein"], required: true },
+      features: { label: "Features", type: "text", required: false }
+    },
+    NIC: {
+      manufacturer: { label: "Hersteller", type: "text", required: true },
+      model: { label: "Modell", type: "text", required: true },
+      interface: { label: "Schnittstelle", type: "select", options: ["PCIe", "USB", "M.2"], required: true },
+      speed: { label: "Geschwindigkeit", type: "select", options: ["100 Mbps", "1 Gbps", "2.5 Gbps", "5 Gbps", "10 Gbps"], required: true },
+      ports: { label: "Anzahl Ports", type: "text", required: true }
+    },
+    PK: {
+      type: { label: "Typ", type: "select", options: ["Cat5e", "Cat6", "Cat6a", "Cat7", "Cat8", "Glasfaser"], required: true },
+      length: { label: "Länge", type: "text", required: true },
+      color: { label: "Farbe", type: "text", required: false }
     }
   }
 }; 

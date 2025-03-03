@@ -301,49 +301,6 @@ const SPEC_FIELDS: Record<Indicator, SpecField[]> = {
       ]
     },
   ],
-  GR: [
-    { 
-      label: "Chip", 
-      key: "chip",
-      hint: "Graphics chip model",
-      type: "select",
-      options: [
-        { label: "NVIDIA RTX 4090", value: "RTX 4090" },
-        { label: "NVIDIA RTX 4080", value: "RTX 4080" },
-        { label: "NVIDIA RTX 4070 Ti", value: "RTX 4070 Ti" },
-        { label: "NVIDIA RTX 4070", value: "RTX 4070" },
-        { label: "NVIDIA RTX 4060 Ti", value: "RTX 4060 Ti" },
-        { label: "NVIDIA RTX 4060", value: "RTX 4060" },
-        { label: "AMD RX 7900 XTX", value: "RX 7900 XTX" },
-        { label: "AMD RX 7900 XT", value: "RX 7900 XT" },
-        { label: "AMD RX 7800 XT", value: "RX 7800 XT" },
-        { label: "AMD RX 7700 XT", value: "RX 7700 XT" },
-      ]
-    },
-    {
-      label: "Memory",
-      key: "memory",
-      hint: "Graphics memory",
-      type: "select",
-      options: [
-        { label: "8 GB GDDR6", value: "8 GB GDDR6" },
-        { label: "12 GB GDDR6X", value: "12 GB GDDR6X" },
-        { label: "16 GB GDDR6", value: "16 GB GDDR6" },
-        { label: "24 GB GDDR6X", value: "24 GB GDDR6X" },
-      ]
-    },
-    { 
-      label: "Interfaces", 
-      key: "interfaces",
-      hint: "Available ports (multiple selection)",
-      type: "multiselect",
-      options: [
-        { label: "HDMI 2.1", value: "HDMI 2.1" },
-        { label: "DisplayPort 1.4", value: "DP 1.4" },
-        { label: "DisplayPort 2.1", value: "DP 2.1" },
-      ]
-    },
-  ],
   CPU: [
     { 
       label: "Model", 
@@ -482,64 +439,47 @@ const SPEC_FIELDS: Record<Indicator, SpecField[]> = {
       required: true
     },
     { 
-      label: "Typ", 
-      key: "type",
-      hint: "Management-Level des Switches",
+      label: "Anzahl Ports", 
+      key: "ports",
+      hint: "Anzahl der verfügbaren Ports",
+      type: "text",
+      required: true
+    },
+    { 
+      label: "Managebar", 
+      key: "manageable",
+      hint: "Ist der Switch managebar?",
       type: "select",
       options: [
-        { label: "Unmanaged", value: "Unmanaged" },
-        { label: "Smart", value: "Smart" },
-        { label: "Managed Layer 2", value: "Managed Layer 2" },
-        { label: "Managed Layer 3", value: "Managed Layer 3" }
+        { label: "Ja", value: "Ja" },
+        { label: "Nein", value: "Nein" }
       ],
       required: true
     },
     { 
-      label: "Ports", 
-      key: "ports",
-      hint: "Anzahl der Ports",
+      label: "PoE-Unterstützung", 
+      key: "poe",
+      hint: "Power over Ethernet Unterstützung",
       type: "select",
       options: [
-        { label: "8 Ports", value: "8 Ports" },
-        { label: "12 Ports", value: "12 Ports" },
-        { label: "16 Ports", value: "16 Ports" },
-        { label: "24 Ports", value: "24 Ports" },
-        { label: "48 Ports", value: "48 Ports" }
+        { label: "Keine", value: "Keine" },
+        { label: "PoE", value: "PoE" },
+        { label: "PoE+", value: "PoE+" },
+        { label: "PoE++", value: "PoE++" }
       ],
       required: true
     },
     { 
       label: "Geschwindigkeit", 
       key: "speed",
-      hint: "Port-Geschwindigkeit",
+      hint: "Maximale Übertragungsgeschwindigkeit",
       type: "select",
       options: [
         { label: "10/100 Mbps", value: "10/100 Mbps" },
-        { label: "10/100/1000 Mbps", value: "10/100/1000 Mbps" },
+        { label: "1 Gbps", value: "1 Gbps" },
         { label: "2.5 Gbps", value: "2.5 Gbps" },
         { label: "5 Gbps", value: "5 Gbps" },
         { label: "10 Gbps", value: "10 Gbps" }
-      ],
-      required: true
-    },
-    { 
-      label: "Management-IP", 
-      key: "management",
-      hint: "IP-Adresse für Management-Zugriff",
-      type: "text"
-    },
-    { 
-      label: "Features", 
-      key: "features",
-      hint: "Unterstützte Features",
-      type: "multiselect",
-      options: [
-        { label: "Basic", value: "Basic" },
-        { label: "VLAN", value: "VLAN" },
-        { label: "PoE", value: "PoE" },
-        { label: "PoE+", value: "PoE+" },
-        { label: "SFP", value: "SFP" },
-        { label: "SFP+", value: "SFP+" }
       ],
       required: true
     }
@@ -560,41 +500,17 @@ const SPEC_FIELDS: Record<Indicator, SpecField[]> = {
       required: true
     },
     { 
-      label: "Typ", 
-      key: "type",
-      hint: "Einsatzbereich des Routers",
-      type: "select",
-      options: [
-        { label: "SOHO", value: "SOHO" },
-        { label: "SMB", value: "SMB" },
-        { label: "Enterprise", value: "Enterprise" },
-        { label: "ISP-Grade", value: "ISP-Grade" }
-      ],
-      required: true
-    },
-    { 
       label: "LAN-Ports", 
-      key: "ports",
+      key: "lanPorts",
       hint: "Anzahl der LAN-Ports",
-      type: "select",
-      options: [
-        { label: "1 Port", value: "1 Port" },
-        { label: "4 Ports", value: "4 Ports" },
-        { label: "8 Ports", value: "8 Ports" },
-        { label: "12 Ports", value: "12 Ports" }
-      ],
+      type: "text",
       required: true
     },
     { 
       label: "WAN-Ports", 
       key: "wanPorts",
       hint: "Anzahl der WAN-Ports",
-      type: "select",
-      options: [
-        { label: "1 Port", value: "1 Port" },
-        { label: "2 Ports", value: "2 Ports" },
-        { label: "4 Ports", value: "4 Ports" }
-      ],
+      type: "text",
       required: true
     },
     { 
@@ -614,20 +530,6 @@ const SPEC_FIELDS: Record<Indicator, SpecField[]> = {
       label: "Features", 
       key: "features",
       hint: "Unterstützte Features",
-      type: "multiselect",
-      options: [
-        { label: "Basic", value: "Basic" },
-        { label: "VPN", value: "VPN" },
-        { label: "Firewall", value: "Firewall" },
-        { label: "QoS", value: "QoS" },
-        { label: "Advanced Security", value: "Advanced Security" }
-      ],
-      required: true
-    },
-    { 
-      label: "Management-IP", 
-      key: "management",
-      hint: "IP-Adresse für Management-Zugriff",
       type: "text"
     }
   ],
@@ -647,18 +549,6 @@ const SPEC_FIELDS: Record<Indicator, SpecField[]> = {
       required: true
     },
     { 
-      label: "Typ", 
-      key: "type",
-      hint: "Einsatzbereich des Access Points",
-      type: "select",
-      options: [
-        { label: "Indoor", value: "Indoor" },
-        { label: "Outdoor", value: "Outdoor" },
-        { label: "Industrial", value: "Industrial" }
-      ],
-      required: true
-    },
-    { 
       label: "WLAN-Standard", 
       key: "wifiStandard",
       hint: "Unterstützter WLAN-Standard",
@@ -671,47 +561,20 @@ const SPEC_FIELDS: Record<Indicator, SpecField[]> = {
       required: true
     },
     { 
-      label: "Frequenzbänder", 
-      key: "bands",
-      hint: "Unterstützte Frequenzbänder",
+      label: "PoE-Unterstützung", 
+      key: "poe",
+      hint: "Kann über PoE betrieben werden?",
       type: "select",
       options: [
-        { label: "2.4 GHz", value: "2.4 GHz" },
-        { label: "5 GHz", value: "5 GHz" },
-        { label: "2.4 + 5 GHz", value: "2.4 + 5 GHz" },
-        { label: "2.4 + 5 + 6 GHz", value: "2.4 + 5 + 6 GHz" }
-      ],
-      required: true
-    },
-    { 
-      label: "Stromversorgung", 
-      key: "powerSupply",
-      hint: "Art der Stromversorgung",
-      type: "select",
-      options: [
-        { label: "Netzteil", value: "Netzteil" },
-        { label: "PoE", value: "PoE" },
-        { label: "PoE+", value: "PoE+" }
+        { label: "Ja", value: "Ja" },
+        { label: "Nein", value: "Nein" }
       ],
       required: true
     },
     { 
       label: "Features", 
       key: "features",
-      hint: "Unterstützte Features",
-      type: "multiselect",
-      options: [
-        { label: "Basic", value: "Basic" },
-        { label: "MIMO", value: "MIMO" },
-        { label: "MU-MIMO", value: "MU-MIMO" },
-        { label: "Mesh", value: "Mesh" }
-      ],
-      required: true
-    },
-    { 
-      label: "Management-IP", 
-      key: "management",
-      hint: "IP-Adresse für Management-Zugriff",
+      hint: "Besondere Funktionen",
       type: "text"
     }
   ],
@@ -731,9 +594,9 @@ const SPEC_FIELDS: Record<Indicator, SpecField[]> = {
       required: true
     },
     { 
-      label: "Typ", 
-      key: "type",
-      hint: "Anschlusstyp der Netzwerkkarte",
+      label: "Schnittstelle", 
+      key: "interface",
+      hint: "Anschlusstyp",
       type: "select",
       options: [
         { label: "PCIe", value: "PCIe" },
@@ -757,27 +620,110 @@ const SPEC_FIELDS: Record<Indicator, SpecField[]> = {
       required: true
     },
     { 
-      label: "Features", 
-      key: "features",
-      hint: "Unterstützte Features",
-      type: "multiselect",
+      label: "Anzahl Ports", 
+      key: "ports",
+      hint: "Anzahl der Netzwerkanschlüsse",
+      type: "text",
+      required: true
+    }
+  ],
+  PK: [
+    { 
+      label: "Typ", 
+      key: "type",
+      hint: "Kabeltyp",
+      type: "select",
       options: [
-        { label: "Basic", value: "Basic" },
-        { label: "Wake-on-LAN", value: "Wake-on-LAN" },
-        { label: "SR-IOV", value: "SR-IOV" },
-        { label: "iSCSI Boot", value: "iSCSI Boot" }
+        { label: "Cat5e", value: "Cat5e" },
+        { label: "Cat6", value: "Cat6" },
+        { label: "Cat6a", value: "Cat6a" },
+        { label: "Cat7", value: "Cat7" },
+        { label: "Cat8", value: "Cat8" },
+        { label: "Glasfaser", value: "Glasfaser" }
       ],
       required: true
     },
     { 
-      label: "Anzahl Ports", 
-      key: "ports",
-      hint: "Anzahl der Netzwerkanschlüsse",
+      label: "Länge", 
+      key: "length",
+      hint: "Kabellänge in Metern",
+      type: "text",
+      required: true
+    },
+    { 
+      label: "Farbe", 
+      key: "color",
+      hint: "Farbe des Kabels",
+      type: "text"
+    }
+  ],
+  VR: [
+    { 
+      label: "Hersteller", 
+      key: "manufacturer",
+      hint: "Hersteller der VR-Brille",
       type: "select",
       options: [
-        { label: "1 Port", value: "1 Port" },
-        { label: "2 Ports", value: "2 Ports" },
-        { label: "4 Ports", value: "4 Ports" }
+        { label: "Meta (Oculus)", value: "Meta" },
+        { label: "HTC", value: "HTC" },
+        { label: "Valve", value: "Valve" },
+        { label: "HP", value: "HP" },
+        { label: "Pico", value: "Pico" },
+        { label: "Sony", value: "Sony" }
+      ],
+      required: true
+    },
+    { 
+      label: "Modell", 
+      key: "model",
+      hint: "Modellbezeichnung",
+      type: "select",
+      options: [
+        { label: "Meta Quest 2", value: "Quest 2" },
+        { label: "Meta Quest 3", value: "Quest 3" },
+        { label: "Meta Quest Pro", value: "Quest Pro" },
+        { label: "Valve Index", value: "Index" },
+        { label: "HTC Vive Pro 2", value: "Vive Pro 2" },
+        { label: "HP Reverb G2", value: "Reverb G2" },
+        { label: "Pico 4", value: "Pico 4" },
+        { label: "PlayStation VR2", value: "PSVR2" }
+      ],
+      required: true
+    },
+    { 
+      label: "Typ", 
+      key: "type",
+      hint: "Art der VR-Brille",
+      type: "select",
+      options: [
+        { label: "Standalone", value: "STANDALONE" },
+        { label: "PC-Tethered", value: "TETHERED" },
+        { label: "Smartphone", value: "SMARTPHONE" }
+      ],
+      required: true
+    },
+    { 
+      label: "Display-Auflösung", 
+      key: "displayResolution",
+      hint: "Auflösung pro Auge",
+      type: "select",
+      options: [
+        { label: "1832 x 1920 pro Auge", value: "1832x1920" },
+        { label: "2160 x 2160 pro Auge", value: "2160x2160" },
+        { label: "2448 x 2448 pro Auge", value: "2448x2448" }
+      ],
+      required: true
+    },
+    { 
+      label: "Bildwiederholrate", 
+      key: "refreshRate",
+      hint: "Maximale Bildwiederholrate in Hz",
+      type: "select",
+      options: [
+        { label: "72 Hz", value: "72" },
+        { label: "90 Hz", value: "90" },
+        { label: "120 Hz", value: "120" },
+        { label: "144 Hz", value: "144" }
       ],
       required: true
     }
@@ -946,119 +892,202 @@ const SPEC_FIELDS: Record<Indicator, SpecField[]> = {
       required: true
     }
   ],
-  PK: [
-    { 
-      label: "Kategorie", 
-      key: "category",
-      hint: "Kabelkategorie",
-      type: "select",
-      options: [
-        { label: "CAT 5e", value: "CAT 5e" },
-        { label: "CAT 6", value: "CAT 6" },
-        { label: "CAT 6a", value: "CAT 6a" },
-        { label: "CAT 7", value: "CAT 7" },
-        { label: "CAT 8", value: "CAT 8" }
-      ],
-      required: true
-    },
-    { 
-      label: "Länge", 
-      key: "length",
-      hint: "Kabellänge in Metern",
-      type: "select",
-      options: [
-        { label: "0.5m", value: "0.5m" },
-        { label: "1m", value: "1m" },
-        { label: "2m", value: "2m" },
-        { label: "3m", value: "3m" },
-        { label: "5m", value: "5m" },
-        { label: "7m", value: "7m" },
-        { label: "10m", value: "10m" },
-        { label: "15m", value: "15m" },
-        { label: "20m", value: "20m" },
-        { label: "30m", value: "30m" }
-      ],
-      required: true
-    },
-    { 
-      label: "Farbe", 
-      key: "color",
-      hint: "Kabelfarbe",
-      type: "select",
-      options: [
-        { label: "Grau", value: "Grau" },
-        { label: "Schwarz", value: "Schwarz" },
-        { label: "Blau", value: "Blau" },
-        { label: "Rot", value: "Rot" },
-        { label: "Gelb", value: "Gelb" },
-        { label: "Grün", value: "Grün" },
-        { label: "Orange", value: "Orange" },
-        { label: "Weiß", value: "Weiß" }
-      ],
-      required: true
-    },
-    { 
-      label: "Steckertyp A", 
-      key: "connectorA",
-      hint: "Steckertyp Ende A",
-      type: "select",
-      options: [
-        { label: "RJ45", value: "RJ45" },
-        { label: "SFP", value: "SFP" },
-        { label: "SFP+", value: "SFP+" },
-        { label: "LC", value: "LC" },
-        { label: "SC", value: "SC" }
-      ],
-      required: true
-    },
-    { 
-      label: "Steckertyp B", 
-      key: "connectorB",
-      hint: "Steckertyp Ende B",
-      type: "select",
-      options: [
-        { label: "RJ45", value: "RJ45" },
-        { label: "SFP", value: "SFP" },
-        { label: "SFP+", value: "SFP+" },
-        { label: "LC", value: "LC" },
-        { label: "SC", value: "SC" }
-      ],
-      required: true
-    },
-    { 
-      label: "Schirmung", 
-      key: "shielding",
-      hint: "Kabelschirmung",
-      type: "select",
-      options: [
-        { label: "U/UTP (Ungeschirmt)", value: "U/UTP" },
-        { label: "F/UTP (Foliengeschirmt)", value: "F/UTP" },
-        { label: "SF/UTP (Geflecht- und Foliengeschirmt)", value: "SF/UTP" },
-        { label: "S/FTP (Geflecht- und Paarfoliengeschirmt)", value: "S/FTP" }
-      ],
-      required: true
-    },
+  MM: [
     { 
       label: "Hersteller", 
       key: "manufacturer",
-      hint: "Kabelhersteller",
+      hint: "Hersteller des Multimeters",
       type: "text",
       required: true
     },
+    { 
+      label: "Modell", 
+      key: "model",
+      hint: "Modellbezeichnung",
+      type: "text",
+      required: true
+    },
+    { 
+      label: "Display-Typ", 
+      key: "displayType",
+      hint: "Art des Displays",
+      type: "select",
+      options: [
+        { label: "Analog", value: "Analog" },
+        { label: "Digital", value: "Digital" },
+        { label: "Digital mit Hintergrundbeleuchtung", value: "Digital mit Hintergrundbeleuchtung" }
+      ],
+      required: true
+    },
+    { 
+      label: "Genauigkeit", 
+      key: "accuracy",
+      hint: "Messgenauigkeit",
+      type: "text",
+      required: true
+    },
+    { 
+      label: "Funktionen", 
+      key: "functions",
+      hint: "Unterstützte Messfunktionen",
+      type: "text",
+      required: true
+    }
   ],
-  VR: [
+  LK: [
     { 
       label: "Hersteller", 
       key: "manufacturer",
-      hint: "Hersteller der VR-Brille",
+      hint: "Hersteller des Lötkolbens",
+      type: "text",
+      required: true
+    },
+    { 
+      label: "Modell", 
+      key: "model",
+      hint: "Modellbezeichnung",
+      type: "text",
+      required: true
+    },
+    { 
+      label: "Leistung", 
+      key: "power",
+      hint: "Leistung in Watt",
+      type: "text",
+      required: true
+    },
+    { 
+      label: "Temperaturbereich", 
+      key: "temperatureRange",
+      hint: "Einstellbarer Temperaturbereich",
+      type: "text",
+      required: true
+    },
+    { 
+      label: "Spitzen", 
+      key: "tips",
+      hint: "Verfügbare Lötspitzen",
+      type: "text"
+    }
+  ],
+  NT: [
+    { 
+      label: "Hersteller", 
+      key: "manufacturer",
+      hint: "Hersteller des Netzwerktesters",
+      type: "text",
+      required: true
+    },
+    { 
+      label: "Modell", 
+      key: "model",
+      hint: "Modellbezeichnung",
+      type: "text",
+      required: true
+    },
+    { 
+      label: "Kabeltypen", 
+      key: "cableTypes",
+      hint: "Unterstützte Kabeltypen",
+      type: "text",
+      required: true
+    },
+    { 
+      label: "Funktionen", 
+      key: "features",
+      hint: "Unterstützte Testfunktionen",
+      type: "text",
+      required: true
+    }
+  ],
+  EW: [
+    { 
+      label: "Hersteller", 
+      key: "manufacturer",
+      hint: "Hersteller des Elektrowerkzeugs",
+      type: "text",
+      required: true
+    },
+    { 
+      label: "Modell", 
+      key: "model",
+      hint: "Modellbezeichnung",
+      type: "text",
+      required: true
+    },
+    { 
+      label: "Typ", 
+      key: "type",
+      hint: "Art des Elektrowerkzeugs",
+      type: "text",
+      required: true
+    },
+    { 
+      label: "Leistung", 
+      key: "power",
+      hint: "Leistung in Watt (falls zutreffend)",
+      type: "text"
+    },
+    { 
+      label: "Zubehör", 
+      key: "accessories",
+      hint: "Mitgeliefertes Zubehör",
+      type: "text"
+    }
+  ],
+  OZ: [
+    { 
+      label: "Hersteller", 
+      key: "manufacturer",
+      hint: "Hersteller des Oszilloskops",
+      type: "text",
+      required: true
+    },
+    { 
+      label: "Modell", 
+      key: "model",
+      hint: "Modellbezeichnung",
+      type: "text",
+      required: true
+    },
+    { 
+      label: "Bandbreite", 
+      key: "bandwidth",
+      hint: "Bandbreite in MHz/GHz",
+      type: "text",
+      required: true
+    },
+    { 
+      label: "Kanäle", 
+      key: "channels",
+      hint: "Anzahl der Kanäle",
       type: "select",
       options: [
-        { label: "Meta (Oculus)", value: "Meta" },
-        { label: "HTC", value: "HTC" },
-        { label: "Valve", value: "Valve" },
-        { label: "HP", value: "HP" },
-        { label: "Pico", value: "Pico" },
-        { label: "Sony", value: "Sony" },
+        { label: "1 Kanal", value: "1" },
+        { label: "2 Kanäle", value: "2" },
+        { label: "4 Kanäle", value: "4" },
+        { label: "8 Kanäle", value: "8" }
+      ],
+      required: true
+    },
+    { 
+      label: "Abtastrate", 
+      key: "sampleRate",
+      hint: "Abtastrate in GSa/s",
+      type: "text",
+      required: true
+    }
+  ],
+  GPU: [
+    { 
+      label: "Hersteller", 
+      key: "manufacturer",
+      hint: "Hersteller der Grafikkarte",
+      type: "select",
+      options: [
+        { label: "NVIDIA", value: "NVIDIA" },
+        { label: "AMD", value: "AMD" },
+        { label: "Intel", value: "Intel" }
       ],
       required: true
     },
@@ -1066,124 +1095,42 @@ const SPEC_FIELDS: Record<Indicator, SpecField[]> = {
       label: "Modell", 
       key: "model",
       hint: "Modellbezeichnung",
+      type: "text",
+      required: true
+    },
+    { 
+      label: "Speicher", 
+      key: "memory",
+      hint: "Grafikspeicher",
       type: "select",
       options: [
-        { label: "Meta Quest 2", value: "Quest 2" },
-        { label: "Meta Quest 3", value: "Quest 3" },
-        { label: "Meta Quest Pro", value: "Quest Pro" },
-        { label: "Valve Index", value: "Index" },
-        { label: "HTC Vive Pro 2", value: "Vive Pro 2" },
-        { label: "HP Reverb G2", value: "Reverb G2" },
-        { label: "Pico 4", value: "Pico 4" },
-        { label: "PlayStation VR2", value: "PSVR2" },
+        { label: "4 GB", value: "4 GB" },
+        { label: "6 GB", value: "6 GB" },
+        { label: "8 GB", value: "8 GB" },
+        { label: "10 GB", value: "10 GB" },
+        { label: "12 GB", value: "12 GB" },
+        { label: "16 GB", value: "16 GB" },
+        { label: "24 GB", value: "24 GB" }
       ],
       required: true
     },
     { 
-      label: "Typ", 
-      key: "type",
-      hint: "Art der VR-Brille",
-      type: "select",
-      options: [
-        { label: "Standalone", value: "STANDALONE" },
-        { label: "PC-Tethered", value: "TETHERED" },
-        { label: "Smartphone", value: "SMARTPHONE" }
-      ],
-      required: true
-    },
-    { 
-      label: "Display-Auflösung", 
-      key: "displayResolution",
-      hint: "Auflösung pro Auge",
-      type: "select",
-      options: [
-        { label: "1832 x 1920 pro Auge", value: "1832x1920" },
-        { label: "2160 x 2160 pro Auge", value: "2160x2160" },
-        { label: "2448 x 2448 pro Auge", value: "2448x2448" },
-      ],
-      required: true
-    },
-    { 
-      label: "Bildwiederholrate", 
-      key: "refreshRate",
-      hint: "Maximale Bildwiederholrate in Hz",
-      type: "select",
-      options: [
-        { label: "72 Hz", value: "72" },
-        { label: "90 Hz", value: "90" },
-        { label: "120 Hz", value: "120" },
-        { label: "144 Hz", value: "144" }
-      ],
-      required: true
-    },
-    { 
-      label: "Sichtfeld", 
-      key: "fieldOfView",
-      hint: "Horizontales Sichtfeld in Grad",
-      type: "select",
-      options: [
-        { label: "90°", value: "90" },
-        { label: "100°", value: "100" },
-        { label: "110°", value: "110" },
-        { label: "120°", value: "120" }
-      ],
-      required: true
-    },
-    { 
-      label: "Tracking", 
-      key: "tracking",
-      hint: "Tracking-System",
-      type: "select",
-      options: [
-        { label: "Inside-Out (Kamera)", value: "Inside-Out" },
-        { label: "Outside-In (Basisstationen)", value: "Outside-In" },
-        { label: "Hybrid", value: "Hybrid" }
-      ],
-      required: true
-    },
-    { 
-      label: "Controller", 
-      key: "controllers",
-      hint: "Art der Controller",
-      type: "select",
-      options: [
-        { label: "Touch Controller", value: "Touch" },
-        { label: "Knuckles Controller", value: "Knuckles" },
-        { label: "Vive Controller", value: "Vive" },
-        { label: "Hand-Tracking", value: "Hand-Tracking" }
-      ],
-      required: true
-    },
-    { 
-      label: "Konnektivität", 
-      key: "connectivity",
-      hint: "Verbindungsoptionen",
+      label: "Anschlüsse", 
+      key: "interfaces",
+      hint: "Verfügbare Anschlüsse",
       type: "multiselect",
       options: [
-        { label: "USB-C", value: "USB-C" },
-        { label: "DisplayPort", value: "DisplayPort" },
         { label: "HDMI", value: "HDMI" },
-        { label: "Wireless", value: "Wireless" },
-        { label: "Bluetooth", value: "Bluetooth" },
-        { label: "WiFi 6E", value: "WiFi 6E" }
+        { label: "DisplayPort", value: "DisplayPort" },
+        { label: "DVI", value: "DVI" },
+        { label: "USB-C", value: "USB-C" }
       ],
       required: true
-    },
-    { 
-      label: "Zubehör", 
-      key: "accessories",
-      hint: "Verfügbares Zubehör",
-      type: "multiselect",
-      options: [
-        { label: "Facial Interface", value: "Facial Interface" },
-        { label: "Elite Strap", value: "Elite Strap" },
-        { label: "Carrying Case", value: "Carrying Case" },
-        { label: "Link Cable", value: "Link Cable" },
-        { label: "Prescription Lenses", value: "Prescription Lenses" },
-        { label: "Extra Battery", value: "Extra Battery" }
-      ]
     }
   ],
+  SO: [],
+  ST: [],
+  HD: []
 };
 
 interface MultiSelectCheckboxesProps {
