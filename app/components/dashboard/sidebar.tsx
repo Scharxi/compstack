@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutGrid, List } from 'lucide-react';
+import { LayoutGrid, List, History } from 'lucide-react';
 
 const navigation = [
   {
@@ -14,6 +14,11 @@ const navigation = [
     name: 'Listen',
     href: '/lists',
     icon: List,
+  },
+  {
+    name: 'Aktivitätshistorie',
+    href: '/activity-history',
+    icon: History,
   },
 ];
 
