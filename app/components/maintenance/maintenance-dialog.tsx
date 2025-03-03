@@ -17,13 +17,16 @@ import { Textarea } from '@/components/ui/textarea';
 import { HardwareComponent, MAINTENANCE_TASKS, MaintenanceProtocol } from '@/app/types/hardware';
 import { useComponentsStore } from '@/app/store/components';
 import { useActivitiesStore } from '@/app/store/activities';
+import { toast } from 'sonner';
 
 interface MaintenanceDialogProps {
-  component: HardwareComponent;
+  component?: HardwareComponent;
   onComplete?: () => void;
+  onSave?: (data: { completedTasks: string[], notes: string }) => void;
+  isLoading?: boolean;
 }
 
-export function MaintenanceDialog({ component, onComplete }: MaintenanceDialogProps) {
+export function MaintenanceDialog({ component, onComplete, onSave, isLoading: isLoadingProp }: MaintenanceDialogProps) {
   const [open, setOpen] = useState(false);
   const [completedTasks, setCompletedTasks] = useState<string[]>([]);
   const [notes, setNotes] = useState('');
@@ -48,38 +51,51 @@ export function MaintenanceDialog({ component, onComplete }: MaintenanceDialogPr
 
     setIsSubmitting(true);
     try {
-      const maintenanceProtocol: MaintenanceProtocol = {
-        date: new Date(),
-        completedTasks,
-        notes: notes.trim() || undefined
-      };
-      
-      const updatedComponent = {
-        ...component,
-        lastMaintenanceDate: new Date(),
-        maintenanceHistory: [
-          ...(component.maintenanceHistory || []),
-          maintenanceProtocol
-        ]
-      };
-      
-      await updateComponent(updatedComponent);
-      
-      // Protokolliere die Wartungsaktivität
-      await logActivity({
-        type: 'maintenance',
-        componentId: component.id,
-        componentName: component.name,
-        user: 'System',
-        details: `Wartung für Komponente "${component.name}" durchgeführt`
-      });
+      // Wenn onSave vorhanden ist, verwende es (für MaintenanceHistory)
+      if (onSave) {
+        await onSave({
+          completedTasks,
+          notes: notes.trim()
+        });
+      } 
+      // Wenn component vorhanden ist, aktualisiere die Komponente direkt
+      else if (component) {
+        const maintenanceProtocol: MaintenanceProtocol = {
+          date: new Date(),
+          completedTasks,
+          notes: notes.trim() || undefined
+        };
+        
+        const updatedComponent = {
+          ...component,
+          lastMaintenanceDate: new Date(),
+          maintenanceHistory: [
+            ...(component.maintenanceHistory || []),
+            maintenanceProtocol
+          ]
+        };
+        
+        await updateComponent(updatedComponent);
+        
+        // Protokolliere die Wartungsaktivität
+        await logActivity({
+          type: 'maintenance',
+          componentId: component.id,
+          componentName: component.name,
+          user: 'System',
+          details: `Wartung für Komponente "${component.name}" durchgeführt`
+        });
+      }
       
       setOpen(false);
       setCompletedTasks([]);
       setNotes('');
       onComplete?.();
+      
+      toast.success('Wartung erfolgreich gespeichert');
     } catch (error) {
-      console.error('Fehler bei der Wartung:', error);
+      console.error('Fehler beim Speichern der Wartung:', error);
+      toast.error('Fehler beim Speichern der Wartung');
     } finally {
       setIsSubmitting(false);
     }
@@ -137,9 +153,9 @@ export function MaintenanceDialog({ component, onComplete }: MaintenanceDialogPr
           </Button>
           <Button 
             onClick={handleSubmit} 
-            disabled={isSubmitting || completedTasks.length === 0}
+            disabled={isSubmitting || isLoadingProp || completedTasks.length === 0}
           >
-            {isSubmitting ? 'Wird gespeichert...' : 'Wartung speichern'}
+            {isSubmitting || isLoadingProp ? 'Wird gespeichert...' : 'Wartung speichern'}
           </Button>
         </DialogFooter>
       </DialogContent>

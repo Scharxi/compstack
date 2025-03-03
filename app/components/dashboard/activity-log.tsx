@@ -44,7 +44,8 @@ export function ActivityLog() {
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-yellow-600 dark:text-yellow-400">
               <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
               <circle cx="9" cy="7" r="4" />
-              <path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
+              <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+              <path d="M16 3.13a4 4 0 0 1 0 7.75" />
             </svg>
           </div>
         );
@@ -52,7 +53,9 @@ export function ActivityLog() {
         return (
           <div className="flex h-8 w-8 items-center justify-center rounded-full bg-red-100 dark:bg-red-900">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-red-600 dark:text-red-400">
-              <path d="M3 6h18M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+              <path d="M3 6h18" />
+              <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+              <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
             </svg>
           </div>
         );
@@ -61,7 +64,8 @@ export function ActivityLog() {
           <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-600 dark:text-gray-400">
               <circle cx="12" cy="12" r="10" />
-              <path d="M12 8v4M12 16h.01" />
+              <path d="M12 16v-4" />
+              <path d="M12 8h.01" />
             </svg>
           </div>
         );
@@ -97,7 +101,7 @@ export function ActivityLog() {
                     </p>
                     <div className="flex items-center pt-1">
                       <p className="text-xs text-muted-foreground">
-                        {formatDate(activity.date)}
+                        {formatDate(new Date(activity.date))}
                       </p>
                       <span className="mx-2 text-muted-foreground">•</span>
                       <p className="text-xs text-muted-foreground">

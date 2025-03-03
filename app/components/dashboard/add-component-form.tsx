@@ -35,7 +35,7 @@ import {
 } from "@/app/types/hardware";
 import { useComponentsStore } from "@/app/store/components";
 import { useActivitiesStore } from "@/app/store/activities";
-import { toast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 import {
   Tooltip,
   TooltipContent,
@@ -1229,71 +1229,82 @@ export function AddComponentForm({ lastRunningNumber, initialData, mode = 'creat
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!name.trim()) {
+      setError('Name ist erforderlich');
+      return;
+    }
+    
     setIsSubmitting(true);
-
+    setError(null);
+    
     try {
-      // Generiere die laufende Nummer
       const runningNumber = (lastRunningNumber + 1).toString().padStart(4, '0');
-
-      // Generiere die ID
-      const id = generateComponentId(
-        category as Category,
-        location as Location,
-        ownership as Ownership,
-        status as Status,
-        indicator as Indicator,
-        runningNumber
-      );
-
-      // Erstelle die Komponentendaten
-      const componentData: Partial<HardwareComponent> = {
-        id,
+      
+      const componentData: any = {
         name,
-        category: category as Category,
-        location: location as Location,
-        ownership: ownership as Ownership,
-        status: status as Status,
-        indicator: indicator as Indicator,
+        category,
+        location,
+        ownership,
+        status,
+        indicator,
         runningNumber,
         serialNumber,
-        specifications: {},
-        notes,
+        specifications,
+        notes
       };
-
-      // Füge Spezifikationen hinzu, wenn vorhanden
-      if (specifications && Object.keys(specifications).length > 0) {
-        componentData.specifications = specifications;
-      }
-
+      
       // Entferne leere Felder
       if (!serialNumber) {
         delete componentData.serialNumber;
       }
+      
       if (!notes) {
         delete componentData.notes;
       }
-
-      // Füge die Komponente hinzu
-      await addComponent(componentData as HardwareComponent);
-
-      // Protokolliere die Aktivität
-      await logActivity({
-        type: 'addition',
-        componentId: id,
-        componentName: name,
-        user: 'System',
-        details: `Neue Komponente "${name}" hinzugefügt`
-      });
-
-      // Schließe das Dialog
-      setOpen(false);
       
-      // Setze das Formular zurück
-      resetForm();
+      if (mode === 'create') {
+        // Generiere eine eindeutige ID
+        componentData.id = `${category}-${indicator}-${runningNumber}`;
+        
+        await addComponent(componentData);
+        
+        // Protokolliere die Aktivität
+        await logActivity({
+          type: 'addition',
+          componentId: componentData.id,
+          componentName: name,
+          user: 'System',
+          details: `Neue Komponente "${name}" hinzugefügt`
+        });
+        
+        toast.success('Komponente erfolgreich hinzugefügt');
+      } else if (initialData) {
+        // Update-Modus
+        const updatedComponent = {
+          ...initialData,
+          ...componentData
+        };
+        
+        await updateComponent(updatedComponent);
+        
+        // Protokolliere die Aktivität
+        await logActivity({
+          type: 'update',
+          componentId: updatedComponent.id,
+          componentName: name,
+          user: 'System',
+          details: `Komponente "${name}" aktualisiert`
+        });
+        
+        toast.success('Komponente erfolgreich aktualisiert');
+      }
+      
+      setOpen(false);
       onClose?.();
     } catch (error) {
-      console.error("Fehler beim Hinzufügen der Komponente:", error);
-      setError("Fehler beim Hinzufügen der Komponente");
+      console.error('Fehler beim Speichern der Komponente:', error);
+      setError('Fehler beim Speichern der Komponente');
     } finally {
       setIsSubmitting(false);
     }

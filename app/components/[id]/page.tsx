@@ -194,9 +194,12 @@ export default function ComponentDetailsPage({ params }: ComponentDetailsProps) 
       
       setCompletedTasks([]);
       setMaintenanceNotes('');
+      setIsPerformingMaintenance(false);
+      
+      toast.success('Wartung erfolgreich gespeichert');
     } catch (error) {
-      console.error('Fehler bei der Wartung:', error);
-    } finally {
+      console.error('Fehler beim Speichern der Wartung:', error);
+      toast.error('Fehler beim Speichern der Wartung');
       setIsPerformingMaintenance(false);
     }
   };
