@@ -34,6 +34,7 @@ import {
   type Indicator
 } from "@/app/types/hardware";
 import { useComponentsStore } from "@/app/store/components";
+import { useActivitiesStore } from "@/app/store/activities";
 import { toast } from "@/components/ui/use-toast";
 import {
   Tooltip,
@@ -1182,26 +1183,20 @@ const MultiSelectCheckboxes = ({
 export function AddComponentForm({ lastRunningNumber, initialData, mode = 'create', onClose }: AddComponentFormProps) {
   const [open, setOpen] = useState(false);
   const [name, setName] = useState(initialData?.name || "");
-  const [category, setCategory] = useState<Category>(initialData?.category || "IT");
-  const [location, setLocation] = useState<Location>(initialData?.location || "ZIT");
-  const [ownership, setOwnership] = useState<Ownership>(initialData?.ownership || "ZIT");
-  const [status, setStatus] = useState<Status>(initialData?.status || "AK");
-  const [indicator, setIndicator] = useState<Indicator>(initialData?.indicator || "PC");
+  const [category, setCategory] = useState<string>(initialData?.category || "IT");
+  const [location, setLocation] = useState<string>(initialData?.location || "ZIT");
+  const [ownership, setOwnership] = useState<string>(initialData?.ownership || "ZIT");
+  const [status, setStatus] = useState<string>(initialData?.status || "AK");
+  const [indicator, setIndicator] = useState<string>(initialData?.indicator || "PC");
   const [serialNumber, setSerialNumber] = useState(initialData?.serialNumber || "");
-  const [specifications, setSpecifications] = useState<Specifications>(() => {
-    // Initialize specifications from initialData or empty object
-    const specs = initialData?.specifications || {};
-    return specs;
-  });
-  const [selectedInterfaces, setSelectedInterfaces] = useState<Record<string, string[]>>(() => {
-    if (initialData?.specifications?.interfaces) {
-      return { interfaces: initialData.specifications.interfaces.split(", ") };
-    }
-    return { interfaces: [] };
-  });
+  const [specifications, setSpecifications] = useState<Specifications>(initialData?.specifications || {});
+  const [selectedInterfaces, setSelectedInterfaces] = useState<Record<string, string[]>>({});
+  const [notes, setNotes] = useState(initialData?.notes || "");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const addComponent = useComponentsStore((state) => state.addComponent);
-  const updateComponent = useComponentsStore((state) => state.updateComponent);
+  const { addComponent, updateComponent } = useComponentsStore();
+  const { logActivity } = useActivitiesStore();
 
   // Filtered indicators based on selected category
   const availableIndicators = CATEGORY_INDICATORS[category] as Indicator[];
@@ -1232,33 +1227,76 @@ export function AddComponentForm({ lastRunningNumber, initialData, mode = 'creat
     }));
   };
 
-  const handleSubmit = () => {
-    const runningNumber = initialData?.runningNumber || String(lastRunningNumber + 1).padStart(3, '0');
-    
-    const componentData: HardwareComponent = {
-      id: initialData?.id || generateComponentId(category, location, ownership, status, indicator, runningNumber),
-      name,
-      category,
-      location,
-      ownership,
-      status,
-      indicator,
-      runningNumber,
-      serialNumber,
-      specifications: Object.fromEntries(
-        Object.entries(specifications).filter(([, value]) => value !== "" && value !== "none")
-      )
-    };
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
 
-    if (mode === 'edit' && initialData) {
-      updateComponent(componentData);
-    } else {
-      addComponent(componentData);
+    try {
+      // Generiere die laufende Nummer
+      const runningNumber = (lastRunningNumber + 1).toString().padStart(4, '0');
+
+      // Generiere die ID
+      const id = generateComponentId(
+        category as Category,
+        location as Location,
+        ownership as Ownership,
+        status as Status,
+        indicator as Indicator,
+        runningNumber
+      );
+
+      // Erstelle die Komponentendaten
+      const componentData: Partial<HardwareComponent> = {
+        id,
+        name,
+        category: category as Category,
+        location: location as Location,
+        ownership: ownership as Ownership,
+        status: status as Status,
+        indicator: indicator as Indicator,
+        runningNumber,
+        serialNumber,
+        specifications: {},
+        notes,
+      };
+
+      // Füge Spezifikationen hinzu, wenn vorhanden
+      if (specifications && Object.keys(specifications).length > 0) {
+        componentData.specifications = specifications;
+      }
+
+      // Entferne leere Felder
+      if (!serialNumber) {
+        delete componentData.serialNumber;
+      }
+      if (!notes) {
+        delete componentData.notes;
+      }
+
+      // Füge die Komponente hinzu
+      await addComponent(componentData as HardwareComponent);
+
+      // Protokolliere die Aktivität
+      await logActivity({
+        type: 'addition',
+        componentId: id,
+        componentName: name,
+        user: 'System',
+        details: `Neue Komponente "${name}" hinzugefügt`
+      });
+
+      // Schließe das Dialog
+      setOpen(false);
+      
+      // Setze das Formular zurück
+      resetForm();
+      onClose?.();
+    } catch (error) {
+      console.error("Fehler beim Hinzufügen der Komponente:", error);
+      setError("Fehler beim Hinzufügen der Komponente");
+    } finally {
+      setIsSubmitting(false);
     }
-
-    setOpen(false);
-    resetForm();
-    onClose?.();
   };
 
   const resetForm = () => {
@@ -1271,6 +1309,7 @@ export function AddComponentForm({ lastRunningNumber, initialData, mode = 'creat
     setSerialNumber("");
     setSpecifications({});
     setSelectedInterfaces({});
+    setNotes("");
   };
 
   const renderSpecificationFields = () => {
@@ -1460,8 +1499,8 @@ export function AddComponentForm({ lastRunningNumber, initialData, mode = 'creat
             <label htmlFor="notes">Anmerkungen</label>
             <textarea
               id="notes"
-              value={specifications.notes || ""}
-              onChange={(e) => handleSpecificationChange("notes", e.target.value)}
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
               placeholder="Optionale Anmerkungen zur Komponente..."
               className="min-h-[100px] p-2 rounded-md border border-input bg-white/50"
             />

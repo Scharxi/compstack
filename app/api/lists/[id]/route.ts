@@ -2,9 +2,15 @@ import { NextResponse } from 'next/server';
 import { updateList, deleteList } from '@/app/services/lists';
 import { auth } from '@/lib/auth';
 
+interface RouteParams {
+  params: {
+    id: string;
+  };
+}
+
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: RouteParams
 ) {
   try {
     // Check authentication
@@ -31,7 +37,10 @@ export async function PUT(
       );
     }
 
-    const list = await updateList(params.id, { name, description, components });
+    // Extrahiere die ID aus den Parametern
+    const listId = params.id;
+    
+    const list = await updateList(listId, { name, description, components });
     return NextResponse.json(list);
   } catch (error) {
     console.error('Failed to update list:', error);
@@ -44,7 +53,7 @@ export async function PUT(
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: RouteParams
 ) {
   try {
     // Check authentication
@@ -53,7 +62,10 @@ export async function DELETE(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    await deleteList(params.id);
+    // Extrahiere die ID aus den Parametern
+    const listId = params.id;
+    
+    await deleteList(listId);
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Failed to delete list:', error);

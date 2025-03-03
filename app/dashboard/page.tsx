@@ -4,7 +4,9 @@ import { useEffect, useMemo } from 'react';
 import { ComponentsTable } from "@/app/components/dashboard/components-table";
 import { AddComponentForm } from "@/app/components/dashboard/add-component-form";
 import { OverviewCards } from "@/app/components/dashboard/overview-cards";
+import { ActivityLog } from "@/app/components/dashboard/activity-log";
 import { useComponentsStore } from "@/app/store/components";
+import { useActivitiesStore } from "@/app/store/activities";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend, PieLabelRenderProps } from 'recharts';
@@ -12,10 +14,12 @@ import { CATEGORIES, LOCATIONS, STATUS, DashboardStats } from "@/app/types/hardw
 
 export default function DashboardPage() {
   const { components, fetchComponents, isLoading, error } = useComponentsStore();
+  const { activities, fetchActivities } = useActivitiesStore();
 
   useEffect(() => {
     fetchComponents();
-  }, [fetchComponents]);
+    fetchActivities();
+  }, [fetchComponents, fetchActivities]);
 
   // Berechne die höchste laufende Nummer
   const getLastRunningNumber = () => {
@@ -39,9 +43,9 @@ export default function DashboardPage() {
         const lastMaintenance = new Date(c.lastMaintenanceDate);
         return now.getTime() - lastMaintenance.getTime() > 180 * 24 * 60 * 60 * 1000; // 180 Tage
       }).length,
-      recentActivities: [] // Würde in einer echten Anwendung befüllt werden
+      recentActivities: activities.slice(0, 5) // Die neuesten 5 Aktivitäten
     };
-  }, [components]);
+  }, [components, activities]);
 
   // Daten für Kategorieverteilung
   const categoryData = useMemo(() => {
@@ -212,27 +216,8 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
-        {/* Letzte Komponenten */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Zuletzt hinzugefügt</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {components.slice(-5).reverse().map(component => (
-                <div key={component.id} className="flex items-center justify-between border-b pb-2">
-                  <div>
-                    <div className="font-medium">{component.name}</div>
-                    <div className="text-sm text-muted-foreground">{component.id}</div>
-                  </div>
-                  <div className="text-sm text-muted-foreground">
-                    {CATEGORIES[component.category]}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+        {/* Aktivitätsprotokoll */}
+        <ActivityLog />
       </div>
 
       {/* Komponententabelle */}

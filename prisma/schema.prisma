@@ -19,7 +19,7 @@ model Component {
   status              String
   indicator           String
   runningNumber       String
-  serialNumber        String
+  serialNumber        String?
   lastMaintenanceDate DateTime?
   assignedTo          String?
   specifications      Json

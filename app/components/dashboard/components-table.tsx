@@ -43,6 +43,14 @@ import { toast } from "sonner";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import { useActivitiesStore } from "@/app/store/activities";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { MoreHorizontal, Edit, Trash, ClipboardCopy } from "lucide-react";
 
 // Hilfsfunktion für einheitliche Datumsformatierung
 function formatDate(date: Date | string | undefined): string {
@@ -159,6 +167,8 @@ export function ComponentsTable({ components }: ComponentsTableProps) {
   const [addToListDialogOpen, setAddToListDialogOpen] = React.useState(false);
   const { deleteComponent, updateComponent } = useComponentsStore();
   const { lists, fetchLists, updateList } = useListsStore();
+  const { logActivity } = useActivitiesStore();
+  const [isDeleting, setIsDeleting] = React.useState<string | null>(null);
 
   React.useEffect(() => {
     fetchLists();
@@ -193,8 +203,24 @@ export function ComponentsTable({ components }: ComponentsTableProps) {
 
   const handleConfirmDelete = async () => {
     if (deletingComponent) {
-      await deleteComponent(deletingComponent.id);
-      setDeletingComponent(null);
+      setIsDeleting(deletingComponent.id);
+      try {
+        await deleteComponent(deletingComponent.id);
+        
+        // Protokolliere die Löschaktivität
+        await logActivity({
+          type: 'retirement',
+          componentId: deletingComponent.id,
+          componentName: deletingComponent.name,
+          user: 'System',
+          details: `Komponente "${deletingComponent.name}" wurde gelöscht`
+        });
+      } catch (error) {
+        console.error("Fehler beim Löschen der Komponente:", error);
+      } finally {
+        setDeletingComponent(null);
+        setIsDeleting(null);
+      }
     }
   };
 
@@ -245,6 +271,10 @@ export function ComponentsTable({ components }: ComponentsTableProps) {
       console.error('Failed to add component to list:', error);
       toast.error('Fehler beim Hinzufügen zur Liste');
     }
+  };
+
+  const handleCopyId = (id: string) => {
+    navigator.clipboard.writeText(id);
   };
 
   return (
