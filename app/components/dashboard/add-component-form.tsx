@@ -34,6 +34,18 @@ import {
   type Indicator
 } from "@/app/types/hardware";
 import { useComponentsStore } from "@/app/store/components";
+import { toast } from "@/components/ui/use-toast";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { InfoCircledIcon } from "@radix-ui/react-icons";
+import {
+  Label,
+  Textarea,
+} from "@/components/ui/label";
 
 interface AddComponentFormProps {
   lastRunningNumber: number;
@@ -1229,7 +1241,11 @@ export function AddComponentForm({ lastRunningNumber, initialData, mode = 'creat
   const [status, setStatus] = useState<Status>(initialData?.status || "AK");
   const [indicator, setIndicator] = useState<Indicator>(initialData?.indicator || "PC");
   const [serialNumber, setSerialNumber] = useState(initialData?.serialNumber || "");
-  const [specifications, setSpecifications] = useState<Specifications>(initialData?.specifications || {});
+  const [specifications, setSpecifications] = useState<Specifications>(() => {
+    // Initialize specifications from initialData or empty object
+    const specs = initialData?.specifications || {};
+    return specs;
+  });
   const [selectedInterfaces, setSelectedInterfaces] = useState<Record<string, string[]>>(() => {
     if (initialData?.specifications?.interfaces) {
       return { interfaces: initialData.specifications.interfaces.split(", ") };
@@ -1492,6 +1508,17 @@ export function AddComponentForm({ lastRunningNumber, initialData, mode = 'creat
           </div>
 
           {renderSpecificationFields()}
+
+          <div className="grid gap-2">
+            <label htmlFor="notes">Anmerkungen</label>
+            <textarea
+              id="notes"
+              value={specifications.notes || ""}
+              onChange={(e) => handleSpecificationChange("notes", e.target.value)}
+              placeholder="Optionale Anmerkungen zur Komponente..."
+              className="min-h-[100px] p-2 rounded-md border border-input bg-white/50"
+            />
+          </div>
 
           <div className="flex justify-end space-x-4">
             <Button 

@@ -40,38 +40,29 @@ export type Indicator =
   | "NIC" // Network Card
   | "SR"  // Server
   | "PK"  // Patch Cable
-  | "VR"; // VR Headset
+  | "VR"  // VR Headset
+  | "ST"  // Smartphone
+  | "HD"  // Headset
+  | "SO"; // Sonstiges
 
 export const INDICATORS: Record<Indicator, string> = {
-  // IT-Equipment
   PC: "Desktop Computer",
   LT: "Laptop",
-  TB: "Tablet",
-  SR: "Server",
-  PR: "Drucker",
-  MO: "Monitor",
-  // IT-Komponenten
+  MON: "Monitor",
   GPU: "Grafikkarte",
+  CPU: "Prozessor",
   RAM: "Arbeitsspeicher",
-  SSD: "SSD-Festplatte",
-  HDD: "HDD-Festplatte",
-  // Netzwerk-Komponenten
+  SSD: "SSD-Speicher",
+  HDD: "HDD-Speicher",
   SW: "Switch",
   RT: "Router",
   AP: "Access Point",
   NIC: "Netzwerkkarte",
-  PK: "Patch-Kabel",
-  // Werkzeug
-  MM: "Multimeter",
-  LK: "Lötkolben",
-  NT: "Netzwerktester",
-  EW: "Elektrowerkzeug",
-  OZ: "Oszilloskop",
-  // Mobile Geräte
+  SR: "Server",
+  PK: "Patchkabel",
+  VR: "VR-Headset",
   ST: "Smartphone",
   HD: "Headset",
-  VR: "VR-Brille",
-  // Sonstiges
   SO: "Sonstiges"
 };
 
@@ -170,10 +161,10 @@ export const MAINTENANCE_TASKS: MaintenanceTask[] = [
 ];
 
 // Mapping von Kategorien zu erlaubten Indikatoren
-export const CATEGORY_INDICATORS: Record<Category, string[]> = {
-  IT: ["PC", "LT", "TB", "SR", "PR", "MO", "GPU", "RAM", "SSD", "HDD", "SW", "RT", "AP", "NIC", "PK", "VR"],
-  WZ: ["MM", "LK", "NT", "EW", "OZ"],
-  MB: ["TB", "ST", "HD"],
+export const CATEGORY_INDICATORS: Record<Category, Indicator[]> = {
+  IT: ["PC", "LT", "MON", "GPU", "CPU", "RAM", "SSD", "HDD", "SR", "VR"],
+  WZ: ["SW", "RT", "AP", "NIC", "PK"],
+  MB: ["ST", "HD"],
   SO: ["SO"]
 };
 

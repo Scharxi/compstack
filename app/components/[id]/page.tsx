@@ -166,8 +166,10 @@ export default function ComponentDetailsPage({ params }: ComponentDetailsProps) 
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              
               {Object.entries(component.specifications).map(([key, value]) => {
+                // Skip notes as they will be displayed separately
+                if (key === 'notes') return null;
+                
                 const specFields = SPECIFICATIONS_CONFIG[component.category as Category]?.[component.indicator];
                 const label = specFields?.[key]?.label || key;
                 
@@ -207,6 +209,17 @@ export default function ComponentDetailsPage({ params }: ComponentDetailsProps) 
             <CardContent>
               <p className="text-sm text-muted-foreground">Zugewiesen an</p>
               <p className="font-medium">{component.assignedTo}</p>
+            </CardContent>
+          </Card>
+        )}
+
+        {component.specifications?.notes && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Anmerkungen</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm whitespace-pre-wrap">{component.specifications.notes}</p>
             </CardContent>
           </Card>
         )}
