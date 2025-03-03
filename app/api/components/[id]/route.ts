@@ -43,6 +43,8 @@ export async function PUT(
     
     // Handle maintenance protocol if present
     if (data.newMaintenanceProtocol) {
+      // Extract and ignore maintenanceHistory to prevent Prisma errors
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { newMaintenanceProtocol, maintenanceHistory, ...componentData } = data;
       
       try {
@@ -86,6 +88,8 @@ export async function PUT(
     }
 
     // Regular component update without maintenance
+    // Extract and ignore maintenanceHistory to prevent Prisma errors
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { maintenanceHistory, ...updateData } = data;
     const component = await prisma.component.update({
       where: {
@@ -133,6 +137,16 @@ export async function DELETE(
     await prisma.maintenanceProtocol.deleteMany({
       where: {
         componentId: decodedId
+      }
+    });
+
+    // Manually set componentId to null for all related activities
+    await prisma.activity.updateMany({
+      where: {
+        componentId: decodedId
+      },
+      data: {
+        componentId: null
       }
     });
 
