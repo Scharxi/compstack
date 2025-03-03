@@ -7,8 +7,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { 
   Select,
@@ -23,7 +21,6 @@ import {
   OWNERSHIPS, 
   STATUS, 
   INDICATORS,
-  MAINTENANCE_TASKS,
   CATEGORY_INDICATORS,
   SPECIFICATIONS_CONFIG,
   type HardwareComponent,
@@ -33,7 +30,6 @@ import {
 import { useComponentsStore } from "@/app/store/components";
 import { fetchComponent } from '@/app/services/api';
 import { ThemeToggle } from "@/app/components/theme-toggle";
-import { MaintenanceDialog } from "@/app/components/maintenance/maintenance-dialog";
 import { MaintenanceHistory } from "@/app/components/maintenance/maintenance-history";
 
 interface ComponentDetailsProps {
@@ -144,18 +140,6 @@ export default function ComponentDetailsPage({ params }: ComponentDetailsProps) 
         }
       });
     }
-  };
-
-  const handleMaintenanceTaskToggle = (taskId: string) => {
-    setCompletedTasks(prev => 
-      prev.includes(taskId) 
-        ? prev.filter(id => id !== taskId)
-        : [...prev, taskId]
-    );
-  };
-
-  const handleMaintenanceNotesChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setMaintenanceNotes(e.target.value);
   };
 
   const handleSaveMaintenance = async (data: { completedTasks: string[], notes: string }) => {

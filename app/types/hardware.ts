@@ -189,6 +189,62 @@ export type SpecificationFields = Record<string, SpecificationField>;
 
 export const SPECIFICATIONS_CONFIG: Record<Category, Record<string, SpecificationFields>> = {
   IT: {
+    VR: {
+      manufacturer: { label: "Hersteller", type: "text", required: true },
+      model: { label: "Modell", type: "text", required: true },
+      type: { 
+        label: "Typ", 
+        type: "select", 
+        options: ["Standalone", "Tethered", "Smartphone-basiert"],
+        required: true 
+      },
+      displayResolution: { 
+        label: "Display-Auflösung", 
+        type: "select",
+        options: ["1832 x 1920", "2160 x 2160", "2880 x 1600", "3664 x 1920"],
+        required: true 
+      },
+      refreshRate: { 
+        label: "Bildwiederholrate", 
+        type: "select",
+        options: ["60 Hz", "72 Hz", "90 Hz", "120 Hz", "144 Hz"],
+        required: true 
+      },
+      fieldOfView: { 
+        label: "Sichtfeld", 
+        type: "select",
+        options: ["90°", "100°", "110°", "120°"],
+        required: true 
+      },
+      tracking: { 
+        label: "Tracking", 
+        type: "select",
+        options: ["3DoF", "6DoF Inside-Out", "6DoF Outside-In"],
+        required: true 
+      },
+      controllers: { 
+        label: "Controller", 
+        type: "select",
+        options: ["Touch Controller", "Knuckles", "Wands", "Hand-Tracking"],
+        required: true 
+      },
+      connectivity: { 
+        label: "Konnektivität", 
+        type: "select",
+        options: ["USB-C", "DisplayPort", "HDMI", "Wireless"],
+        required: true 
+      },
+      storage: { 
+        label: "Speicher", 
+        type: "select",
+        options: ["64 GB", "128 GB", "256 GB", "512 GB"],
+        required: true 
+      },
+      accessories: { 
+        label: "Zubehör", 
+        type: "text"
+      }
+    },
     PC: {
       CPU: { label: "Prozessor", type: "text", required: true },
       RAM: { label: "Arbeitsspeicher", type: "text", required: true },
