@@ -113,12 +113,7 @@ export interface DashboardStats {
   availableComponents: number;
   inUseComponents: number;
   maintenanceRequired: number;
-  recentActivities: {
-    id: string;
-    type: 'added' | 'updated' | 'removed';
-    component: HardwareComponent;
-    timestamp: Date;
-  }[];
+  recentActivities: Activity[];
 }
 
 export interface Activity {
